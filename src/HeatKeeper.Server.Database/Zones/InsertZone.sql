@@ -1,0 +1,1 @@
+INSERT INTO Zones(Id, Description) VALUES(@id, @description);

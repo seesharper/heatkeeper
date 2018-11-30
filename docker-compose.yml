@@ -1,0 +1,30 @@
+version: '3'
+services:
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./influxdb/data:/var/lib/influxdb
+  grafana:
+    image: grafana/grafana:latest
+    depends_on:
+      - influxdb
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+  chronograf:
+    image: chronograf:latest
+    entrypoint: 'chronograf --influxdb-url=http://influxdb:8086'
+    depends_on:
+      - influxdb
+    container_name: chronograf
+    ports: ['8888:8888']
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro

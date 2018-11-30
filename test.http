@@ -1,0 +1,8 @@
+http://localhost:8086/ping
+
+###
+http://localhost:8086/debug/vars
+
+###
+
+http://localhost:8086/metrics
