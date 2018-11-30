@@ -263,3 +263,4 @@ project.json
 /build/dotnet-script
 /dotnet-script
 /.vscode
+*.db
