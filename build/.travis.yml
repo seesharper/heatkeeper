@@ -9,8 +9,7 @@ mono:
 matrix:
   include:
     - os: linux
-      dist: trusty      
-      sudo: required          
-script:      
+      dist: trusty
+script:
   - chmod +x build.sh
   - ./build.sh
