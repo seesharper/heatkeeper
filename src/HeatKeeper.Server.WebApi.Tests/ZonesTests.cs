@@ -31,18 +31,11 @@ namespace HeatKeeper.Server.WebApi.Tests
         public async Task TestShouldCreateZone()
         {
             var client = _factory.CreateClient();
-            var response = await client.PostAsync("api/zones", new JsonContent(new CreateZoneRequest("1", "TEST")));
-            response.EnsureSuccessStatusCode();            
+            var response = await client.PostAsync("api/zones", new JsonContent(new CreateZoneRequest("1", "TEST")));            
+            response.EnsureSuccessStatusCode();                        
         }
 
-        [Fact]
-        public async Task TestShouldCreateZone2()
-        {
-            //var client = _factory.CreateClient();
-            // var response = await client.PostAsync("api/zones", new JsonContent(new CreateZoneRequest("1", "TEST")));
-            // response.EnsureSuccessStatusCode();
-            // throw new Exception();
-        }
+       
     }
 
     public class JsonContent : StringContent
