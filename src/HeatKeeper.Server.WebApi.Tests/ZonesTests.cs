@@ -1,9 +1,14 @@
 using System;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
+using HeatKeeper.Server.CQRS;
 using HeatKeeper.Server.Host;
+using HeatKeeper.Server.WebApi.Tests.Transactions;
 using HeatKeeper.Server.WebApi.Zones;
+using LightInject;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -15,14 +20,28 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public ZonesTests(WebApplicationFactory<Startup> factory)
         {
-            _factory = factory;
+            _factory = factory.WithWebHostBuilder(builder => {
+                builder.ConfigureTestContainer<IServiceContainer>(c => {
+                    c.Decorate(typeof(ICommandHandler<>), typeof(RollbackCommandHandler<>));
+                });
+            });            
         }
 
         [Fact]
-        public void TestShouldCreateZone()
+        public async Task TestShouldCreateZone()
         {
             var client = _factory.CreateClient();
-            var response = client.PostAsync("api/zones", new JsonContent(new CreateZoneRequest("1", "TEST")));
+            var response = await client.PostAsync("api/zones", new JsonContent(new CreateZoneRequest("1", "TEST")));
+            response.EnsureSuccessStatusCode();            
+        }
+
+        [Fact]
+        public async Task TestShouldCreateZone2()
+        {
+            //var client = _factory.CreateClient();
+            // var response = await client.PostAsync("api/zones", new JsonContent(new CreateZoneRequest("1", "TEST")));
+            // response.EnsureSuccessStatusCode();
+            // throw new Exception();
         }
     }
 

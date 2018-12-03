@@ -13,6 +13,7 @@ namespace HeatKeeper.Server.Database
         {
             serviceRegistry.RegisterScoped(CreateConnection);
             serviceRegistry.RegisterSingleton<IDatabaseInitializer, DatabaseInitializer>();
+            serviceRegistry.RegisterSingleton<ISqlProvider,SqlProvider>();
         }
 
         private IDbConnection CreateConnection(IServiceFactory factory)
