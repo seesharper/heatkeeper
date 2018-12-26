@@ -1,0 +1,1 @@
+SELECT name, description from locations order by name

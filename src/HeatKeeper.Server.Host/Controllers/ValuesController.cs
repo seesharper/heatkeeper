@@ -10,10 +10,15 @@ namespace heatkeeper_server.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        public ValuesController(DisposeTest test)
+        {
+        }
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
+            //throw new Exception("This is a exception");
             return new string[] { "value1", "value2" };
         }
 
@@ -40,6 +45,14 @@ namespace heatkeeper_server.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+    }
+
+    public class DisposeTest : IDisposable
+    {
+        public void Dispose()
+        {
+
         }
     }
 }
