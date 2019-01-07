@@ -21,7 +21,7 @@ namespace HeatKeeper.Server.Zones
 
         public async Task<ZoneQueryResult[]> HandleAsync(GetAllZonesQuery query, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var result = await dbConnection.ReadAsync<ZoneQueryResult>(sqlProvider.GetAllZones);
+            var result = await dbConnection.ReadAsync<ZoneQueryResult>(sqlProvider.GetAllZones, query);
             return result.ToArray();
         }
     }

@@ -2,14 +2,16 @@ namespace HeatKeeper.Server.WebApi.Zones
 {
     public class CreateZoneRequest
     {
-        public CreateZoneRequest(string id, string description)
+        public CreateZoneRequest(string name, string description, string location)
         {
-            Id = id;
+            Name = name;
             Description = description;
+            Location = location;
         }
 
-        public string Id { get; }
+        public string Name { get; }
         public string Description { get; }
+        public string Location { get; }
     }
 
 }

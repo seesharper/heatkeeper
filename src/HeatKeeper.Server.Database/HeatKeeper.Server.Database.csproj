@@ -15,10 +15,14 @@
   <ItemGroup>
     <None Remove="Zones\InsertZone.sql" />
     <None Remove="Zones\GetAllZones.sql" />
+    <None Remove="Locations\InsertLocations.sql" />
+    <None Remove="Locations\GetAllLocations.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Zones\InsertZone.sql" />
     <EmbeddedResource Include="Zones\GetAllZones.sql" />
+    <EmbeddedResource Include="Locations\InsertLocation.sql" />
+    <EmbeddedResource Include="Locations\GetAllLocations.sql" />
   </ItemGroup>
 </Project>

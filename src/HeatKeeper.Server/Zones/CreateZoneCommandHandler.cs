@@ -19,9 +19,9 @@ namespace HeatKeeper.Server.Zones
             this.sqlProvider = sqlProvider;
         }
 
-        public Task HandleAsync(CreateZoneCommand command, CancellationToken cancellationToken = default(CancellationToken))
-        {                        
-            return ((DbCommand)dbConnection.CreateCommand(sqlProvider.InsertZone, command)).ExecuteNonQueryAsync();            
+        public async Task HandleAsync(CreateZoneCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            await ((DbCommand)dbConnection.CreateCommand(sqlProvider.InsertZone, command)).ExecuteNonQueryAsync();
         }
     }
 }
