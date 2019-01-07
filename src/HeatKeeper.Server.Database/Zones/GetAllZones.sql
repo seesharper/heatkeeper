@@ -1,5 +1,10 @@
-SELECT 
-    id,
-    description
+SELECT
+    Id,
+    Description
 FROM
-    zones
+    Zones z
+INNER JOIN
+    Locations l
+ON
+    z.LocationId    =   l.Id AND
+    l.Name          =   @location

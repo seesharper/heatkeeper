@@ -2,4 +2,10 @@
     "cSpell.words": [
         "heatkeeper"
     ]
+    ,"omnisharp.path": "/Users/bernhardrichter/GitHub/omnisharp-roslyn/bin/Debug/OmniSharp.Stdio.Driver/net461/OmniSharp.exe",
+    "omnisharp.useGlobalMono": "always",
+    "csharp.unitTestDebuggingOptions": {
+        "type": "coreclr"
+    }
+
 }

@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="LightInject.Microsoft.AspNetCore.Hosting" Version="1.0.0" />
+    <PackageReference Include="Refit.HttpClientFactory" Version="4.6.58" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HeatKeeper.Server\HeatKeeper.Server.csproj" />

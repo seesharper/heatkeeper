@@ -1,18 +1,12 @@
 version: '3'
 services:
-  heatkeeper:
-    build: .
-    image: seesharper/heatkeeper
-    container_name: heatkeeper
-    ports:
-      - "5000:80"
   influxdb:
     image: influxdb:latest
     container_name: influxdb
     ports:
       - "8086:8086"
     volumes:
-      - ./influxdb/data:/var/lib/influxdb
+      - ./db/influxdb/data:/var/lib/influxdb
   grafana:
     image: grafana/grafana:latest
     depends_on:
@@ -21,7 +15,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana/data:/var/lib/grafana
+      - ./db/grafana/data:/var/lib/grafana
   chronograf:
     image: chronograf:latest
     entrypoint: 'chronograf --influxdb-url=http://influxdb:8086'

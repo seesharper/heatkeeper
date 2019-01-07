@@ -8,6 +8,10 @@ namespace HeatKeeper.Server.Database
         string InsertZone { get; }
 
         string GetAllZones { get; }
+
+        string InsertLocation { get; }
+
+        string GetAllLocations { get; }
     }
 
     public class SqlProvider : ISqlProvider
@@ -16,6 +20,11 @@ namespace HeatKeeper.Server.Database
         public string InsertZone { get => Load("Zones.InsertZone"); }
 
         public string GetAllZones { get => Load("Zones.GetAllZones"); }
+
+        public string InsertLocation { get => Load("Locations.InsertLocation"); }
+
+        public string GetAllLocations { get => Load("Locations.GetAllLocations"); }
+
 
         public string Load(string name)
         {

@@ -7,7 +7,7 @@ using LightInject;
 namespace HeatKeeper.Server.CQRS
 {
     /// <summary>
-    /// Extends the <see cref="IServiceRegistry"/> interface     
+    /// Extends the <see cref="IServiceRegistry"/> interface
     /// </summary>
     public static class ContainerExtensions
     {
@@ -25,7 +25,7 @@ namespace HeatKeeper.Server.CQRS
                     .Select(t => GetGenericInterface(t, typeof(ICommandHandler<>)))
                     .Where(m => m != null);
             RegisterHandlers(serviceRegistry, commandTypes);
-            serviceRegistry.Register<ICommandExecutor>(factory => new CommandExecutor((IServiceFactory)serviceRegistry));
+            serviceRegistry.Register<ICommandExecutor>(factory => new CommandExecutor(GetCurrentScope(factory)), new PerScopeLifetime());
             return serviceRegistry;
         }
 
@@ -42,8 +42,13 @@ namespace HeatKeeper.Server.CQRS
                     .Select(t => GetGenericInterface(t, typeof(IQueryHandler<,>)))
                     .Where(m => m != null);
             RegisterHandlers(serviceRegistry, commandTypes);
-            serviceRegistry.Register<IQueryExecutor>(factory => new QueryExecutor((IServiceFactory) serviceRegistry));
+            serviceRegistry.Register<IQueryExecutor>(factory => new QueryExecutor(GetCurrentScope(factory)), new PerScopeLifetime());
             return serviceRegistry;
+        }
+
+        private static IServiceFactory GetCurrentScope(IServiceFactory serviceFactory)
+        {
+            return ((IServiceContainer)serviceFactory).ScopeManagerProvider.GetScopeManager(serviceFactory).CurrentScope;
         }
 
         private static (Type, Type)? GetGenericInterface(Type type, Type genericTypeDefinition)
@@ -60,7 +65,7 @@ namespace HeatKeeper.Server.CQRS
                         .Contains(closedGenericInterface);
                     if (!isDecorator)
                     {
-                        return (closedGenericInterface, type);                        
+                        return (closedGenericInterface, type);
                     }
                 }
             }
@@ -75,7 +80,7 @@ namespace HeatKeeper.Server.CQRS
                 {
                     registry.Register(handler.Value.serviceType, handler.Value.implementingType, handler.Value.implementingType.FullName);
                 }
-                
+
             }
         }
     }

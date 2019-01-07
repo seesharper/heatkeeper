@@ -21,16 +21,16 @@ namespace HeatKeeper.Server.WebApi.Zones
 
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CreateZoneRequest createZoneRequest)
-        {            
-            var createZoneCommand = new CreateZoneCommand(createZoneRequest.Id, createZoneRequest.Description);
+        {
+            var createZoneCommand = new CreateZoneCommand(createZoneRequest.Name, createZoneRequest.Description, createZoneRequest.Location);
             await commandExecutor.ExecuteAsync(createZoneCommand);
-            return CreatedAtAction(nameof(Post), new { id = createZoneRequest.Id });
+            return CreatedAtAction(nameof(Post), new { id = createZoneRequest.Name });
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(string location)
         {
-            var result = await queryExecutor.ExecuteAsync(new GetAllZonesQuery());
+            var result = await queryExecutor.ExecuteAsync(new GetAllZonesQuery(location));
             var response = result.Select(zrq => new ZoneResponse(zrq.Id, zrq.Description)).ToArray();
             return Ok(response);
         }
