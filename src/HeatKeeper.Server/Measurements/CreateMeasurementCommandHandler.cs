@@ -1,45 +1,30 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
+using System.Threading;
+using System.Data.Common;
+using System.Data;
+using HeatKeeper.Server.Database;
 using HeatKeeper.Server.CQRS;
-using Vibrant.InfluxDB.Client;
+using DbReader;
 
 namespace HeatKeeper.Server.Measurements
 {
-    public class CreateMeasurementCommandHandler : ICommandHandler<CreateMeasurementCommand[]>
+    public class CreateMeasurementsCommandHandler : ICommandHandler<CreateMeasurementCommand[]>
     {
-        private readonly IInfluxClient influxClient;
-        private readonly IMapper mapper;
+        private readonly IDbConnection dbConnection;
+        private readonly ISqlProvider sqlProvider;
 
-        public CreateMeasurementCommandHandler(IInfluxClient influxClient, IMapper mapper)
+        public CreateMeasurementsCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
         {
-            this.influxClient = influxClient;
-            this.mapper = mapper;
+            this.dbConnection = dbConnection;
+            this.sqlProvider = sqlProvider;
         }
 
         public async Task HandleAsync(CreateMeasurementCommand[] commands, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var influxMeasurements = mapper.Map<CreateMeasurementCommand[], InFluxMeasurement[]>(commands);            
-            await influxClient.WriteAsync("heatkeeper", influxMeasurements);
+            foreach (var command in commands)
+            {
+                await ((DbCommand)dbConnection.CreateCommand(sqlProvider.InsertMeasurement, command)).ExecuteNonQueryAsync();
+            }
         }
     }
-
-    public class InFluxMeasurement
-{
-   [InfluxTimestamp]
-   public DateTime Timestamp { get; set; }
-
-   [InfluxTag( "location" )]
-   public string Location { get; set; }
-
-   [InfluxTag( "zone" )]
-   public string Zone { get; set; }
-
-   [InfluxField( "temperature" )]
-   public double Temperature { get; set; }
-
-   [InfluxField( "humidity" )]
-   public long Humidity { get; set; }
-}
 }

@@ -2,17 +2,15 @@ namespace HeatKeeper.Server.Measurements
 {
     public class CreateMeasurementCommand
     {
-        public CreateMeasurementCommand(string sensorId, double batteryLevel ,double temperature, double humidity)
+        public CreateMeasurementCommand(string sensorId, int measurementType, double value)
         {
             SensorId = sensorId;
-            BatteryLevel = batteryLevel;
-            Temperature = temperature;
-            Humidity = humidity;
+            MeasurementType = measurementType;
+            Value = value;
         }
 
         public string SensorId { get; }
-        public double BatteryLevel { get; }
-        public double Temperature { get; }
-        public double Humidity { get; }
+        public int MeasurementType { get; }
+        public double Value { get; }
     }
 }

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Refit;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace HeatKeeper.Server.Host
 {
@@ -37,6 +38,11 @@ namespace HeatKeeper.Server.Host
             // https://stackoverflow.com/questions/38661090/token-based-authentication-in-web-api-without-any-user-interface
 
             // https://developer.okta.com/blog/2018/02/01/secure-aspnetcore-webapi-token-auth
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Heatkeeper", Version = "v1" });
+            });
         }
 
         public void ConfigureContainer(IServiceContainer container)
@@ -65,6 +71,15 @@ namespace HeatKeeper.Server.Host
                 app.UseDeveloperExceptionPage();
                 //app.UseHsts();
             }
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = string.Empty;
+            });
 
             //app.UseHttpsRedirection();
             app.UseMvc();

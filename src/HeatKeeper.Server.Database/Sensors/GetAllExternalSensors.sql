@@ -1,0 +1,4 @@
+SELECT
+    ExternalId
+FROM
+    Sensors

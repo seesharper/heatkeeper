@@ -2,9 +2,9 @@ using HeatKeeper.Server.CQRS;
 
 namespace HeatKeeper.Server.Zones
 {
-    public class GetAllZonesQuery : IQuery<ZoneQueryResult[]>
+    public class ZonesByLocationQuery : IQuery<ZoneQueryResult[]>
     {
-        public GetAllZonesQuery(string location)
+        public ZonesByLocationQuery(string location)
         {
             Location = location;
         }

@@ -8,18 +8,18 @@ using System.Linq;
 
 namespace HeatKeeper.Server.Zones
 {
-    public class GetAllZonesQueryHandler : IQueryHandler<GetAllZonesQuery, ZoneQueryResult[]>
+    public class ZonesByLocationQueryHandler : IQueryHandler<ZonesByLocationQuery, ZoneQueryResult[]>
     {
         private readonly IDbConnection dbConnection;
         private readonly ISqlProvider sqlProvider;
 
-        public GetAllZonesQueryHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
+        public ZonesByLocationQueryHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
         {
             this.dbConnection = dbConnection;
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task<ZoneQueryResult[]> HandleAsync(GetAllZonesQuery query, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<ZoneQueryResult[]> HandleAsync(ZonesByLocationQuery query, CancellationToken cancellationToken = default(CancellationToken))
         {
             var result = await dbConnection.ReadAsync<ZoneQueryResult>(sqlProvider.GetAllZones, query);
             return result.ToArray();

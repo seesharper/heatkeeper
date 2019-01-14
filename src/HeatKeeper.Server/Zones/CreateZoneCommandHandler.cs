@@ -1,10 +1,10 @@
+using DbReader;
+using HeatKeeper.Server.CQRS;
+using HeatKeeper.Server.Database;
 using System.Data;
+using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Server.CQRS;
-using DbReader;
-using System.Data.Common;
-using HeatKeeper.Server.Database;
 
 namespace HeatKeeper.Server.Zones
 {

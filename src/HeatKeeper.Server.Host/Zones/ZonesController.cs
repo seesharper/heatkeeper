@@ -30,7 +30,7 @@ namespace HeatKeeper.Server.WebApi.Zones
         [HttpGet]
         public async Task<IActionResult> Get(string location)
         {
-            var result = await queryExecutor.ExecuteAsync(new GetAllZonesQuery(location));
+            var result = await queryExecutor.ExecuteAsync(new ZonesByLocationQuery(location));
             var response = result.Select(zrq => new ZoneResponse(zrq.Id, zrq.Description)).ToArray();
             return Ok(response);
         }
