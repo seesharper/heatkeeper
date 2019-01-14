@@ -8,20 +8,23 @@ using DbReader;
 
 namespace HeatKeeper.Server.Measurements
 {
-    public class CreateMeasurementCommandHandler : ICommandHandler<CreateMeasurementCommand>
+    public class CreateMeasurementsCommandHandler : ICommandHandler<CreateMeasurementCommand[]>
     {
         private readonly IDbConnection dbConnection;
         private readonly ISqlProvider sqlProvider;
 
-        public CreateMeasurementCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
+        public CreateMeasurementsCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
         {
             this.dbConnection = dbConnection;
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task HandleAsync(CreateMeasurementCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(CreateMeasurementCommand[] commands, CancellationToken cancellationToken = default(CancellationToken))
         {
-            await ((DbCommand)dbConnection.CreateCommand(sqlProvider.InsertMeasurement, command)).ExecuteNonQueryAsync();
+            foreach (var command in commands)
+            {
+                await ((DbCommand)dbConnection.CreateCommand(sqlProvider.InsertMeasurement, command)).ExecuteNonQueryAsync();
+            }
         }
     }
 }
