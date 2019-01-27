@@ -1,12 +1,12 @@
 using System;
 using System.Data;
 using System.Net.Http;
-
 using HeatKeeper.Server.CQRS;
 using HeatKeeper.Server.Database.Transactions;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Logging;
 using HeatKeeper.Server.Mapping;
+using HeatKeeper.Server.Users;
 using LightInject;
 using Refit;
 using Vibrant.InfluxDB.Client;
@@ -23,7 +23,8 @@ namespace HeatKeeper.Server
                 .Decorate<IDbConnection, ConnectionDecorator>()
                 .RegisterConstructorDependency<Logger>((f,p) => f.GetInstance<LogFactory>()(p.Member.DeclaringType))
                 .RegisterSingleton<IInfluxClient>(f => new InfluxClient(new Uri("http://influxdb:8086")))
-                .RegisterSingleton<IMapper, Mapper>();
+                .RegisterSingleton<IMapper, Mapper>()
+                .RegisterSingleton<IUserService,UserService>();
         }
     }
 }

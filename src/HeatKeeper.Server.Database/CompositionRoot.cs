@@ -3,7 +3,7 @@ using System.Data;
 using System.IO;
 using DbReader;
 using LightInject;
-using Microsoft.Data.Sqlite;
+using System.Data.SQLite;
 using Microsoft.Extensions.Configuration;
 
 namespace HeatKeeper.Server.Database
@@ -21,13 +21,14 @@ namespace HeatKeeper.Server.Database
         {
             var configuration = factory.GetInstance<IConfiguration>();
             var connectionString = configuration["ConnectionString"];
-            SqliteConnection connection = new SqliteConnection(connectionString);
+            SQLiteConnection connection = new SQLiteConnection(connectionString);
             connection.Disposed += (a,e) => {
                 Console.WriteLine("Disposed");
             };
             DbReaderOptions.WhenReading<long?>().Use((rd, i)=> rd.GetInt32(i));
             DbReaderOptions.WhenReading<long>().Use((rd, i)=> rd.GetInt32(i));
             DbReaderOptions.WhenReading<string>().Use((rd, i)=> (string)rd.GetValue(i));
+            DbReaderOptions.WhenReading<bool>().Use((rd, i)=> rd.GetInt32(i) == 0 ? false : true);
             connection.Open();
             return connection;
         }

@@ -65,18 +65,42 @@
 		  "            this.sqlProvider = sqlProvider;",
 		  "        }",
 		  "",
-		  "        public async Task HandleAsync(SampleCommand command, CancellationToken cancellationToken = default(CancellationToken))",
+		  "        public async Task HandleAsync(${TM_FILENAME/(.*)\\Handler..+$/$1/} command, CancellationToken cancellationToken = default(CancellationToken))",
 		  "        {            ",
 		  "        }",
 		  "    }",
 		  "",
-		  "    public class SampleCommand",
+		  "    public class ${TM_FILENAME/(.*)\\Handler..+$/$1/}",
 		  "    {        ",
 		  "    }",
 		  "}"
 		],
 		"description": "Command Handler"
-	  }
+	  },
+	  "public class": {
+		"prefix": "pc",
+		"body": [
+		  "namespace ${TM_DIRECTORY/(.*src.)|(src.*)|([\\/])/${2}${3:+.}/g}",
+		  "{",
+		  "    public class ${TM_FILENAME/(.*)\\..+$/$1/}",
+		  "    {        ",
+		  "    }",
+		  "}"
+		],
+		"description": "public class"
+	  },
+		"public interface": {
+			"prefix": "pi",
+			"body": [
+				"namespace ${TM_DIRECTORY/(.*src.)|(src.*)|([\\/])/${2}${3:+.}/g}",
+				"{",
+				"    public interface ${TM_FILENAME/(.*)\\..+$/$1/}",
+				"    {        ",
+				"    }",
+				"}"
+			],
+			"description": "public class"
+			}
 
 
 }

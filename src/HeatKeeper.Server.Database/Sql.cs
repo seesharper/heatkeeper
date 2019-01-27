@@ -20,6 +20,10 @@ namespace HeatKeeper.Server.Database
         string GetAllSensors { get; }
 
         string GetAllExternalSensors { get; }
+
+        string InsertUser { get; }
+
+        string GetUser {get;}
     }
 
     public class SqlProvider : ISqlProvider
@@ -40,6 +44,10 @@ namespace HeatKeeper.Server.Database
         public string GetAllSensors { get => Load("Sensors.GetAllSensors"); }
 
         public string GetAllExternalSensors { get => Load("Sensors.GetAllExternalSensors"); }
+
+        public string InsertUser { get => Load("Users.InsertUser"); }
+
+        public string GetUser { get => Load("Users.GetUser"); }
 
         public string Load(string name)
         {

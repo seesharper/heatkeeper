@@ -12,6 +12,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Refit;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace HeatKeeper.Server.Host
 {
@@ -28,7 +31,7 @@ namespace HeatKeeper.Server.Host
         {
             //services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddControllersAsServices();
-
+            services.Configure<Settings>(Configuration);
             // var test = Refit.RestService.For<IHelloClient>("http://github.com");
 
             // var test2 = test.GetType().Assembly.CodeBase;
@@ -38,6 +41,32 @@ namespace HeatKeeper.Server.Host
             // https://stackoverflow.com/questions/38661090/token-based-authentication-in-web-api-without-any-user-interface
 
             // https://developer.okta.com/blog/2018/02/01/secure-aspnetcore-webapi-token-auth
+
+
+
+
+            // configure jwt authentication
+            var appSettings = Configuration.Get<Settings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
+
 
             services.AddSwaggerGen(c =>
             {
