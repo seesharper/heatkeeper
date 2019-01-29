@@ -100,7 +100,17 @@
 				"}"
 			],
 			"description": "public class"
+			},
+			"public async method" : {
+				"prefix": "pas",
+				"body": [
+				"public async Task ${1:method}",
+				"{",
+				"}"
+				],
+				"description": "public async method"
 			}
+
 
 
 }

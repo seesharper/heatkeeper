@@ -1,20 +1,18 @@
 namespace HeatKeeper.Server.Users
 {
-    public class CreateUserCommand
+    public class NewUser
     {
-        public CreateUserCommand(string name, string email, string hashedPassword, bool isAdmin)
+        public NewUser(string name, string email, bool isAdmin, string password)
         {
             Name = name;
             Email = email;
-            HashedPassword = hashedPassword;
             IsAdmin = isAdmin;
+            Password = password;
         }
 
         public string Name { get; }
         public string Email { get; }
-        public string HashedPassword { get; }
         public bool IsAdmin { get; }
-
-        public long Id { get; set;}
+        public string Password { get; }
     }
 }

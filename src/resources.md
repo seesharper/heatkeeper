@@ -18,3 +18,7 @@ https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?
 
 
 https://stackoverflow.com/questions/38340078/how-to-decode-jwt-token
+
+https://tahirnaushad.com/2017/09/04/consuming-asp-net-core-2-0-web-api-using-httpclient/
+
+https://fullstackmark.com/post/13/jwt-authentication-with-aspnet-core-2-web-api-angular-5-net-core-identity-and-facebook-login

@@ -1,1 +1,1 @@
-SELECT name, description from locations order by name
+SELECT id, name, description from locations order by name

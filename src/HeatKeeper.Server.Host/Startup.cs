@@ -15,6 +15,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using HeatKeeper.Server.Users;
 
 namespace HeatKeeper.Server.Host
 {
@@ -48,6 +49,9 @@ namespace HeatKeeper.Server.Host
             // configure jwt authentication
             var appSettings = Configuration.Get<Settings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            var test = Encoding.UTF8.GetBytes(appSettings.Secret);
+
+
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -76,6 +80,7 @@ namespace HeatKeeper.Server.Host
 
         public void ConfigureContainer(IServiceContainer container)
         {
+            container.Register<IUserContext, UserContext>();
             container.RegisterScoped<DisposeTest, DisposeTest>();
             container.RegisterFrom<HeatKeeper.Server.Database.CompositionRoot>();
             container.RegisterFrom<HeatKeeper.Server.CompositionRoot>();
@@ -109,6 +114,13 @@ namespace HeatKeeper.Server.Host
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
                 c.RoutePrefix = string.Empty;
             });
+
+
+
+
+            app.UseAuthentication();
+
+
 
             //app.UseHttpsRedirection();
             app.UseMvc();

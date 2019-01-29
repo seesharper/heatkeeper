@@ -1,0 +1,1 @@
+SELECT Id FROM Locations WHERE Name = @Name

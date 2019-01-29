@@ -15,6 +15,8 @@ using Xunit.Abstractions;
 using FluentAssertions;
 using System.Linq;
 using System.Data;
+using System.Net.Http;
+using AutoFixture;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
@@ -22,6 +24,8 @@ namespace HeatKeeper.Server.WebApi.Tests
     public class TestBase : IDisposable
     {
         private IServiceContainer _container;
+
+
 
         public TestBase(ITestOutputHelper testOutputHelper)
         {
@@ -32,9 +36,11 @@ namespace HeatKeeper.Server.WebApi.Tests
             testOutputHelper.Capture();
         }
 
-
+        public Fixture Fixture => new Fixture();
 
         public WebApplicationFactory<Startup> Factory { get; }
+
+
 
         public void Dispose()
         {
@@ -53,19 +59,38 @@ namespace HeatKeeper.Server.WebApi.Tests
         public async Task ShouldCreateLocation()
         {
             var client = Factory.CreateClient();
-            var response = await client.PostAsync("api/locations", new JsonContent(new CreateLocationRequest("Home", "This is my home in Norway")));
+            var response = await client.CreateLocation(Fixture.Create<CreateLocationRequest>());
             response.EnsureSuccessStatusCode();
+            response.ContentAs<CreateLocationResponse>().Id.Should().Be(1);
         }
 
         [Fact]
         public async Task ShouldGetLocations()
         {
             var client = Factory.CreateClient();
+            var firstRequest = Fixture.Create<CreateLocationRequest>();
+            var secondRequest = Fixture.Create<CreateLocationRequest>();
+            await client.CreateLocation(firstRequest);
+            await client.CreateLocation(secondRequest);
 
-            await client.PostAsync("api/locations", new JsonContent(new CreateLocationRequest("Home", "This is my home in Norway")));
-            await client.PostAsync("api/locations", new JsonContent(new CreateLocationRequest("Cabin", "This is my cabin in Sweden")));
             var locations = await client.GetAsync<GetLocationsResponse[]>("api/locations");
+
             locations.Length.Should().Be(2);
+        }
+
+        [Fact]
+        public async Task ShouldAddUser()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+            var createLocationRequest = new HttpRequestBuilder()
+                .AddMethod(HttpMethod.Post)
+                .AddBearerToken(token)
+                .AddRequestUri("api/locations")
+                .AddContent(new JsonContent(TestRequests.CreateTestLocationRequest))
+                .Build();
+
+            await client.SendAsync(createLocationRequest);
         }
     }
 }

@@ -28,10 +28,10 @@ namespace HeatKeeper.Server.Users
             this.queryExecutor = queryExecutor;
         }
 
-        public async Task CreateUser(string name, string password, bool isAdmin, string email)
+        public async Task CreateUser(NewUser user)
         {
-            var hashedPassword = passwordHasher.HashPassword(this, password);
-            var createUserCommand = new CreateUserCommand(name, email, hashedPassword, isAdmin);
+            var hashedPassword = passwordHasher.HashPassword(this, user.Password);
+            var createUserCommand = new CreateUserCommand(user.Name, user.Email, hashedPassword, user.IsAdmin);
             await commandExecutor.ExecuteAsync(createUserCommand);
         }
 
@@ -40,7 +40,7 @@ namespace HeatKeeper.Server.Users
             var user = await queryExecutor.ExecuteAsync(new GetUserQuery(name));
             if (user == null && name == AdminUser.UserName)
             {
-                await CreateUser(AdminUser.UserName, AdminUser.DefaultPassword, true, "E-Mail address goes here");
+                await CreateUser(new NewUser(AdminUser.UserName, "E-mail address goes here", true, AdminUser.DefaultPassword));
                 return await Authenticate(name, password);
             }
             if (user != null)
@@ -57,10 +57,12 @@ namespace HeatKeeper.Server.Users
         private string CreateToken(GetUserQueryResult user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("appSettings.Secret");
+            var key = Encoding.ASCII.GetBytes(settings.Secret);
             List<Claim> claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Name, user.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.Name, user.Name));
+            claims.Add(new Claim(ClaimTypes.Email, user.Email));
             claims.Add(new Claim(ClaimTypes.Role, user.IsAdmin ? "admin" : "user"));
+            claims.Add(new Claim(ClaimTypes.Sid, user.Id.ToString()));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

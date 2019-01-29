@@ -22,7 +22,8 @@ namespace HeatKeeper.Server.Users
 
         public async Task HandleAsync(CreateUserCommand command, CancellationToken cancellationToken = default(CancellationToken))
         {
-            await ((DbCommand)dbConnection.CreateCommand(sqlProvider.InsertUser, command)).ExecuteNonQueryAsync();
+            await dbConnection.ExecuteAsync(sqlProvider.InsertUser, command);
+            command.Id = await dbConnection.ExecuteScalarAsync<long>(sqlProvider.GetUserId, new { command.Name });
         }
     }
 }

@@ -23,11 +23,19 @@ namespace HeatKeeper.Server.Host.Locations
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CreateLocationRequest createLocationRequest)
+        public async Task<ActionResult<CreateLocationResponse>> Post([FromBody] CreateLocationRequest request)
         {
-            var command = mapper.Map<CreateLocationRequest,CreateLocationCommand>(createLocationRequest);
+            var command = new CreateLocationCommand(request.Name, request.Description);
             await commandExecutor.ExecuteAsync(command);
-            return CreatedAtAction(nameof(Post), new { id = createLocationRequest.Name });
+            return CreatedAtAction(nameof(Post), new CreateLocationResponse(command.Id));
+        }
+
+        [HttpPost("adduser")]
+        public async Task<IActionResult> AddUser([FromBody] AddUserRequest request)
+        {
+            var addUserCommand = new AddUserCommand(request.UserId, request.LocationId);
+            await commandExecutor.ExecuteAsync(addUserCommand);
+            return CreatedAtAction(nameof(AddUser),new AddUserResponse(request.LocationId));
         }
 
         [HttpGet]
