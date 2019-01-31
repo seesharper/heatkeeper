@@ -54,7 +54,7 @@ namespace HeatKeeper.Server.Host
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };
-            }).AddCookie();
+            });
 
 
 
