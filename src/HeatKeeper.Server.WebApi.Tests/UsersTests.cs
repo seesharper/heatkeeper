@@ -38,6 +38,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         public async Task ShouldCreateUser()
         {
             var client = Factory.CreateClient();
+
             var token = await client.AuthenticateAsAdminUser();
 
             var createUserRequest = new CreateUserRequest("TestUser", "TestUser@gmail.com", true, "TestUser12324");

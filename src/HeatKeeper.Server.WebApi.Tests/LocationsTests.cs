@@ -25,8 +25,6 @@ namespace HeatKeeper.Server.WebApi.Tests
     {
         private IServiceContainer _container;
 
-
-
         public TestBase(ITestOutputHelper testOutputHelper)
         {
             Factory = new WebApplicationFactory<Startup>()

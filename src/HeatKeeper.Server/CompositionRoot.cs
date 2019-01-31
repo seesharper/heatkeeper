@@ -24,7 +24,9 @@ namespace HeatKeeper.Server
                 .RegisterConstructorDependency<Logger>((f,p) => f.GetInstance<LogFactory>()(p.Member.DeclaringType))
                 .RegisterSingleton<IInfluxClient>(f => new InfluxClient(new Uri("http://influxdb:8086")))
                 .RegisterSingleton<IMapper, Mapper>()
-                .RegisterSingleton<IUserService,UserService>();
+                .RegisterSingleton<IPasswordManager,PasswordManager>()
+                .RegisterSingleton<IAuthenticationManager, AuthenticationManager>()
+                .RegisterSingleton<ITokenProvider, JwtTokenProvider>();
         }
     }
 }
