@@ -1,6 +1,7 @@
 language: csharp
 mono: none
 dotnet: 2.2
+dist: xenial
 env:
   global:
     - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
