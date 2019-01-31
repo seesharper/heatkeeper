@@ -21,7 +21,6 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task<HttpResponseMessage> PostAsync<T>(this HttpClient client, string requestUri, string bearerToken, T content)
         {
-
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
@@ -48,7 +47,6 @@ namespace HeatKeeper.Server.WebApi.Tests
             var request = new AuthenticateUserRequest(AdminUser.UserName, AdminUser.DefaultPassword);
             var response = await client.PostAsync("api/users/authenticate", new JsonContent(request));
             var content = await response.ContentAs<AuthenticateUserResponse>();
-            var handler = new JwtSecurityTokenHandler();
             return content.Token;
         }
 

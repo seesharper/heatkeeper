@@ -2,7 +2,6 @@ using System.Threading.Tasks;
 using HeatKeeper.Server.CQRS;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Mapping;
-using heatkeeper_server.Controllers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatKeeper.Server.Host.Locations
@@ -15,7 +14,7 @@ namespace HeatKeeper.Server.Host.Locations
         private readonly ICommandExecutor commandExecutor;
         private readonly IMapper mapper;
 
-        public LocationsController(IQueryExecutor queryExecutor, ICommandExecutor commandExecutor, IMapper mapper, DisposeTest d)
+        public LocationsController(IQueryExecutor queryExecutor, ICommandExecutor commandExecutor, IMapper mapper)
         {
             this.queryExecutor = queryExecutor;
             this.commandExecutor = commandExecutor;

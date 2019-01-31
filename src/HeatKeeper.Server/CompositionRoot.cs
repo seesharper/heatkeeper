@@ -8,7 +8,7 @@ using HeatKeeper.Server.Logging;
 using HeatKeeper.Server.Mapping;
 using HeatKeeper.Server.Users;
 using LightInject;
-using Refit;
+
 using Vibrant.InfluxDB.Client;
 
 namespace HeatKeeper.Server

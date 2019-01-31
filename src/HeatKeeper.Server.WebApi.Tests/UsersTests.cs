@@ -53,8 +53,5 @@ namespace HeatKeeper.Server.WebApi.Tests
             var c = await response.Content.ReadAsStringAsync();
             response.StatusCode.Should().Be(HttpStatusCode.Created);
         }
-
-
-
     }
 }

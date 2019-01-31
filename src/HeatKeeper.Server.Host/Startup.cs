@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Logging;
-using heatkeeper_server.Controllers;
 using LightInject;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Refit;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -81,7 +79,6 @@ namespace HeatKeeper.Server.Host
         public void ConfigureContainer(IServiceContainer container)
         {
             container.Register<IUserContext, UserContext>();
-            container.RegisterScoped<DisposeTest, DisposeTest>();
             container.RegisterFrom<HeatKeeper.Server.Database.CompositionRoot>();
             container.RegisterFrom<HeatKeeper.Server.CompositionRoot>();
             container.RegisterSingleton<LogFactory>(f => {
@@ -128,14 +125,5 @@ namespace HeatKeeper.Server.Host
     }
 
 
-    public interface IHelloClient
-{
-    [Get("/helloworld")]
-    Task<Reply> GetMessageAsync();
-}
 
-public class Reply
-{
-    public string Message { get; set; }
-}
 }
