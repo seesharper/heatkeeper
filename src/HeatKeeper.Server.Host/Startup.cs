@@ -28,20 +28,8 @@ namespace HeatKeeper.Server.Host
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddControllersAsServices();
             services.Configure<Settings>(Configuration);
-            // var test = Refit.RestService.For<IHelloClient>("http://github.com");
-
-            // var test2 = test.GetType().Assembly.CodeBase;
-            ////// How do we secure this API?
-            //https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-custom-storage-providers?view=aspnetcore-2.1
-
-            // https://stackoverflow.com/questions/38661090/token-based-authentication-in-web-api-without-any-user-interface
-
-            // https://developer.okta.com/blog/2018/02/01/secure-aspnetcore-webapi-token-auth
-
-
 
 
             // configure jwt authentication
@@ -66,7 +54,7 @@ namespace HeatKeeper.Server.Host
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };
-            });
+            }).AddCookie();
 
 
 
