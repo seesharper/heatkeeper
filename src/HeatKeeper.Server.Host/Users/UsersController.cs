@@ -14,11 +14,14 @@ namespace HeatKeeper.Server.Host.Users
     {
         private readonly ICommandExecutor commandExecutor;
         private readonly IAuthenticationManager authenticationManager;
+        private readonly IApiKeyProvider apiKeyProvider;
+        private readonly ITokenProvider tokenProvider;
 
-        public UsersController(ICommandExecutor commandExecutor, IAuthenticationManager authenticationManager)
+        public UsersController(ICommandExecutor commandExecutor, IAuthenticationManager authenticationManager, IApiKeyProvider apiKeyProvider)
         {
             this.commandExecutor = commandExecutor;
             this.authenticationManager = authenticationManager;
+            this.apiKeyProvider = apiKeyProvider;
         }
 
         [AllowAnonymous]
@@ -40,6 +43,13 @@ namespace HeatKeeper.Server.Host.Users
             var registerUserCommand = new RegisterUserCommand(request.Name, request.Email, request.Password, request.IsAdmin);
             await commandExecutor.ExecuteAsync(registerUserCommand);
             return Created(nameof(Post), new RegisterUserResponse(registerUserCommand.Id));
+        }
+
+        [HttpGet("apikey")]
+        public ActionResult<GetApiKeyResponse> GetApiKey()
+        {
+            var apiKey = apiKeyProvider.CreateApiKey();
+            return new GetApiKeyResponse(apiKey.Token);
         }
     }
 }

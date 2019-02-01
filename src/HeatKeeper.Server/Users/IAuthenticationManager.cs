@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -49,7 +50,7 @@ namespace HeatKeeper.Server.Users
             claims.Add(new Claim(ClaimTypes.Role, user.IsAdmin ? "admin" : "user"));
             claims.Add(new Claim(ClaimTypes.Sid, user.Id.ToString()));
 
-            return new AuthenticationResult(tokenProvider.CreateToken(claims), isAuthenticated: true);
+            return new AuthenticationResult(tokenProvider.CreateToken(claims, DateTime.UtcNow.AddDays(7)), isAuthenticated: true);
         }
     }
 

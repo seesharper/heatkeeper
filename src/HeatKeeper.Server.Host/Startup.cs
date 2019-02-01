@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using HeatKeeper.Server.Users;
+using Microsoft.AspNetCore.Http;
 
 namespace HeatKeeper.Server.Host
 {
@@ -66,7 +67,8 @@ namespace HeatKeeper.Server.Host
 
         public void ConfigureContainer(IServiceContainer container)
         {
-            container.Register<IUserContext, UserContext>();
+            container.RegisterSingleton<IUserContext, UserContext>();
+            container.RegisterSingleton<IHttpContextAccessor, HttpContextAccessor>();
             container.RegisterFrom<HeatKeeper.Server.Database.CompositionRoot>();
             container.RegisterFrom<HeatKeeper.Server.CompositionRoot>();
             container.RegisterSingleton<LogFactory>(f => {

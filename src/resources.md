@@ -27,3 +27,7 @@ https://fullstackmark.com/post/13/jwt-authentication-with-aspnet-core-2-web-api-
 https://wildermuth.com/2017/08/19/Two-AuthorizationSchemes-in-ASP-NET-Core-2
 
 https://docs.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view=aspnetcore-2.2
+
+https://auth0.com/blog/using-json-web-tokens-as-api-keys/
+
+https://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration

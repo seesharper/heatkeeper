@@ -53,5 +53,21 @@ namespace HeatKeeper.Server.WebApi.Tests
             var c = await response.Content.ReadAsStringAsync();
             response.StatusCode.Should().Be(HttpStatusCode.Created);
         }
+
+        [Fact]
+        public async Task ShouldCreateApiKey()
+        {
+             var client = Factory.CreateClient();
+             var token = await client.AuthenticateAsAdminUser();
+
+            var request = new HttpRequestBuilder()
+                .AddMethod(HttpMethod.Get)
+                .AddRequestUri("api/users/apikey")
+                .AddBearerToken(token)
+                .Build();
+
+            var responseMessage = await client.SendAsync(request);
+            responseMessage.EnsureSuccessStatusCode();
+        }
     }
 }
