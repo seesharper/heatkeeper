@@ -1,0 +1,8 @@
+
+POST http://localhost:5000/api/users/authenticate
+Content-Type: application/json
+
+{
+	"name" : "admin",
+	"password" :"admin1234"
+}

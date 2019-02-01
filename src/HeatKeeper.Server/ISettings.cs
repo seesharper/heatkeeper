@@ -1,7 +1,9 @@
 namespace HeatKeeper.Server
 {
-    interface ISettings
+    public class Settings
     {
-        string PathToDatabase { get; }
+        public string ConnectionString { get; set; }
+
+        public string Secret { get; set; }
     }
 }

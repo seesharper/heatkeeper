@@ -1,4 +1,7 @@
+using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace HeatKeeper.Server.Database
@@ -13,6 +16,8 @@ namespace HeatKeeper.Server.Database
 
         string GetAllLocations { get; }
 
+        string GetLocationId { get; }
+
         string InsertMeasurement { get; }
 
         string InsertSensor { get; }
@@ -20,37 +25,61 @@ namespace HeatKeeper.Server.Database
         string GetAllSensors { get; }
 
         string GetAllExternalSensors { get; }
+
+        string InsertUser { get; }
+
+        string GetUserId { get; }
+
+        string GetUser {get;}
+
+        string AddUser {get;}
     }
 
     public class SqlProvider : ISqlProvider
     {
+        private static ConcurrentDictionary<string,string> sqlCache = new ConcurrentDictionary<string, string>();
 
-        public string InsertZone { get => Load("Zones.InsertZone"); }
+        public string InsertZone => Load();
 
-        public string GetAllZones { get => Load("Zones.GetAllZones"); }
+        public string GetAllZones => Load();
 
-        public string InsertLocation { get => Load("Locations.InsertLocation"); }
+        public string InsertLocation=> Load();
 
-        public string GetAllLocations { get => Load("Locations.GetAllLocations"); }
+        public string GetAllLocations => Load();
 
-        public string InsertMeasurement { get => Load("Measurements.InsertMeasurement"); }
+        public string InsertMeasurement => Load();
 
-        public string InsertSensor { get => Load("Sensors.InsertSensor"); }
+        public string InsertSensor => Load();
 
-        public string GetAllSensors { get => Load("Sensors.GetAllSensors"); }
+        public string GetAllSensors => Load();
 
-        public string GetAllExternalSensors { get => Load("Sensors.GetAllExternalSensors"); }
+        public string GetAllExternalSensors => Load();
 
-        public string Load(string name)
+        public string InsertUser => Load();
+        public string GetUser=> Load();
+
+        public string AddUser => Load();
+
+        public string GetLocationId => Load();
+
+        public string GetUserId => Load();
+
+        public string Load([CallerMemberName] string name = "")
         {
             return LoadSql(name);
         }
 
         private static string LoadSql(string name)
         {
+            return sqlCache.GetOrAdd(name, FindSqlResource);
+        }
+
+        private static string FindSqlResource(string name)
+        {
             var assembly = typeof(SqlProvider).Assembly;
-            var test = assembly.GetManifestResourceNames();
-            var resourceStream = assembly.GetManifestResourceStream($"HeatKeeper.Server.Database.{name}.sql");
+            var resourceNames = assembly.GetManifestResourceNames();
+            var sqlResource = resourceNames.First(r => r.Contains(name));
+            var resourceStream = assembly.GetManifestResourceStream(sqlResource);
             using (var reader = new StreamReader(resourceStream, Encoding.UTF8))
             {
                 return reader.ReadToEnd();

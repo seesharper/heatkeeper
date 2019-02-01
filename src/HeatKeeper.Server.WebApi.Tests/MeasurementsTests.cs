@@ -19,7 +19,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             var createMeasurementRequest = new CreateMeasurementRequest(SensorID, MeasurementType.Temperature, 23.7);
             var measurements = new []{createMeasurementRequest};
             var client = Factory.CreateClient();
-            await client.PostAsync("api/measurements", new JsonContent(measurements));
+            var response = await client.PostAsync("api/measurements", new JsonContent(measurements));
+            response.EnsureSuccessStatusCode();
         }
     }
 }

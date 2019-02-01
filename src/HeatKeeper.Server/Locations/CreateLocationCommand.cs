@@ -11,5 +11,7 @@ namespace HeatKeeper.Server.Locations
         public string Name { get; }
 
         public string Description { get; }
+
+        public long Id { get; set;}
     }
 }

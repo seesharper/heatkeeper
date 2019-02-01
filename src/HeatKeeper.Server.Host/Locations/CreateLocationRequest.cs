@@ -1,3 +1,5 @@
+using HeatKeeper.Server.Locations;
+
 namespace HeatKeeper.Server.Host.Locations
 {
     public class CreateLocationRequest

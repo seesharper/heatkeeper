@@ -22,7 +22,8 @@ namespace HeatKeeper.Server.Locations
 
         public async Task HandleAsync(CreateLocationCommand command, CancellationToken cancellationToken = default(CancellationToken))
         {
-            await ((DbCommand)dbConnection.CreateCommand(sqlProvider.InsertLocation, command)).ExecuteNonQueryAsync();
+            await dbConnection.ExecuteAsync(sqlProvider.InsertLocation, command);
+            command.Id = await dbConnection.ExecuteScalarAsync<long>(sqlProvider.GetLocationId, new {command.Name});
         }
     }
 }

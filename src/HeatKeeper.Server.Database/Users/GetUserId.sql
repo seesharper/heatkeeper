@@ -1,0 +1,1 @@
+SELECT Id FROM Users WHERE name = @name

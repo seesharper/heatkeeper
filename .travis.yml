@@ -1,14 +1,11 @@
 language: csharp
 mono: none
-dotnet: 2.1.500
-env:
-  global:
-    - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
-    - DOTNET_CLI_TELEMETRY_OPTOUT=true
-matrix:
-  include:
-    - os: linux
-      dist: trusty
+dotnet: 2.2
+dist: xenial
+sudo: required
+global:
+  - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
+  - DOTNET_CLI_TELEMETRY_OPTOUT=true
 script:
   - chmod +x build.sh
   - ./build.sh
