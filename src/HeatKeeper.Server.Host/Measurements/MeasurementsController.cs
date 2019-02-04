@@ -1,6 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
-using HeatKeeper.Server.CQRS;
+using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Mapping;
 using HeatKeeper.Server.Sensors;
 using Microsoft.AspNetCore.Mvc;

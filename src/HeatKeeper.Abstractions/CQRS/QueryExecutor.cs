@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LightInject;
 
-namespace HeatKeeper.Server.CQRS
+namespace HeatKeeper.Abstractions.CQRS
 {
     /// <summary>
     /// An <see cref="IQueryExecutor"/> that is capable of executing a query.
@@ -74,7 +74,7 @@ namespace HeatKeeper.Server.CQRS
 
             // Push the query onto the evaluation stack.
             generator.Emit(OpCodes.Ldarg_1);
-            
+
             // The query is passed in as an IQuery<TResult> instance
             // and we need to cast it to the actual query type.
             generator.Emit(OpCodes.Castclass, queryType);

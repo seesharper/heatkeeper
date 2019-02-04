@@ -1,4 +1,4 @@
-﻿namespace HeatKeeper.Server.CQRS
+﻿namespace HeatKeeper.Abstractions.CQRS
 {
     /// <summary>
     /// A marker interface to be implemented by all queries.

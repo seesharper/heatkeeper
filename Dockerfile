@@ -1,12 +1,14 @@
-FROM microsoft/dotnet:2.1.500-sdk
+FROM microsoft/dotnet:2.2-sdk
 
 COPY src /src
 
 WORKDIR /src
 
 
-RUN dotnet publish -c release -o /app
+RUN dotnet publish -c release -o /heatkeeper/app
+
+VOLUME [ "/db" ]
 
 EXPOSE 80
 
-ENTRYPOINT [ "dotnet", "/app/HeatKeeper.Server.Host.dll" ]
+ENTRYPOINT [ "dotnet", "/heatkeeper/app/HeatKeeper.Server.Host.dll" ]

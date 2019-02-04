@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using LightInject;
 
-namespace HeatKeeper.Server.CQRS
+namespace HeatKeeper.Abstractions.CQRS
 {
     /// <summary>
     /// Extends the <see cref="IServiceRegistry"/> interface

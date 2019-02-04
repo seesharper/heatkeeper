@@ -1,4 +1,4 @@
-using HeatKeeper.Server.CQRS;
+using HeatKeeper.Abstractions.CQRS;
 using System.Threading;
 using System.Threading.Tasks;
 

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Data.Common;
 using System.Data;
 using HeatKeeper.Server.Database;
-using HeatKeeper.Server.CQRS;
+using HeatKeeper.Abstractions.CQRS;
 using DbReader;
 
 namespace HeatKeeper.Server.Measurements

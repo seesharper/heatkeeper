@@ -1,7 +1,7 @@
 using System;
 using System.Data;
 
-namespace HeatKeeper.Server.Database.Transactions
+namespace HeatKeeper.Abstractions.Transactions
 {
     public class ConnectionDecorator : IDbConnection
     {

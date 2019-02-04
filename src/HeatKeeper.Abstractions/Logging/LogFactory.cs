@@ -1,6 +1,6 @@
 using System;
 
-namespace HeatKeeper.Server.Logging
+namespace HeatKeeper.Abstractions.Logging
 {
     public delegate Logger LogFactory(Type type);
 

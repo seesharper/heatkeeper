@@ -15,4 +15,8 @@
   <ItemGroup>
     <EmbeddedResource Include="**/*.sql" />
   </ItemGroup>
+
+   <ItemGroup>
+    <ProjectReference Include="..\HeatKeeper.Abstractions\HeatKeeper.Abstractions.csproj" />
+  </ItemGroup>
 </Project>

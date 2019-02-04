@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace HeatKeeper.Server.CQRS
+namespace HeatKeeper.Abstractions.CQRS
 {
     /// <summary>
     /// Represents a class that is capable of executing a command.

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using LightInject;
 
-namespace HeatKeeper.Server.CQRS
+namespace HeatKeeper.Abstractions.CQRS
 {
     /// <summary>
     /// A <see cref="ICommandExecutor"/> that is capable

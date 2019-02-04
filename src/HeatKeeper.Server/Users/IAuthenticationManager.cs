@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using HeatKeeper.Server.CQRS;
+using HeatKeeper.Abstractions.CQRS;
 
 namespace HeatKeeper.Server.Users
 {

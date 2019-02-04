@@ -1,10 +1,10 @@
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Server.CQRS;
-using HeatKeeper.Server.Logging;
+using HeatKeeper.Abstractions.CQRS;
+using HeatKeeper.Abstractions.Logging;
 
-namespace HeatKeeper.Server.Database.Transactions
+namespace HeatKeeper.Abstractions.Transactions
 {
     public class TransactionalCommandHandler<TCommand> : ICommandHandler<TCommand>
 {

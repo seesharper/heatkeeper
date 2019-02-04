@@ -1,10 +1,10 @@
 using System;
 using System.Data;
 using System.Net.Http;
-using HeatKeeper.Server.CQRS;
-using HeatKeeper.Server.Database.Transactions;
+using HeatKeeper.Abstractions.CQRS;
+using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Locations;
-using HeatKeeper.Server.Logging;
+using HeatKeeper.Abstractions.Logging;
 using HeatKeeper.Server.Mapping;
 using HeatKeeper.Server.Users;
 using LightInject;

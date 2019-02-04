@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using HeatKeeper.Server.CQRS;
+using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Mapping;
 using Microsoft.AspNetCore.Mvc;

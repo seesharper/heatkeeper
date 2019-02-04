@@ -6,14 +6,21 @@ namespace HeatKeeper.Server.Database
 {
     public interface IDatabaseInitializer
     {
-        void Initialize(string connectionString);
+        void Initialize();
     }
 
     public class DatabaseInitializer : IDatabaseInitializer
     {
-        public void Initialize(string connectionString)
+        private readonly IConnectionStringProvider connectionStringProvider;
+
+        public DatabaseInitializer(IConnectionStringProvider connectionStringProvider)
         {
-            var serviceProvider = CreateServices(connectionString);
+            this.connectionStringProvider = connectionStringProvider;
+        }
+
+        public void Initialize()
+        {
+            var serviceProvider = CreateServices(connectionStringProvider.GetConnectionString());
 
             // Put the database update into a scope to ensure
             // that all resources will be disposed.

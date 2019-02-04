@@ -18,7 +18,7 @@ namespace HeatKeeper.Server.WebApi
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            TestOutputHelper.Current.WriteLine($"{logLevel}{formatter(state, exception)}");
+            TestOutputHelper.Current.WriteLine($"{logLevel} {formatter(state, exception)}");
             if (exception != null)
             {
                  TestOutputHelper.Current.WriteLine(exception.ToString());

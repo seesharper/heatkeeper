@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
-using HeatKeeper.Server.CQRS;
+using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Host.Locations;
-using HeatKeeper.Server.Logging;
+using HeatKeeper.Abstractions.Logging;
 using HeatKeeper.Server.WebApi.Tests.Transactions;
 using LightInject;
 using Microsoft.AspNetCore.Hosting;
