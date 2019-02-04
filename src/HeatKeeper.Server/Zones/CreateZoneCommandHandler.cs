@@ -1,5 +1,5 @@
 using DbReader;
-using HeatKeeper.Server.CQRS;
+using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Database;
 using System.Data;
 using System.Data.Common;

@@ -13,5 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\HeatKeeper.Server\HeatKeeper.Server.csproj" />
     <ProjectReference Include="..\HeatKeeper.Server.Database\HeatKeeper.Server.Database.csproj" />
+    <ProjectReference Include="..\HeatKeeper.Abstractions\HeatKeeper.Abstractions.csproj" />
   </ItemGroup>
 </Project>

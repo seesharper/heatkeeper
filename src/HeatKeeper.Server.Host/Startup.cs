@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using HeatKeeper.Server.Database;
-using HeatKeeper.Server.Logging;
+using HeatKeeper.Abstractions.Logging;
 using LightInject;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using HeatKeeper.Server.Users;
 using Microsoft.AspNetCore.Http;
+using System;
 
 namespace HeatKeeper.Server.Host
 {
@@ -32,11 +33,16 @@ namespace HeatKeeper.Server.Host
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddControllersAsServices();
             services.Configure<Settings>(Configuration);
 
-
             // configure jwt authentication
             var appSettings = Configuration.Get<Settings>();
+            var secret = appSettings.Secret;
+            if (string.IsNullOrWhiteSpace(secret))
+            {
+                throw new InvalidOperationException("Unable to find secret");
+            }
+
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-            var test = Encoding.UTF8.GetBytes(appSettings.Secret);
+
 
 
             services.AddAuthentication(x =>
@@ -81,8 +87,7 @@ namespace HeatKeeper.Server.Host
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IDatabaseInitializer databaseInitializer)
         {
-            var test = Configuration.GetValue<string>("ConnectionString");
-            databaseInitializer.Initialize(test);
+            databaseInitializer.Initialize();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

@@ -4,7 +4,7 @@ using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using DbReader;
-using HeatKeeper.Server.CQRS;
+using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Database;
 
 namespace HeatKeeper.Server.Locations

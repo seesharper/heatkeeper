@@ -1,7 +1,7 @@
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Server.CQRS;
+using HeatKeeper.Abstractions.CQRS;
 
 namespace HeatKeeper.Server.WebApi.Tests.Transactions
 {

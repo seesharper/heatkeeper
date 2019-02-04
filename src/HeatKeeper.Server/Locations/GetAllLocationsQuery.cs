@@ -1,4 +1,4 @@
-using HeatKeeper.Server.CQRS;
+using HeatKeeper.Abstractions.CQRS;
 
 namespace HeatKeeper.Server.Locations
 {

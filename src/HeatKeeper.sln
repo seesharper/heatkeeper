@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatKeeper.Server.Host", "H
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatKeeper.Server.Database", "HeatKeeper.Server.Database\HeatKeeper.Server.Database.csproj", "{3D0F4011-CA4B-4B51-A05D-5D0298B82D69}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatKeeper.Abstractions", "HeatKeeper.Abstractions\HeatKeeper.Abstractions.csproj", "{B4B69607-A345-4E44-9401-9B32F4167513}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,5 +86,17 @@ Global
 		{3D0F4011-CA4B-4B51-A05D-5D0298B82D69}.Release|x64.Build.0 = Release|Any CPU
 		{3D0F4011-CA4B-4B51-A05D-5D0298B82D69}.Release|x86.ActiveCfg = Release|Any CPU
 		{3D0F4011-CA4B-4B51-A05D-5D0298B82D69}.Release|x86.Build.0 = Release|Any CPU
+		{B4B69607-A345-4E44-9401-9B32F4167513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4B69607-A345-4E44-9401-9B32F4167513}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4B69607-A345-4E44-9401-9B32F4167513}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B4B69607-A345-4E44-9401-9B32F4167513}.Debug|x64.Build.0 = Debug|Any CPU
+		{B4B69607-A345-4E44-9401-9B32F4167513}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B4B69607-A345-4E44-9401-9B32F4167513}.Debug|x86.Build.0 = Debug|Any CPU
+		{B4B69607-A345-4E44-9401-9B32F4167513}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4B69607-A345-4E44-9401-9B32F4167513}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4B69607-A345-4E44-9401-9B32F4167513}.Release|x64.ActiveCfg = Release|Any CPU
+		{B4B69607-A345-4E44-9401-9B32F4167513}.Release|x64.Build.0 = Release|Any CPU
+		{B4B69607-A345-4E44-9401-9B32F4167513}.Release|x86.ActiveCfg = Release|Any CPU
+		{B4B69607-A345-4E44-9401-9B32F4167513}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

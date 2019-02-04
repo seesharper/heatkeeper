@@ -1,6 +1,6 @@
 using System.Data;
 using System.Linq;
-using HeatKeeper.Server.CQRS;
+using HeatKeeper.Abstractions.CQRS;
 using LightInject;
 
 namespace HeatKeeper.Server.WebApi.Tests.Transactions
