@@ -38,7 +38,7 @@ namespace HeatKeeper.Server.Users
                 await commandExecutor.ExecuteAsync(new RegisterUserCommand(AdminUser.UserName, "Email", AdminUser.DefaultPassword, true));
                 return await Authenticate(userName, password);
             }
-
+    
             if (user == null || !passwordManager.VerifyPassword(password, user.HashedPassword))
             {
                 return new AuthenticationResult(string.Empty, isAuthenticated: false);

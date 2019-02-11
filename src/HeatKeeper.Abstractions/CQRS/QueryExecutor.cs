@@ -39,6 +39,7 @@ namespace HeatKeeper.Abstractions.CQRS
         /// <param name="query">The query to be executed.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>The result from the query.</returns>
+        [System.Diagnostics.DebuggerStepThrough]
         public async Task<TResult> ExecuteAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken)
         {
             var queryDelegate = Cache<TResult>.GetOrAdd(query.GetType(), CreateDelegate<TResult>);

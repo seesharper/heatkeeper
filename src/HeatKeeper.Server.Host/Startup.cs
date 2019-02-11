@@ -16,6 +16,8 @@ using System.Text;
 using HeatKeeper.Server.Users;
 using Microsoft.AspNetCore.Http;
 using System;
+using Microsoft.AspNetCore.Diagnostics;
+using System.Net;
 
 namespace HeatKeeper.Server.Host
 {
@@ -77,10 +79,11 @@ namespace HeatKeeper.Server.Host
             container.RegisterSingleton<IHttpContextAccessor, HttpContextAccessor>();
             container.RegisterFrom<HeatKeeper.Server.Database.CompositionRoot>();
             container.RegisterFrom<HeatKeeper.Server.CompositionRoot>();
-            container.RegisterSingleton<LogFactory>(f => {
-               var loggerFactory = f.GetInstance<ILoggerFactory>();
-               LogFactory factory = (type) => (l, m,e ) => loggerFactory.CreateLogger(type).LogInformation(m);
-               return factory;
+            container.RegisterSingleton<LogFactory>(f =>
+            {
+                var loggerFactory = f.GetInstance<ILoggerFactory>();
+                LogFactory factory = (type) => (l, m, e) => loggerFactory.CreateLogger(type).LogInformation(m);
+                return factory;
             });
         }
 
@@ -88,6 +91,8 @@ namespace HeatKeeper.Server.Host
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IDatabaseInitializer databaseInitializer)
         {
             databaseInitializer.Initialize();
+
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -107,10 +112,29 @@ namespace HeatKeeper.Server.Host
                 c.RoutePrefix = string.Empty;
             });
 
+             app.UseExceptionHandler(errorApp =>
+            {
+                errorApp.Run(async context =>
+                {
+                    var errorFeature = context.Features.Get<IExceptionHandlerFeature>();
+                    var exception = errorFeature.Error;
+                    if (exception is AuthenticationFailedException)
+                    {
+                        ProblemDetails problemDetails = new ProblemDetails();
+                        problemDetails.Status = (int)HttpStatusCode.Unauthorized;
+                        problemDetails.Title = exception.Message;
+                        await context.Response.WriteProblemDetails(problemDetails);
+                    }
 
+
+                    // log the exception etc..
+                    // produce some response for the caller
+                });
+            });
 
 
             app.UseAuthentication();
+
 
 
 
