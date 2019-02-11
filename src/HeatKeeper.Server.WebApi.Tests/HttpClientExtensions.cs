@@ -50,6 +50,16 @@ namespace HeatKeeper.Server.WebApi.Tests
             return content.Token;
         }
 
+        public static async Task<HttpResponseMessage> PostAuthenticateRequest(this HttpClient client, string userName, string password)
+        {
+            var authenticateRequest = new HttpRequestBuilder()
+                .AddJsonContent(new AuthenticateUserRequest(userName, password))
+                .AddMethod(HttpMethod.Post)
+                .AddRequestUri("api/users/authenticate")
+                .Build();
+            return await client.SendAsync(authenticateRequest);
+        }
+
         public static async Task<HttpResponseMessage> CreateLocation(this HttpClient client, CreateLocationRequest request)
         {
             var token = await client.AuthenticateAsAdminUser();

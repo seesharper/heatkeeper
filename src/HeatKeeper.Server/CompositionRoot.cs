@@ -25,9 +25,12 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<IInfluxClient>(f => new InfluxClient(new Uri("http://influxdb:8086")))
                 .RegisterSingleton<IMapper, Mapper>()
                 .RegisterSingleton<IPasswordManager,PasswordManager>()
+                .RegisterSingleton<IPasswordPolicy,PasswordPolicy>()
                 .RegisterSingleton<IAuthenticationManager, AuthenticationManager>()
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
-                .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>();
+                .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
+                .Decorate<ICommandHandler<ChangePasswordCommand>, ChangePasswordValidator>();
+
         }
     }
 }

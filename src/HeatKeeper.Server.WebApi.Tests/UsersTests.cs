@@ -31,7 +31,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             var request = new AuthenticateUserRequest(AdminUser.UserName, "InvalidPassword");
             var client = Factory.CreateClient();
             var response = await client.PostAsync("api/users/authenticate", new JsonContent(request));
-            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
         [Fact]
@@ -69,5 +69,28 @@ namespace HeatKeeper.Server.WebApi.Tests
             var responseMessage = await client.SendAsync(request);
             responseMessage.EnsureSuccessStatusCode();
         }
+
+        [Fact]
+        public async Task ShouldChangePasswordAndAuthenticate()
+        {
+             const string newPassword = "^SzCzWW5D@EaU8veHkJaRqlY";
+             var client = Factory.CreateClient();
+             var token = await client.AuthenticateAsAdminUser();
+
+             var request = new HttpRequestBuilder()
+                .AddMethod(HttpMethod.Patch)
+                .AddRequestUri("api/users/password")
+                .AddBearerToken(token)
+                .AddContent(new JsonContent(new ChangePasswordRequest(AdminUser.DefaultPassword, newPassword, newPassword)))
+                .Build();
+
+            var responseMessage = await client.SendAsync(request);
+            responseMessage.EnsureSuccessStatusCode();
+
+            var authenticateResponse = await client.PostAuthenticateRequest(AdminUser.UserName, newPassword);
+            authenticateResponse.EnsureSuccessStatusCode();
+        }
+
+
     }
 }

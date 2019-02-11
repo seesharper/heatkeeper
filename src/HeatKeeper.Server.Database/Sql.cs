@@ -33,6 +33,8 @@ namespace HeatKeeper.Server.Database
         string GetUser {get;}
 
         string AddUser {get;}
+
+        string UpdatePasswordHash {get;}
     }
 
     public class SqlProvider : ISqlProvider
@@ -63,6 +65,8 @@ namespace HeatKeeper.Server.Database
         public string GetLocationId => Load();
 
         public string GetUserId => Load();
+
+        public string UpdatePasswordHash => Load();
 
         public string Load([CallerMemberName] string name = "")
         {

@@ -1,3 +1,4 @@
+using System.Net;
 using System.Threading.Tasks;
 using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Mapping;
@@ -28,13 +29,9 @@ namespace HeatKeeper.Server.Host.Users
         [HttpPost("authenticate")]
         public async Task<ActionResult<AuthenticateUserResponse>> Authenticate([FromBody]AuthenticateUserRequest request)
         {
-            var authenticationResult = await authenticationManager.Authenticate(request.Name, request.Password);
-            if (authenticationResult.IsAuthenticated)
-            {
-                return Ok(new AuthenticateUserResponse(authenticationResult.Token));
-            }
-
-            return BadRequest(new { message = "Username or password is incorrect" });
+            var command = new AuthenticateCommand(request.Username, request.Password);
+            await commandExecutor.ExecuteAsync(command);
+            return Ok(new AuthenticateUserResponse(command.Token));
         }
 
         [HttpPost()]
@@ -44,6 +41,15 @@ namespace HeatKeeper.Server.Host.Users
             await commandExecutor.ExecuteAsync(registerUserCommand);
             return Created(nameof(Post), new RegisterUserResponse(registerUserCommand.Id));
         }
+
+        [HttpPatch("password")]
+        public async Task<IActionResult> ChangePassword([FromBody]ChangePasswordRequest request)
+        {
+            var changePasswordCommand = new ChangePasswordCommand(request.OldPassword,request.NewPassword, request.ConfirmedPassword);
+            await commandExecutor.ExecuteAsync(changePasswordCommand);
+            return Ok();
+        }
+
 
         [HttpGet("apikey")]
         public ActionResult<GetApiKeyResponse> GetApiKey()

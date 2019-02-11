@@ -17,4 +17,33 @@ namespace HeatKeeper.Abstractions.CQRS
         /// <returns><see cref="Task"/>.</returns>
         Task ExecuteAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default(CancellationToken));
     }
+
+    public interface IBus
+    {
+       Task ExecuteAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default(CancellationToken));
+
+       Task<TResult> ExecuteAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default(CancellationToken));
+    }
+
+    public class Bus : IBus
+    {
+        private readonly ICommandExecutor commandExecutor;
+        private readonly IQueryExecutor queryExecutor;
+
+        public Bus(ICommandExecutor commandExecutor, IQueryExecutor queryExecutor)
+        {
+            this.commandExecutor = commandExecutor;
+            this.queryExecutor = queryExecutor;
+        }
+
+        public async Task ExecuteAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            await commandExecutor.ExecuteAsync(command, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<TResult> ExecuteAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await queryExecutor.ExecuteAsync(query, cancellationToken).ConfigureAwait(false);
+        }
+    }
 }

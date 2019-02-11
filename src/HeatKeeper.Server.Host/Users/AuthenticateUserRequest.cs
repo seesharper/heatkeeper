@@ -2,13 +2,13 @@ namespace HeatKeeper.Server.Host.Users
 {
     public class AuthenticateUserRequest
     {
-        public AuthenticateUserRequest(string name, string password)
+        public AuthenticateUserRequest(string userName, string password)
         {
-            Name = name;
+            Username = userName;
             Password = password;
         }
 
-        public string Name { get; }
+        public string Username { get; }
         public string Password { get; }
     }
 }

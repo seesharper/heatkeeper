@@ -31,3 +31,9 @@ https://docs.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view
 https://auth0.com/blog/using-json-web-tokens-as-api-keys/
 
 https://stackoverflow.com/questions/26739167/jwt-json-web-token-automatic-prolongation-of-expiration
+
+https://stackoverflow.com/questions/9220432/http-401-unauthorized-or-403-forbidden-for-a-disabled-user
+
+https://www.strathweb.com/2018/07/centralized-exception-handling-and-request-validation-in-asp-net-core/
+
+https://jeroenhildering.com/2016/11/24/mapping-exceptions-to-http-responses-with-net-core/

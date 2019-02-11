@@ -40,6 +40,12 @@ namespace HeatKeeper.Server.WebApi.Tests
             return this;
         }
 
+        public HttpRequestBuilder AddJsonContent<T>(T content)
+        {
+            this.content = new JsonContent(content);
+            return this;
+        }
+
         public HttpRequestBuilder AddBearerToken(string bearerToken)
         {
             this.bearerToken = bearerToken;

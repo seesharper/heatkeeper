@@ -26,6 +26,7 @@ namespace HeatKeeper.Abstractions.CQRS
                     .Where(m => m != null);
             RegisterHandlers(serviceRegistry, commandTypes);
             serviceRegistry.Register<ICommandExecutor>(factory => new CommandExecutor(GetCurrentScope(factory)), new PerScopeLifetime());
+            serviceRegistry.Register<IBus,Bus>(new PerScopeLifetime());
             return serviceRegistry;
         }
 
@@ -43,11 +44,13 @@ namespace HeatKeeper.Abstractions.CQRS
                     .Where(m => m != null);
             RegisterHandlers(serviceRegistry, commandTypes);
             serviceRegistry.Register<IQueryExecutor>(factory => new QueryExecutor(GetCurrentScope(factory)), new PerScopeLifetime());
+            serviceRegistry.Register<IBus,Bus>(new PerScopeLifetime());
             return serviceRegistry;
         }
 
         private static IServiceFactory GetCurrentScope(IServiceFactory serviceFactory)
         {
+            // NOTE: Maybe we should look into LightInject and make sure that we pass the current scope rather than the container instance.
             return ((IServiceContainer)serviceFactory).ScopeManagerProvider.GetScopeManager(serviceFactory).CurrentScope;
         }
 

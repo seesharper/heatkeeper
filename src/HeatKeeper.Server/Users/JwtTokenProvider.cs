@@ -19,7 +19,7 @@ namespace HeatKeeper.Server.Users
 
         public string CreateToken(IEnumerable<Claim> claims, DateTime expires)
         {
-             var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(settings.Secret);
 
             var tokenDescriptor = new SecurityTokenDescriptor
