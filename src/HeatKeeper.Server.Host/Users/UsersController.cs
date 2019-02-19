@@ -14,14 +14,14 @@ namespace HeatKeeper.Server.Host.Users
     public class UsersController : ControllerBase
     {
         private readonly ICommandExecutor commandExecutor;
-        private readonly IAuthenticationManager authenticationManager;
+        private readonly IQueryExecutor queryExecutor;
         private readonly IApiKeyProvider apiKeyProvider;
         private readonly ITokenProvider tokenProvider;
 
-        public UsersController(ICommandExecutor commandExecutor, IAuthenticationManager authenticationManager, IApiKeyProvider apiKeyProvider)
+        public UsersController(ICommandExecutor commandExecutor, IQueryExecutor queryExecutor, IApiKeyProvider apiKeyProvider)
         {
             this.commandExecutor = commandExecutor;
-            this.authenticationManager = authenticationManager;
+            this.queryExecutor = queryExecutor;
             this.apiKeyProvider = apiKeyProvider;
         }
 
@@ -29,9 +29,11 @@ namespace HeatKeeper.Server.Host.Users
         [HttpPost("authenticate")]
         public async Task<ActionResult<AuthenticateUserResponse>> Authenticate([FromBody]AuthenticateUserRequest request)
         {
-            var command = new AuthenticateCommand(request.Username, request.Password);
-            await commandExecutor.ExecuteAsync(command);
-            return Ok(new AuthenticateUserResponse(command.Token));
+            var query = new AuthenticatedUserQuery(request.Username, request.Password);
+            var result = await queryExecutor.ExecuteAsync(query);
+            return Ok(new AuthenticateUserResponse(result.Token, result.Id, result.Name, result.Email, result.IsAdmin));
+
+            //return Ok(new AuthenticateUserResponse(command.Token));
         }
 
         [HttpPost()]
