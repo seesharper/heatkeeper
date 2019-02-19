@@ -32,7 +32,18 @@ namespace HeatKeeper.Server.Host
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddControllersAsServices();
+            services.AddCors(options => {
+
+                options.AddPolicy("DevelopmentPolicy", config => {
+                    config.AllowAnyOrigin();
+                    config.AllowAnyMethod();
+                    config.AllowAnyHeader();
+                });
+            });
+
+            services.AddMvc(options => {
+                options.Filters.Add<GlobalExceptionFilter>();
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddControllersAsServices();
             services.Configure<Settings>(Configuration);
 
             // configure jwt authentication
@@ -95,6 +106,7 @@ namespace HeatKeeper.Server.Host
 
             if (env.IsDevelopment())
             {
+                app.UseCors("DevelopmentPolicy");
                 app.UseDeveloperExceptionPage();
             }
             else
@@ -112,32 +124,7 @@ namespace HeatKeeper.Server.Host
                 c.RoutePrefix = string.Empty;
             });
 
-             app.UseExceptionHandler(errorApp =>
-            {
-                errorApp.Run(async context =>
-                {
-                    var errorFeature = context.Features.Get<IExceptionHandlerFeature>();
-                    var exception = errorFeature.Error;
-                    if (exception is AuthenticationFailedException)
-                    {
-                        ProblemDetails problemDetails = new ProblemDetails();
-                        problemDetails.Status = (int)HttpStatusCode.Unauthorized;
-                        problemDetails.Title = exception.Message;
-                        await context.Response.WriteProblemDetails(problemDetails);
-                    }
-
-
-                    // log the exception etc..
-                    // produce some response for the caller
-                });
-            });
-
-
             app.UseAuthentication();
-
-
-
-
             //app.UseHttpsRedirection();
             app.UseMvc();
         }

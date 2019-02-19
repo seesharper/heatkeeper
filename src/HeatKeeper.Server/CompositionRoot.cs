@@ -26,7 +26,6 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<IMapper, Mapper>()
                 .RegisterSingleton<IPasswordManager,PasswordManager>()
                 .RegisterSingleton<IPasswordPolicy,PasswordPolicy>()
-                .RegisterSingleton<IAuthenticationManager, AuthenticationManager>()
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .Decorate<ICommandHandler<ChangePasswordCommand>, ChangePasswordValidator>();
