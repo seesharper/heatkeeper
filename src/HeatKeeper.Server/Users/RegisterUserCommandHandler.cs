@@ -18,7 +18,7 @@ namespace HeatKeeper.Server.Users
         public async Task HandleAsync(RegisterUserCommand command, CancellationToken cancellationToken = default(CancellationToken))
         {
             var hashedPassword = passwordManager.GetHashedPassword(command.Password);
-            var createUserCommand = new CreateUserCommand(command.Name, command.Email, hashedPassword, command.IsAdmin);
+            var createUserCommand = new CreateUserCommand(command.Name, command.Email, command.IsAdmin, hashedPassword);
             await commandExecutor.ExecuteAsync(createUserCommand);
             command.Id = createUserCommand.Id;
         }
@@ -26,18 +26,20 @@ namespace HeatKeeper.Server.Users
 
     public class RegisterUserCommand
     {
-        public RegisterUserCommand(string name, string email, string password, bool isAdmin)
+        public RegisterUserCommand(string name, string email, bool isAdmin, string password, string confirmedPassword)
         {
             Name = name;
             Email = email;
-            Password = password;
             IsAdmin = isAdmin;
+            Password = password;
+            ConfirmedPassword = confirmedPassword;
         }
 
         public string Name { get; }
         public string Email { get; }
-        public string Password { get; }
         public bool IsAdmin { get; }
+        public string Password { get; }
+        public string ConfirmedPassword { get; }
         public long Id { get; set;}
     }
 }

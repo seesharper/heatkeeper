@@ -1,18 +1,23 @@
-using System.Threading.Tasks;
+using AutoFixture;
+using FluentAssertions;
 using HeatKeeper.Server.Host.Users;
 using HeatKeeper.Server.Users;
-using Xunit;
-using Xunit.Abstractions;
-using FluentAssertions;
+using HeatKeeper.Server.WebApi.Tests.Customizations;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
+using Xunit;
+using Xunit.Abstractions;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
+
     public class UsersTests : TestBase
     {
         public UsersTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
+            Fixture.Customizations.Add(new MailAddressCustomization());
+            Fixture.Customizations.Add(new PasswordCustomization());
         }
 
         [Fact]
@@ -34,25 +39,22 @@ namespace HeatKeeper.Server.WebApi.Tests
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
+
         [Fact]
-        public async Task ShouldCreateUser()
+        public async Task ShouldCreateAndGetAllUsers()
         {
             var client = Factory.CreateClient();
 
-            var token = await client.AuthenticateAsAdminUser();
+            await client.CreateUser(Fixture.Create<RegisterUserRequest>());
+            await client.CreateUser(Fixture.Create<RegisterUserRequest>());
+            await client.CreateUser(Fixture.Create<RegisterUserRequest>());
 
-            var createUserRequest = new CreateUserRequest("TestUser", "TestUser@gmail.com", true, "TestUser12324");
-            var postRequest = new HttpRequestBuilder()
-                .AddMethod(HttpMethod.Post)
-                .AddRequestUri("api/users")
-                .AddBearerToken(token)
-                .AddContent(new JsonContent(createUserRequest))
-                .Build();
+            var response = await client.GetAllUsers();
+            var users = await response.ContentAs<GetUserResponse[]>();
 
-            var response = await client.SendAsync(postRequest);
-            var c = await response.Content.ReadAsStringAsync();
-            response.StatusCode.Should().Be(HttpStatusCode.Created);
+            users.Length.Should().Be(4);
         }
+
 
         [Fact]
         public async Task ShouldCreateApiKey()
@@ -61,7 +63,7 @@ namespace HeatKeeper.Server.WebApi.Tests
              var token = await client.AuthenticateAsAdminUser();
 
             var request = new HttpRequestBuilder()
-                .AddMethod(HttpMethod.Get)
+                .WithMethod(HttpMethod.Get)
                 .AddRequestUri("api/users/apikey")
                 .AddBearerToken(token)
                 .Build();
@@ -78,7 +80,7 @@ namespace HeatKeeper.Server.WebApi.Tests
              var token = await client.AuthenticateAsAdminUser();
 
              var request = new HttpRequestBuilder()
-                .AddMethod(HttpMethod.Patch)
+                .WithMethod(HttpMethod.Patch)
                 .AddRequestUri("api/users/password")
                 .AddBearerToken(token)
                 .AddContent(new JsonContent(new ChangePasswordRequest(AdminUser.DefaultPassword, newPassword, newPassword)))

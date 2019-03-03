@@ -33,7 +33,7 @@ namespace HeatKeeper.Server.Users
             var user = await queryExecutor.ExecuteAsync(new GetUserQuery(query.UserName));
             if (user == null && query.UserName == AdminUser.UserName)
             {
-                await commandExecutor.ExecuteAsync(new RegisterUserCommand(AdminUser.UserName, "Email", AdminUser.DefaultPassword, true));
+                await commandExecutor.ExecuteAsync(new RegisterUserCommand(AdminUser.UserName, "admin@no.org",true, AdminUser.DefaultPassword,AdminUser.DefaultPassword));
                 return await HandleAsync(query);
             }
 

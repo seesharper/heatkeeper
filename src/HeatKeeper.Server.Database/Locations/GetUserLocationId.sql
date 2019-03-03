@@ -1,0 +1,1 @@
+SELECT Id FROM UserLocations WHERE UserId = @UserId and LocationId = @LocationId

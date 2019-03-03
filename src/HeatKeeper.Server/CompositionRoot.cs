@@ -28,8 +28,11 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<IPasswordPolicy,PasswordPolicy>()
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
-                .Decorate<ICommandHandler<ChangePasswordCommand>, ChangePasswordValidator>();
-
+                .RegisterSingleton<IEmailValidator, EmailValidator>()
+                .Decorate<ICommandHandler<RegisterUserCommand>, RegisterUserValidator>()
+                .Decorate<ICommandHandler<ChangePasswordCommand>, ChangePasswordValidator>()
+                .Decorate(typeof(ICommandHandler<>), typeof(ValidatedLocationCommandHandler<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(ValidatedUserCommandHandler<>));
         }
     }
 }

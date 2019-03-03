@@ -22,7 +22,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
         }
 
-        public HttpRequestBuilder AddMethod(HttpMethod method)
+        public HttpRequestBuilder WithMethod(HttpMethod method)
         {
             this.method = method;
             return this;

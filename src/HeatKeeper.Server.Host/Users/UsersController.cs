@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using HeatKeeper.Abstractions.CQRS;
@@ -32,16 +33,22 @@ namespace HeatKeeper.Server.Host.Users
             var query = new AuthenticatedUserQuery(request.Username, request.Password);
             var result = await queryExecutor.ExecuteAsync(query);
             return Ok(new AuthenticateUserResponse(result.Token, result.Id, result.Name, result.Email, result.IsAdmin));
-
-            //return Ok(new AuthenticateUserResponse(command.Token));
         }
 
         [HttpPost()]
-        public async Task<ActionResult<RegisterUserResponse>> Post([FromBody]CreateUserRequest request)
+        public async Task<ActionResult<RegisterUserResponse>> Post([FromBody]RegisterUserRequest request)
         {
-            var registerUserCommand = new RegisterUserCommand(request.Name, request.Email, request.Password, request.IsAdmin);
+            var registerUserCommand = new RegisterUserCommand(request.Name, request.Email, request.IsAdmin, request.Password, request.ConfirmedPassword);
             await commandExecutor.ExecuteAsync(registerUserCommand);
             return Created(nameof(Post), new RegisterUserResponse(registerUserCommand.Id));
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<GetUserResponse[]>> Get()
+        {
+            var allUsersQuery = new AllUsersQuery();
+            var result = await queryExecutor.ExecuteAsync(allUsersQuery);
+            return result.Select(r => new GetUserResponse(r.Id, r.Name, r.Email, r.IsAdmin)).ToArray();
         }
 
         [HttpPatch("password")]

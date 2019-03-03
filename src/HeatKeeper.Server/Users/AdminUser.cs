@@ -4,6 +4,6 @@ namespace HeatKeeper.Server.Users
     {
         public const string UserName = "admin";
 
-        public const string DefaultPassword = "admin1234";
+        public const string DefaultPassword = "Admin-1234";
     }
 }

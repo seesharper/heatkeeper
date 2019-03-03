@@ -1,8 +1,8 @@
 namespace HeatKeeper.Server.Locations
 {
-    public class CreateLocationCommand
+    public class InsertLocationCommand
     {
-        public CreateLocationCommand(string name, string description)
+        public InsertLocationCommand(string name, string description)
         {
             Name = name;
             Description = description;
