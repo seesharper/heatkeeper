@@ -1,8 +1,8 @@
 namespace HeatKeeper.Server.Host.Locations
 {
-    public class AddUserRequest
+    public class AddUserLocationRequest
     {
-        public AddUserRequest(long userId, long locationId)
+        public AddUserLocationRequest(long userId, long locationId)
         {
             UserId = userId;
             LocationId = locationId;

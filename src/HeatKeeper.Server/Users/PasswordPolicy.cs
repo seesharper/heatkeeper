@@ -8,15 +8,19 @@ namespace HeatKeeper.Server.Users
     {
         // https://stackoverflow.com/questions/16945376/regex-for-complex-password-validation
 
-        public void Apply(string passwordCandidate)
+        public void Apply(string password, string confirmedPassword)
         {
-            ValidatePassword(passwordCandidate);
+            ValidatePassword(password, confirmedPassword);
         }
 
-        private void ValidatePassword(string password)
+        private void ValidatePassword(string password, string confirmedPassword)
         {
+            if (!string.Equals(password, confirmedPassword))
+            {
+                throw new HeatKeeperSecurityException("The password does not match confirmed password");
+            }
+
             var input = password;
-            string errorMessage = string.Empty;
 
             if (string.IsNullOrWhiteSpace(input))
             {

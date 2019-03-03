@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
 using HeatKeeper.Server.Users;
@@ -50,11 +51,51 @@ namespace HeatKeeper.Server.WebApi.Tests
             return content.Token;
         }
 
+        public static async Task<HttpResponseMessage> CreateUser(this HttpClient client, RegisterUserRequest createUserRequest)
+        {
+            var token = await client.AuthenticateAsAdminUser();
+            var postRequest = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Post)
+                .AddRequestUri("api/users")
+                .AddBearerToken(token)
+                .AddContent(new JsonContent(createUserRequest))
+                .Build();
+            return await client.SendAsync(postRequest);
+        }
+
+        public static async Task<HttpResponseMessage> GetAllUsers(this HttpClient client)
+        {
+            var token = await client.AuthenticateAsAdminUser();
+
+            var postRequest = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Get)
+                .AddRequestUri("api/users")
+                .AddBearerToken(token)
+                .Build();
+
+            return await client.SendAsync(postRequest);
+        }
+
+        public static async Task<HttpResponseMessage> AddUserToLocation(this HttpClient client, AddUserLocationRequest addUserLocationRequest)
+        {
+            var token = await client.AuthenticateAsAdminUser();
+
+            var postRequest = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Post)
+                .AddRequestUri("api/locations/users")
+                .AddJsonContent(addUserLocationRequest)
+                .AddBearerToken(token)
+                .Build();
+
+            return await client.SendAsync(postRequest);
+        }
+
+
         public static async Task<HttpResponseMessage> PostAuthenticateRequest(this HttpClient client, string userName, string password)
         {
             var authenticateRequest = new HttpRequestBuilder()
                 .AddJsonContent(new AuthenticateUserRequest(userName, password))
-                .AddMethod(HttpMethod.Post)
+                .WithMethod(HttpMethod.Post)
                 .AddRequestUri("api/users/authenticate")
                 .Build();
             return await client.SendAsync(authenticateRequest);
@@ -66,10 +107,22 @@ namespace HeatKeeper.Server.WebApi.Tests
             var httpRequest = new HttpRequestBuilder()
                 .AddBearerToken(token)
                 .AddContent(new JsonContent(request))
-                .AddMethod(HttpMethod.Post)
+                .WithMethod(HttpMethod.Post)
                 .AddRequestUri("api/locations")
                 .Build();
             return  await client.SendAsync(httpRequest);
+        }
+
+        public static async Task<GetLocationsResponse[]> GetLocations(this HttpClient client)
+        {
+            var token = await client.AuthenticateAsAdminUser();
+            var httpRequest = new HttpRequestBuilder()
+                .AddBearerToken(token)
+                .WithMethod(HttpMethod.Get)
+                .AddRequestUri("api/locations")
+                .Build();
+            var response = await client.SendAsync(httpRequest);
+            return await response.ContentAs<GetLocationsResponse[]>();
         }
     }
 }

@@ -2,6 +2,6 @@ namespace HeatKeeper.Server.Users
 {
     public interface IPasswordPolicy
     {
-        void Apply(string passwordCandidate);        
+        void Apply(string password, string confirmedPassword);
     }
 }

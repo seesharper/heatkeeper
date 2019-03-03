@@ -28,7 +28,7 @@ namespace HeatKeeper.Server.Users
                 throw new HeatKeeperSecurityException("The new password must be different from the old password");
             }
 
-            passwordPolicy.Apply(command.NewPassword);
+            passwordPolicy.Apply(command.NewPassword, command.ConfirmedPassword);
 
             await handler.HandleAsync(command).ConfigureAwait(false);
         }

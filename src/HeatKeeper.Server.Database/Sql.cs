@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
@@ -32,9 +33,21 @@ namespace HeatKeeper.Server.Database
 
         string GetUser {get;}
 
-        string AddUser {get;}
+        string InsertUserLocation {get;}
 
         string UpdatePasswordHash {get;}
+
+        string DeleteUserLocation {get;}
+
+        string GetUserLocationId { get; }
+
+        string GetAllUsers {get;}
+
+        string UpdateUser {get;}
+
+        string UserExists {get;}
+
+        string LocationExists{get;}
     }
 
     public class SqlProvider : ISqlProvider
@@ -60,13 +73,25 @@ namespace HeatKeeper.Server.Database
         public string InsertUser => Load();
         public string GetUser=> Load();
 
-        public string AddUser => Load();
+        public string InsertUserLocation => Load();
 
         public string GetLocationId => Load();
 
         public string GetUserId => Load();
 
         public string UpdatePasswordHash => Load();
+
+        public string DeleteUserLocation => Load();
+
+        public string GetUserLocationId => Load();
+
+        public string GetAllUsers => Load();
+
+        public string UpdateUser => Load();
+
+        public string UserExists => Load();
+
+        public string LocationExists => Load();
 
         public string Load([CallerMemberName] string name = "")
         {
@@ -82,7 +107,7 @@ namespace HeatKeeper.Server.Database
         {
             var assembly = typeof(SqlProvider).Assembly;
             var resourceNames = assembly.GetManifestResourceNames();
-            var sqlResource = resourceNames.First(r => r.Contains(name));
+            var sqlResource = resourceNames.First(r => r.EndsWith($"{name}.sql",StringComparison.InvariantCultureIgnoreCase));
             var resourceStream = assembly.GetManifestResourceStream(sqlResource);
             using (var reader = new StreamReader(resourceStream, Encoding.UTF8))
             {

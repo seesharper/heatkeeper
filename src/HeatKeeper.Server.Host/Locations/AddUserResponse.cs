@@ -1,12 +1,12 @@
 namespace HeatKeeper.Server.Host.Locations
 {
-    public class AddUserResponse
+    public class AddUserLocationResponse
     {
-        public AddUserResponse(long id)
+        public AddUserLocationResponse(long userLocationId)
         {
-            Id = id;
+            UserLocationId = userLocationId;
         }
 
-        public long Id { get; }
+        public long UserLocationId { get; }
     }
 }
