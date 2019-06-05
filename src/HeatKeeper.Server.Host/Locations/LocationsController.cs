@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Host.Zones;
 using HeatKeeper.Server.Locations;
-using HeatKeeper.Server.Mapping;
 using HeatKeeper.Server.Zones;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,13 +16,11 @@ namespace HeatKeeper.Server.Host.Locations
     {
         private readonly IQueryExecutor queryExecutor;
         private readonly ICommandExecutor commandExecutor;
-        private readonly IMapper mapper;
 
-        public LocationsController(IQueryExecutor queryExecutor, ICommandExecutor commandExecutor, IMapper mapper)
+        public LocationsController(IQueryExecutor queryExecutor, ICommandExecutor commandExecutor)
         {
             this.queryExecutor = queryExecutor;
             this.commandExecutor = commandExecutor;
-            this.mapper = mapper;
         }
 
         [HttpPost]
@@ -63,7 +60,7 @@ namespace HeatKeeper.Server.Host.Locations
         {
             var addUserCommand = new InsertUserLocationCommand(request.UserId, request.LocationId);
             await commandExecutor.ExecuteAsync(addUserCommand);
-            return CreatedAtAction(nameof(AddUser),new AddUserLocationResponse(addUserCommand.UserLocationId));
+            return CreatedAtAction(nameof(AddUser), new AddUserLocationResponse(addUserCommand.UserLocationId));
         }
 
         [HttpDelete("users")]
