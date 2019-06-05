@@ -1,6 +1,7 @@
 using System.Data;
 using LightInject;
 using HeatKeeper.Abstractions.Transactions;
+using ResourceReader;
 
 namespace HeatKeeper.Server.Database
 {
@@ -13,7 +14,7 @@ namespace HeatKeeper.Server.Database
                 .RegisterSingleton<IDatabaseInitializer, DatabaseInitializer>()
                 .RegisterSingleton<IDbConnectionFactory, SqliteConnectionFactory>()
                 .RegisterSingleton<IConnectionStringProvider, SqliteConnectionStringProvider>()
-                .RegisterSingleton<ISqlProvider,SqlProvider>();
+                .RegisterSingleton<ISqlProvider>(f => new ResourceBuilder().Build<ISqlProvider>());
         }
 
         private IDbConnection CreateConnection(IServiceFactory factory)
