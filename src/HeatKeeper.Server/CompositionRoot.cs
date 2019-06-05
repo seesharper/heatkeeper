@@ -10,6 +10,7 @@ using HeatKeeper.Server.Users;
 using LightInject;
 
 using Vibrant.InfluxDB.Client;
+using HeatKeeper.Server.Zones;
 
 namespace HeatKeeper.Server
 {
@@ -32,6 +33,7 @@ namespace HeatKeeper.Server
                 .Decorate<ICommandHandler<RegisterUserCommand>, RegisterUserValidator>()
                 .Decorate<ICommandHandler<ChangePasswordCommand>, ChangePasswordValidator>()
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidatedLocationCommandHandler<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(ValidatedZoneCommandHandler<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidatedUserCommandHandler<>));
         }
     }

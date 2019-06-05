@@ -1,10 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using AutoFixture;
 using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Host.Locations;
+using HeatKeeper.Server.Host.Zones;
 using HeatKeeper.Server.WebApi.Tests.Transactions;
-using HeatKeeper.Server.WebApi.Zones;
 using LightInject;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -20,13 +21,14 @@ namespace HeatKeeper.Server.WebApi.Tests
         }
 
 
+
+
         [Fact]
-        public async Task TestShouldCreateZone()
+        public async Task ShouldGetZonesForLocation()
         {
             var client = Factory.CreateClient();
-            await client.PostAsync("api/locations", new JsonContent(new CreateLocationRequest("Home", "This is my home in Norway")));
-            var response = await client.PostAsync("api/zones", new JsonContent(new CreateZoneRequest("Livingroom", "Livingroom", "Home")));
-            response.EnsureSuccessStatusCode();
+            await client.GetZones(12);
+
         }
 
 

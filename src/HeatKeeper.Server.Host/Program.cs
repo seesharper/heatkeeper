@@ -1,5 +1,4 @@
 ﻿using System;
-using HeatKeeper.Server.WebApi;
 using LightInject.Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;

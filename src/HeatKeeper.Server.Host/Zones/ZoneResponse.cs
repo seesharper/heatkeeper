@@ -1,14 +1,16 @@
-namespace HeatKeeper.Server.Zones
+namespace HeatKeeper.Server.Host.Zones
 {
     public class ZoneResponse
     {
-        public ZoneResponse(string id, string description)
+        public ZoneResponse(long id, string name, string description)
         {
             Id = id;
+            Name = name;
             Description = description;
         }
 
-        public string Id { get; }
+        public long Id { get; }
+        public string Name { get; }
         public string Description { get; }
     }
 }
