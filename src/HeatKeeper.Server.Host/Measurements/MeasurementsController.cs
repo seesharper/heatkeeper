@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using HeatKeeper.Abstractions.CQRS;
-using HeatKeeper.Server.Mapping;
 using HeatKeeper.Server.Sensors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,12 +11,10 @@ namespace HeatKeeper.Server.Measurements
     public class MeasurementsController : ControllerBase
     {
         private readonly ICommandExecutor commandExecutor;
-        private readonly IMapper mapper;
 
-        public MeasurementsController(ICommandExecutor commandExecutor, IMapper mapper)
+        public MeasurementsController(ICommandExecutor commandExecutor)
         {
             this.commandExecutor = commandExecutor;
-            this.mapper = mapper;
         }
 
         [HttpPost]

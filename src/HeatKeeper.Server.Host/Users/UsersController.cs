@@ -2,7 +2,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using HeatKeeper.Abstractions.CQRS;
-using HeatKeeper.Server.Mapping;
 using HeatKeeper.Server.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -54,7 +53,7 @@ namespace HeatKeeper.Server.Host.Users
         [HttpPatch("password")]
         public async Task<IActionResult> ChangePassword([FromBody]ChangePasswordRequest request)
         {
-            var changePasswordCommand = new ChangePasswordCommand(request.OldPassword,request.NewPassword, request.ConfirmedPassword);
+            var changePasswordCommand = new ChangePasswordCommand(request.OldPassword, request.NewPassword, request.ConfirmedPassword);
             await commandExecutor.ExecuteAsync(changePasswordCommand);
             return Ok();
         }
