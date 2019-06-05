@@ -1,17 +1,17 @@
-namespace HeatKeeper.Server.WebApi.Zones
+using HeatKeeper.Server.Zones;
+
+namespace HeatKeeper.Server.Host.Zones
 {
     public class CreateZoneRequest
     {
-        public CreateZoneRequest(string name, string description, string location)
+        public CreateZoneRequest(string name, string description)
         {
             Name = name;
             Description = description;
-            Location = location;
         }
 
         public string Name { get; }
         public string Description { get; }
-        public string Location { get; }
     }
 
 }

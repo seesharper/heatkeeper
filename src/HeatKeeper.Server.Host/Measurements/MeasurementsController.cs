@@ -21,10 +21,9 @@ namespace HeatKeeper.Server.Measurements
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CreateMeasurementRequest[] createMeasurementRequests)
+        public async Task<IActionResult> Post([FromBody] CreateMeasurementCommand[] createMeasurementCommands)
         {
-            await commandExecutor.ExecuteAsync(new CreateMissingSensorsCommand(createMeasurementRequests.Select(cmr => cmr.SensorId)));
-            var createMeasurementCommands = mapper.Map<CreateMeasurementRequest[], CreateMeasurementCommand[]>(createMeasurementRequests);
+            await commandExecutor.ExecuteAsync(new CreateMissingSensorsCommand(createMeasurementCommands.Select(cmr => cmr.SensorId)));
             await commandExecutor.ExecuteAsync(createMeasurementCommands);
             return Ok();
         }

@@ -41,6 +41,8 @@ namespace HeatKeeper.Server.Host
                 });
             });
 
+            services.AddRouting(options => options.LowercaseUrls = true);
+
             services.AddMvc(options => {
                 options.Filters.Add<GlobalExceptionFilter>();
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddControllersAsServices();

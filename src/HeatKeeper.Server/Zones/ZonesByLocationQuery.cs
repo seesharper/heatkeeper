@@ -4,11 +4,11 @@ namespace HeatKeeper.Server.Zones
 {
     public class ZonesByLocationQuery : IQuery<ZoneQueryResult[]>
     {
-        public ZonesByLocationQuery(string location)
+        public ZonesByLocationQuery(long locationId)
         {
-            Location = location;
+            LocationId = locationId;
         }
 
-        public string Location { get; }
+        public long LocationId { get; }
     }
 }

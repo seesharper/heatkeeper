@@ -48,6 +48,10 @@ namespace HeatKeeper.Server.Database
         string UserExists {get;}
 
         string LocationExists{get;}
+
+        string ZonesByLocation {get;}
+
+        string ZoneExists {get;}
     }
 
     public class SqlProvider : ISqlProvider
@@ -93,6 +97,10 @@ namespace HeatKeeper.Server.Database
 
         public string LocationExists => Load();
 
+        public string ZonesByLocation => Load();
+
+        public string ZoneExists => Load();
+
         public string Load([CallerMemberName] string name = "")
         {
             return LoadSql(name);
@@ -107,7 +115,11 @@ namespace HeatKeeper.Server.Database
         {
             var assembly = typeof(SqlProvider).Assembly;
             var resourceNames = assembly.GetManifestResourceNames();
-            var sqlResource = resourceNames.First(r => r.EndsWith($"{name}.sql",StringComparison.InvariantCultureIgnoreCase));
+            var sqlResource = resourceNames.FirstOrDefault(r => r.EndsWith($"{name}.sql",StringComparison.InvariantCultureIgnoreCase));
+            if (sqlResource == null)
+            {
+
+            }
             var resourceStream = assembly.GetManifestResourceStream(sqlResource);
             using (var reader = new StreamReader(resourceStream, Encoding.UTF8))
             {

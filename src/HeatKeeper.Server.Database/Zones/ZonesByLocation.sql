@@ -3,5 +3,6 @@ SELECT
     Name,
     Description
 FROM
-    Zones z
-WHERE LocationId = @LocationId
+    Zones
+WHERE
+    LocationId = @LocationId

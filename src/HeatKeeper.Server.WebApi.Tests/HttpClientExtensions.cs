@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
+using HeatKeeper.Server.Host.Zones;
 using HeatKeeper.Server.Users;
+
 using Newtonsoft.Json;
 
 namespace HeatKeeper.Server.WebApi.Tests
@@ -123,6 +125,31 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .Build();
             var response = await client.SendAsync(httpRequest);
             return await response.ContentAs<GetLocationsResponse[]>();
+        }
+
+
+        public static async Task<HttpResponseMessage> CreateZone(this HttpClient client, long locationId, CreateZoneRequest request)
+        {
+            var token = await client.AuthenticateAsAdminUser();
+            var httpRequest = new HttpRequestBuilder()
+                .AddBearerToken(token)
+                .AddJsonContent(request)
+                .WithMethod(HttpMethod.Post)
+                .AddRequestUri($"api/locations/{locationId}/zones")
+                .Build();
+            return await client.SendAsync(httpRequest);
+        }
+
+
+        public static async Task<HttpResponseMessage> GetZones(this HttpClient client, long locationId)
+        {
+            var token = await client.AuthenticateAsAdminUser();
+            var httpRequest = new HttpRequestBuilder()
+                .AddBearerToken(token)
+                .WithMethod(HttpMethod.Get)
+                .AddRequestUri($"api/locations/{locationId}/zones")
+                .Build();
+             return await client.SendAsync(httpRequest);
         }
     }
 }

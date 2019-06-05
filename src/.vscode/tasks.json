@@ -12,6 +12,45 @@
                 "reveal": "always"
             },
             "problemMatcher": "$msCompile"
-        }
+        },
+        {
+            "label": "test",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+              "test",
+              "-c",
+              "release",
+              "-f",
+              "netcoreapp2.2",
+              "${workspaceFolder}/HeatKeeper.Server.WebApi.Tests/HeatKeeper.Server.WebApi.Tests.csproj"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+              "kind": "test",
+              "isDefault": true
+            }
+          },
+          {
+            "label": "test with code coverage",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+              "test",
+              "-c",
+              "release",
+              "-f",
+              "netcoreapp2.2",
+              "/p:CollectCoverage=true",
+              "/p:Exclude=\"[xunit*]*\"",
+              "/p:CoverletOutputFormat=lcov",
+              "${workspaceFolder}/HeatKeeper.Server.WebApi.Tests/HeatKeeper.Server.WebApi.Tests.csproj"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+              "kind": "test",
+              "isDefault": true
+            }
+          }
     ]
 }

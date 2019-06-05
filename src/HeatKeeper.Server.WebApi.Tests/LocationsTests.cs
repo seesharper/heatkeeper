@@ -2,6 +2,7 @@ using AutoFixture;
 using FluentAssertions;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
+using HeatKeeper.Server.Host.Zones;
 using HeatKeeper.Server.WebApi.Tests.Customizations;
 using LightInject;
 using System.Net;
@@ -37,6 +38,41 @@ namespace HeatKeeper.Server.WebApi.Tests
         }
 
         [Fact]
+        public async Task ShouldCreateAndGetZones()
+        {
+            var client = Factory.CreateClient();
+            var locationMessageResponse = await client.CreateLocation(Fixture.Create<CreateLocationRequest>());
+            var locationId = (await locationMessageResponse.ContentAs<CreateLocationResponse>()).Id;
+            await client.CreateZone(locationId, Fixture.Create<CreateZoneRequest>());
+            await client.CreateZone(locationId, Fixture.Create<CreateZoneRequest>());
+
+            var zones = await (await client.GetZones(locationId)).ContentAs<ZoneResponse[]>();
+            zones.Length.Should().Be(2);
+        }
+
+        [Fact]
+        public async Task ShouldBeAbleToCreateSameZoneInDifferentLocations()
+        {
+            var client = Factory.CreateClient();
+            var locationMessageResponse = await client.CreateLocation(Fixture.Create<CreateLocationRequest>());
+            var firstLocationId = (await locationMessageResponse.ContentAs<CreateLocationResponse>()).Id;
+            locationMessageResponse = await client.CreateLocation(Fixture.Create<CreateLocationRequest>());
+            var secondLocationId = (await locationMessageResponse.ContentAs<CreateLocationResponse>()).Id;
+
+            var createZoneRequest = Fixture.Create<CreateZoneRequest>();
+
+            await client.CreateZone(firstLocationId, createZoneRequest);
+            await client.CreateZone(secondLocationId, createZoneRequest);
+
+            var zones = await (await client.GetZones(firstLocationId)).ContentAs<ZoneResponse[]>();
+            zones.Length.Should().Be(1);
+
+            zones = await (await client.GetZones(secondLocationId)).ContentAs<ZoneResponse[]>();
+            zones.Length.Should().Be(1);
+        }
+
+
+        [Fact]
         public async Task ShouldHandleDuplicateLocation()
         {
             var client = Factory.CreateClient();
@@ -51,6 +87,25 @@ namespace HeatKeeper.Server.WebApi.Tests
             locationRequestMessage.StatusCode.Should().Be(HttpStatusCode.Conflict);
         }
 
+        [Fact]
+        public async Task ShouldHandleCreatingDuplicateZones()
+        {
+            var client = Factory.CreateClient();
+
+            var createLocationRequest = Fixture.Create<CreateLocationRequest>();
+
+            var locationRequestMessage = await client.CreateLocation(createLocationRequest);
+            var locationId = (await locationRequestMessage.ContentAs<CreateLocationResponse>()).Id;
+
+            var createZoneRequest = Fixture.Create<CreateZoneRequest>();
+
+            var zoneRequestMessage = await client.CreateZone(locationId, createZoneRequest);
+            zoneRequestMessage.EnsureSuccessStatusCode();
+
+            zoneRequestMessage = await client.CreateZone(locationId, createZoneRequest);
+
+            zoneRequestMessage.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        }
 
         [Fact]
         public async Task ShouldAddUserToLocation()
