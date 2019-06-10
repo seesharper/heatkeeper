@@ -1,7 +1,6 @@
 version: "3"
 services:
   heatkeeper:
-    build: .
     image: bernhardrichter/heatkeeper:latest
     container_name: heatkeeper
     volumes:
@@ -17,14 +16,8 @@ services:
       - "8086:8086"
     volumes:
       - ./db/influxdb/data:/var/lib/influxdb
-  telegraf:
-    image: telegraf:latest
-    container_name: telegraf
-    volumes:
-      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
   watchtower:
     image: v2tec/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ~/.docker/config.json:/config.json
     command: --interval 30 --debug
