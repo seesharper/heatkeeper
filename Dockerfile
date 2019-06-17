@@ -5,7 +5,7 @@ WORKDIR /github
 
 RUN git clone https://github.com/seesharper/heatkeeper.client
 
-FROM node:10-alpine as client-build
+FROM node:10-alpine as client-build-stage
 
 WORKDIR /src
 
@@ -31,6 +31,8 @@ VOLUME [ "/db" ]
 WORKDIR /app
 
 COPY --from=build-stage /heatkeeper/app .
+
+COPY --from=client-build-stage src/dist wwwroot
 
 EXPOSE 80
 
