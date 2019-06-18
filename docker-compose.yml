@@ -1,7 +1,7 @@
 version: "3"
 services:
   heatkeeper:
-    image: bernhardrichter/heatkeeper:latest
+    image: bernhardrichter/heatkeeper:1.0.3
     container_name: heatkeeper
     volumes:
       - ./db/sqlite/data:/heatkeeper/db

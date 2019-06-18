@@ -32,9 +32,11 @@ namespace HeatKeeper.Server.Host
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(options => {
+            services.AddCors(options =>
+            {
 
-                options.AddPolicy("DevelopmentPolicy", config => {
+                options.AddPolicy("DevelopmentPolicy", config =>
+                {
                     config.AllowAnyOrigin();
                     config.AllowAnyMethod();
                     config.AllowAnyHeader();
@@ -43,7 +45,8 @@ namespace HeatKeeper.Server.Host
 
             services.AddRouting(options => options.LowercaseUrls = true);
 
-            services.AddMvc(options => {
+            services.AddMvc(options =>
+            {
                 options.Filters.Add<GlobalExceptionFilter>();
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddControllersAsServices();
             services.Configure<Settings>(Configuration);
@@ -103,6 +106,7 @@ namespace HeatKeeper.Server.Host
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IDatabaseInitializer databaseInitializer)
         {
+            app.UseStaticFiles();
             databaseInitializer.Initialize();
 
 
@@ -123,7 +127,7 @@ namespace HeatKeeper.Server.Host
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-                c.RoutePrefix = string.Empty;
+                c.RoutePrefix = "swagger";
             });
 
             app.UseAuthentication();
