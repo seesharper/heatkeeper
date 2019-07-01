@@ -1,5 +1,5 @@
 #!/usr/bin/env dotnet-script
-#load "nuget:Dotnet.Build, 0.5.0"
+#load "nuget:Dotnet.Build, 0.5.1"
 #load "nuget:github-changelog, 0.1.5"
 #load "nuget:dotnet-steps, 0.0.1"
 #load "build-context.csx"
@@ -8,7 +8,7 @@
 using static ChangeLog;
 using static DotNet;
 using static ReleaseManagement;
-
+using static Command;
 [StepDescription("Runs all the tests")]
 Step test = () => Test(IntegrationsTests);
 
