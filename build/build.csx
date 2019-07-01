@@ -9,6 +9,11 @@ using static ChangeLog;
 using static DotNet;
 using static ReleaseManagement;
 using static Command;
+using static SimpleExec.Command;
+
+await Docker.BuildAsync(dockerRepository, version, rootFolder);
+return;
+
 [StepDescription("Runs all the tests")]
 Step test = () => Test(IntegrationsTests);
 

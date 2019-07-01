@@ -1,10 +1,17 @@
 #load "nuget:Dotnet.Build, 0.5.0"
+#r "nuget:SimpleExec, 5.0.1"
+using static SimpleExec.Command;
 
 public static class Docker
 {
     public static void Build(string repository, string tag, string workingDirectory)
     {
         Command.Execute("docker", $@"build --rm -f ""Dockerfile"" -t {repository}:{tag} .", workingDirectory);
+    }
+
+    public static async Task BuildAsync(string repository, string tag, string workingDirectory)
+    {
+        await RunAsync("docker", $@"build --rm -f ""Dockerfile"" -t {repository}:{tag} .", workingDirectory);
     }
 
     public static void Push(string repository, string tag, string workingDirectory)
