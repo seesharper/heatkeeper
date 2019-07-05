@@ -1,5 +1,5 @@
 #!/usr/bin/env dotnet-script
-#load "nuget:Dotnet.Build, 0.5.1"
+#load "nuget:Dotnet.Build, 0.6.0"
 #load "nuget:github-changelog, 0.1.5"
 #load "nuget:dotnet-steps, 0.0.1"
 #load "build-context.csx"
@@ -8,10 +8,6 @@
 using static ChangeLog;
 using static DotNet;
 using static ReleaseManagement;
-using static SimpleExec.Command;
-
-await Docker.BuildAsync(dockerRepository, version, rootFolder);
-return;
 
 [StepDescription("Runs all the tests")]
 Step test = () => Test(IntegrationsTests);
@@ -23,9 +19,9 @@ Step testcoverage = () =>
 };
 
 [StepDescription("Builds the docker image using the latest git tag.")]
-Step dockerimage = () =>
+AsyncStep dockerimage = async () =>
 {
-    Docker.Build(dockerRepository, version, rootFolder);
+    await Docker.BuildAsync(dockerRepository, version, rootFolder);
 };
 
 
@@ -35,7 +31,7 @@ AsyncStep deploy = async () =>
 {
     test();
     testcoverage();
-    dockerimage();
+    await dockerimage();
     if (!BuildEnvironment.IsSecure)
     {
         Logger.Log("Deployment can only be done in a secure environment");
@@ -49,7 +45,7 @@ AsyncStep deploy = async () =>
         Git.Default.RequireCleanWorkingTree();
         await ReleaseManagerFor(owner, projectName, BuildEnvironment.GitHubAccessToken)
         .CreateRelease(Git.Default.GetLatestTag(), pathToReleaseNotes, Array.Empty<ReleaseAsset>());
-        Docker.Push(dockerRepository, version, rootFolder);
+        await Docker.PushAsync(dockerRepository, version, rootFolder);
     }
 };
 
