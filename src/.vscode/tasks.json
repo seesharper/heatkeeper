@@ -57,6 +57,18 @@
         "kind": "test",
         "isDefault": true
       }
+    },
+    {
+      "label": "docker image",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "script",
+        "${workspaceFolder}/../build/build.csx",
+        "dockerimage"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": "build"
     }
   ]
 }
