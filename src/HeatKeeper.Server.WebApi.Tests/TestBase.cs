@@ -18,8 +18,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public TestBase(ITestOutputHelper testOutputHelper)
         {
             Factory = new WebApplicationFactory<Startup>()
-            .WithWebHostBuilder(builder => {
-                builder.ConfigureTestContainer<IServiceContainer>(c => {c.EnableRollback(); _container = c;}).ConfigureLogging(loggingBuilder => loggingBuilder.AddProvider(new TestLoggerProvider()));
+            .WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestContainer<IServiceContainer>(c => { c.EnableRollback(); _container = c; }).ConfigureLogging(loggingBuilder => loggingBuilder.AddProvider(new TestLoggerProvider()));
             });
             testOutputHelper.Capture();
             Fixture = new Fixture();
@@ -27,7 +28,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         }
 
-        public Fixture Fixture {get;}
+        public Fixture Fixture { get; }
 
         public WebApplicationFactory<Startup> Factory { get; }
 
@@ -35,6 +36,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public void Dispose()
         {
+            //Factory.Dispose();
             _container.Dispose();
         }
     }

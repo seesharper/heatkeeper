@@ -1,6 +1,6 @@
 {
   "cSpell.words": ["heatkeeper"],
-  "omnisharp.useGlobalMono": "always",
+
   "csharp.unitTestDebuggingOptions": {
     "type": "coreclr"
   },

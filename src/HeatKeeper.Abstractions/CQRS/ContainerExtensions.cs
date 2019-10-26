@@ -45,8 +45,8 @@ namespace HeatKeeper.Abstractions.CQRS
                     .Where(m => m != null);
             RegisterHandlers(serviceRegistry, commandTypes);
             // The problem here is that the factory is the root scope.
-            //serviceRegistry.Register<IQueryExecutor>(factory => new QueryExecutor(GetCurrentScope(factory)), new PerScopeLifetime());
-            serviceRegistry.Register<IQueryExecutor>(factory => new QueryExecutor(factory), new PerContainerLifetime());
+            serviceRegistry.Register<IQueryExecutor>(factory => new QueryExecutor(GetCurrentScope(factory)), new PerScopeLifetime());
+            //serviceRegistry.Register<IQueryExecutor>(factory => new QueryExecutor(factory), new PerContainerLifetime());
             serviceRegistry.Register<IBus, Bus>(new PerContainerLifetime());
             return serviceRegistry;
         }

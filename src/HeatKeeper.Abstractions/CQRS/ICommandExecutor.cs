@@ -15,7 +15,7 @@ namespace HeatKeeper.Abstractions.CQRS
         /// <param name="command">The command to be executed.</param>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns><see cref="Task"/>.</returns>
-        Task ExecuteAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default(CancellationToken));
+        Task ExecuteAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default);
     }
 
     public interface IBus

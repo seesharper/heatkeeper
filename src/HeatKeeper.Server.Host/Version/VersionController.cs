@@ -10,11 +10,11 @@ namespace HeatKeeper.Server.Measurements
     [ApiController]
     public class VersionController : ControllerBase
     {
-        private readonly ICommandExecutor commandExecutor;
+        private readonly ICommandExecutor _commandExecutor;
 
         public VersionController(ICommandExecutor commandExecutor)
         {
-            this.commandExecutor = commandExecutor;
+            _commandExecutor = commandExecutor;
         }
 
         [HttpGet]
