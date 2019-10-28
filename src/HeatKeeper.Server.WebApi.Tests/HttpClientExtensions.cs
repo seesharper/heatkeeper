@@ -19,7 +19,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
             var result = await client.GetAsync(requestUri);
             result.EnsureSuccessStatusCode();
-            return await result.Content.ReadAsAsync<T>();
+            return await result.ContentAs<T>();
         }
 
         public static async Task<HttpResponseMessage> PostAsync<T>(this HttpClient client, string requestUri, string bearerToken, T content)
@@ -112,7 +112,7 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .WithMethod(HttpMethod.Post)
                 .AddRequestUri("api/locations")
                 .Build();
-            return  await client.SendAsync(httpRequest);
+            return await client.SendAsync(httpRequest);
         }
 
         public static async Task<GetLocationsResponse[]> GetLocations(this HttpClient client)
@@ -149,7 +149,7 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .WithMethod(HttpMethod.Get)
                 .AddRequestUri($"api/locations/{locationId}/zones")
                 .Build();
-             return await client.SendAsync(httpRequest);
+            return await client.SendAsync(httpRequest);
         }
     }
 }

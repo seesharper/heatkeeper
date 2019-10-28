@@ -15,7 +15,7 @@ Step test = () => Test(IntegrationsTests);
 [StepDescription("Runs the tests with test coverage")]
 Step testcoverage = () =>
 {
-    DotNet.TestWithCodeCoverage(projectName, IntegrationsTests, coverageArtifactsFolder, targetFramework: "netcoreapp2.2", threshold: 10);
+    DotNet.TestWithCodeCoverage(projectName, IntegrationsTests, coverageArtifactsFolder, targetFramework: "netcoreapp3.0", threshold: 10);
 };
 
 [StepDescription("Builds the docker image using the latest git tag.")]

@@ -1,23 +1,25 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using HeatKeeper.Server.Database;
 using HeatKeeper.Abstractions.Logging;
+using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Users;
 using LightInject;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Swashbuckle.AspNetCore.Swagger;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using HeatKeeper.Server.Users;
-using Microsoft.AspNetCore.Http;
-using System;
-using Microsoft.AspNetCore.Diagnostics;
-using System.Net;
+using Swashbuckle.AspNetCore.Swagger;
+
 
 namespace HeatKeeper.Server.Host
 {
@@ -32,6 +34,8 @@ namespace HeatKeeper.Server.Host
 
         public void ConfigureServices(IServiceCollection services)
         {
+
+
             services.AddCors(options =>
             {
 
@@ -48,7 +52,7 @@ namespace HeatKeeper.Server.Host
             services.AddMvc(options =>
             {
                 options.Filters.Add<GlobalExceptionFilter>();
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddControllersAsServices();
+            }).AddControllersAsServices().AddNewtonsoftJson();
             services.Configure<Settings>(Configuration);
 
             // configure jwt authentication
@@ -104,11 +108,9 @@ namespace HeatKeeper.Server.Host
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IDatabaseInitializer databaseInitializer)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseInitializer databaseInitializer)
         {
-            app.UseStaticFiles();
             databaseInitializer.Initialize();
-
 
             if (env.IsDevelopment())
             {
@@ -120,19 +122,29 @@ namespace HeatKeeper.Server.Host
                 app.UseDeveloperExceptionPage();
                 //app.UseHsts();
             }
-            app.UseSwagger();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseStaticFiles();
 
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-            // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
+            app.UseRouting();
+
+
+            app.UseEndpoints(endpoints =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-                c.RoutePrefix = "swagger";
+                endpoints.MapControllers();
             });
 
-            app.UseAuthentication();
+            // app.UseSwagger();
+
+            // // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // // specifying the Swagger JSON endpoint.
+            // app.UseSwaggerUI(c =>
+            // {
+            //     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            //     c.RoutePrefix = "swagger";
+            // });
             //app.UseHttpsRedirection();
-            app.UseMvc();
+
         }
     }
 
