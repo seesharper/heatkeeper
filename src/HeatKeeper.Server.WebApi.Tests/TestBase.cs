@@ -13,19 +13,16 @@ namespace HeatKeeper.Server.WebApi.Tests
 {
     public class TestBase : IDisposable
     {
-        private IServiceContainer _container;
-
         public TestBase(ITestOutputHelper testOutputHelper)
         {
             Factory = new WebApplicationFactory<Startup>()
             .WithWebHostBuilder(builder =>
             {
-                builder.ConfigureTestContainer<IServiceContainer>(c => { c.EnableRollback(); _container = c; }).ConfigureLogging(loggingBuilder => loggingBuilder.AddProvider(new TestLoggerProvider()));
+                builder.ConfigureTestContainer<IServiceContainer>(c => c.EnableRollback())
+                .ConfigureLogging(loggingBuilder => loggingBuilder.AddProvider(new TestLoggerProvider()));
             });
             testOutputHelper.Capture();
             Fixture = new Fixture();
-
-
         }
 
         public Fixture Fixture { get; }
@@ -36,8 +33,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public void Dispose()
         {
-            //Factory.Dispose();
-            _container.Dispose();
+            Factory.Dispose();
         }
     }
 }

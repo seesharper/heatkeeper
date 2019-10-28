@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using HeatKeeper.Abstractions.Logging;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Users;
@@ -11,15 +8,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Swashbuckle.AspNetCore.Swagger;
-
+using Microsoft.OpenApi.Models;
 
 namespace HeatKeeper.Server.Host
 {
@@ -34,8 +28,6 @@ namespace HeatKeeper.Server.Host
 
         public void ConfigureServices(IServiceCollection services)
         {
-
-
             services.AddCors(options =>
             {
 
@@ -65,8 +57,6 @@ namespace HeatKeeper.Server.Host
 
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
-
-
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -85,11 +75,9 @@ namespace HeatKeeper.Server.Host
                 };
             });
 
-
-
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "Heatkeeper", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Heatkeeper", Version = "v1" });
             });
         }
 
@@ -102,8 +90,8 @@ namespace HeatKeeper.Server.Host
             container.RegisterSingleton<LogFactory>(f =>
             {
                 var loggerFactory = f.GetInstance<ILoggerFactory>();
-                LogFactory factory = (type) => (l, m, e) => loggerFactory.CreateLogger(type).LogInformation(m);
-                return factory;
+                Logger Factory(Type type) => (l, m, e) => loggerFactory.CreateLogger(type).LogInformation(m);
+                return Factory;
             });
         }
 
@@ -111,6 +99,16 @@ namespace HeatKeeper.Server.Host
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseInitializer databaseInitializer)
         {
             databaseInitializer.Initialize();
+
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = "swagger";
+            });
 
             if (env.IsDevelopment())
             {
@@ -120,29 +118,21 @@ namespace HeatKeeper.Server.Host
             else
             {
                 app.UseDeveloperExceptionPage();
-                //app.UseHsts();
             }
-            app.UseAuthentication();
-            app.UseAuthorization();
+
             app.UseStaticFiles();
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
 
-            // app.UseSwagger();
 
-            // // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-            // // specifying the Swagger JSON endpoint.
-            // app.UseSwaggerUI(c =>
-            // {
-            //     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            //     c.RoutePrefix = "swagger";
-            // });
             //app.UseHttpsRedirection();
 
         }
