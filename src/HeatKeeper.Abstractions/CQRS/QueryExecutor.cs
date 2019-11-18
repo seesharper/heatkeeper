@@ -49,14 +49,14 @@ namespace HeatKeeper.Abstractions.CQRS
         private static Func<IServiceFactory, IQuery<TResult>, CancellationToken, Task<TResult>> CreateDelegate<TResult>(Type queryType)
         {
             // Define the signature of the dynamic method.
-            var dynamicMethod = new System.Reflection.Emit.DynamicMethod("DynamicMethod", typeof(Task<TResult>), new[] { typeof(IServiceFactory), typeof(IQuery<TResult>) , typeof(CancellationToken) });
-            System.Reflection.Emit.ILGenerator generator = dynamicMethod.GetILGenerator();
+            var dynamicMethod = new System.Reflection.Emit.DynamicMethod("DynamicMethod", typeof(Task<TResult>), new[] { typeof(IServiceFactory), typeof(IQuery<TResult>), typeof(CancellationToken) });
+            var generator = dynamicMethod.GetILGenerator();
 
             // Create the closed generic query handler type.
-            Type queryHandlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, typeof(TResult));
+            var queryHandlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, typeof(TResult));
 
             // Get the MethodInfo that represents the HandleAsync method.
-            MethodInfo method = queryHandlerType.GetMethod("HandleAsync");
+            var method = queryHandlerType.GetMethod("HandleAsync");
 
             // Push the service factory onto the evaluation stack.
             generator.Emit(OpCodes.Ldarg_0);

@@ -19,7 +19,7 @@ namespace HeatKeeper.Server.Host
                 context.Result = new UnauthorizedObjectResult(problemDetails);
             }
 
-            if(context.Exception is HeatKeeperConflictException)
+            if (context.Exception is HeatKeeperConflictException)
             {
                 ProblemDetails problemDetails = new ProblemDetails();
                 problemDetails.Status = (int)HttpStatusCode.Conflict;
