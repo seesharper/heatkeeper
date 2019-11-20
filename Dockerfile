@@ -15,7 +15,7 @@ RUN npm install
 RUN npm run build
 
 # Build stage
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build-stage
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS build-stage
 
 COPY src /src
 

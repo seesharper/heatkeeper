@@ -1,64 +1,29 @@
-#!/usr/bin/env dotnet-script
-#load "nuget:Dotnet.Build, 0.6.0"
-#load "nuget:github-changelog, 0.1.5"
-#load "nuget:dotnet-steps, 0.0.1"
-#load "build-context.csx"
+#load "nuget:Dotnet.Build, 0.9.0"
+#load "nuget:dotnet-steps, 0.0.2"
 
-
-using static ChangeLog;
-using static DotNet;
-using static ReleaseManagement;
-
-[StepDescription("Runs all the tests")]
-Step test = () => Test(IntegrationsTests);
+BuildContext.CodeCoverageThreshold = 30;
 
 [StepDescription("Runs the tests with test coverage")]
-Step testcoverage = () =>
-{
-    DotNet.TestWithCodeCoverage(projectName, IntegrationsTests, coverageArtifactsFolder, targetFramework: "netcoreapp3.0", threshold: 10);
-};
+Step testcoverage = () => DotNet.TestWithCodeCoverage();
 
-[StepDescription("Builds the docker image using the latest git tag.")]
-AsyncStep dockerimage = async () =>
-{
-    await Docker.BuildAsync(dockerRepository, version, rootFolder);
-};
+[StepDescription("Runs all the tests for all target frameworks")]
+Step test = () => DotNet.Test();
 
+[StepDescription("Creates the NuGet packages")]
+AsyncStep dockerImage = async () =>
+{
+    // test();
+    // testcoverage();
+    await Docker.BuildAsync("bernhardrichter/heatkeeper", "v1.0.0", BuildContext.RepositoryFolder);
+};
 
 [DefaultStep]
-[StepDescription("Deploys a new container image if we are on a tag commit in a secure environment.")]
+[StepDescription("Deploys packages if we are on a tag commit in a secure environment.")]
 AsyncStep deploy = async () =>
 {
-    test();
-    testcoverage();
-    await dockerimage();
-    if (!BuildEnvironment.IsSecure)
-    {
-        Logger.Log("Deployment can only be done in a secure environment");
-        return;
-    }
-
-    await CreateReleaseNotes();
-
-    if (Git.Default.IsTagCommit())
-    {
-        Git.Default.RequireCleanWorkingTree();
-        await ReleaseManagerFor(owner, projectName, BuildEnvironment.GitHubAccessToken)
-        .CreateRelease(Git.Default.GetLatestTag(), pathToReleaseNotes, Array.Empty<ReleaseAsset>());
-        await Docker.PushAsync(dockerRepository, version, rootFolder);
-    }
+    await dockerImage();
+    await Artifacts.Deploy();
 };
 
-await ExecuteSteps(Args);
-
-
-private async Task CreateReleaseNotes()
-{
-    Logger.Log("Creating release notes");
-    var generator = ChangeLogFrom(owner, projectName, BuildEnvironment.GitHubAccessToken).SinceLatestTag();
-    if (!Git.Default.IsTagCommit())
-    {
-        generator = generator.IncludeUnreleased();
-    }
-    await generator.Generate(pathToReleaseNotes, FormattingOptions.Default.WithPullRequestBody());
-}
+await StepRunner.Execute(Args);
+return 0;
