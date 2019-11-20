@@ -18,10 +18,10 @@ namespace HeatKeeper.Server.WebApi
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            TestOutputHelper.Current.WriteLine($"{logLevel} {formatter(state, exception)}");
+            TestOutputHelper.Current?.WriteLine($"{logLevel} {formatter(state, exception)}");
             if (exception != null)
             {
-                 TestOutputHelper.Current.WriteLine(exception.ToString());
+                TestOutputHelper.Current?.WriteLine(exception.ToString());
             }
         }
     }
@@ -43,7 +43,7 @@ namespace HeatKeeper.Server.WebApi
 
     public static class TestLoggerFactoryExtensions
     {
-       public static ILoggerFactory AddTestLogger(this ILoggerFactory loggerFactory)
+        public static ILoggerFactory AddTestLogger(this ILoggerFactory loggerFactory)
         {
             loggerFactory.AddProvider(new TestLoggerProvider());
             return loggerFactory;

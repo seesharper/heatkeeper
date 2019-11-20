@@ -7,7 +7,6 @@
     <PackageReference Include="FluentMigrator" Version="3.1.3" />
     <PackageReference Include="FluentMigrator.Runner" Version="3.1.3" />
     <PackageReference Include="FluentMigrator.Runner.SQLite" Version="3.1.3" />
-    <PackageReference Include="LightInject" Version="5.4.0" />
     <PackageReference Include="ResourceReader" Version="0.0.1" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.109.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
@@ -17,7 +16,7 @@
     <EmbeddedResource Include="**/*.sql" />
   </ItemGroup>
 
-   <ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\HeatKeeper.Abstractions\HeatKeeper.Abstractions.csproj" />
   </ItemGroup>
 </Project>

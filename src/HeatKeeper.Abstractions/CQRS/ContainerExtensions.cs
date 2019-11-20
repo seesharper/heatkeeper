@@ -25,7 +25,6 @@ namespace HeatKeeper.Abstractions.CQRS
                     .Select(t => GetGenericInterface(t, typeof(ICommandHandler<>)))
                     .Where(m => m != null);
             RegisterHandlers(serviceRegistry, commandTypes);
-            //serviceRegistry.Register<ICommandExecutor>(factory => new CommandExecutor(GetCurrentScope(factory)), new PerScopeLifetime());
             serviceRegistry.Register<ICommandExecutor>(factory => new CommandExecutor(factory), new PerContainerLifetime());
             serviceRegistry.Register<IBus, Bus>(new PerScopeLifetime());
             return serviceRegistry;
@@ -44,18 +43,11 @@ namespace HeatKeeper.Abstractions.CQRS
                     .Select(t => GetGenericInterface(t, typeof(IQueryHandler<,>)))
                     .Where(m => m != null);
             RegisterHandlers(serviceRegistry, commandTypes);
-            // The problem here is that the factory is the root scope.
-            serviceRegistry.Register<IQueryExecutor>(factory => new QueryExecutor(GetCurrentScope(factory)), new PerScopeLifetime());
-            //serviceRegistry.Register<IQueryExecutor>(factory => new QueryExecutor(factory), new PerContainerLifetime());
-            serviceRegistry.Register<IBus, Bus>(new PerContainerLifetime());
+            serviceRegistry.Register<IQueryExecutor>(factory => new QueryExecutor(factory), new PerScopeLifetime());
+            serviceRegistry.Register<IBus, Bus>(new PerScopeLifetime());
             return serviceRegistry;
         }
 
-        private static IServiceFactory GetCurrentScope(IServiceFactory serviceFactory)
-        {
-            // NOTE: Maybe we should look into LightInject and make sure that we pass the current scope rather than the container instance.
-            return ((IServiceContainer)serviceFactory).ScopeManagerProvider.GetScopeManager(serviceFactory).CurrentScope;
-        }
 
         private static (Type, Type)? GetGenericInterface(Type type, Type genericTypeDefinition)
         {

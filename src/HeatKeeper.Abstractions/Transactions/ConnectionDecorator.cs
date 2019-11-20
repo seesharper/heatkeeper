@@ -46,19 +46,10 @@ namespace HeatKeeper.Abstractions.Transactions
             set { dbConnection.ConnectionString = value; }
         }
 
-        public int ConnectionTimeout
-        {
-            get { return dbConnection.ConnectionTimeout; }
-        }
+        public int ConnectionTimeout => dbConnection.ConnectionTimeout;
 
-        public string Database
-        {
-            get { return dbConnection.Database; }
-        }
+        public string Database => dbConnection.Database;
 
-        public ConnectionState State
-        {
-            get { return dbConnection.State; }
-        }
+        public ConnectionState State => dbConnection.State;
     }
 }

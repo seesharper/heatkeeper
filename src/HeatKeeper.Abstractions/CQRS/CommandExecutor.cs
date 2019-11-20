@@ -31,9 +31,9 @@ namespace HeatKeeper.Abstractions.CQRS
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns><see cref="Task"/>.</returns>
         [System.Diagnostics.DebuggerStepThrough]
-        public async Task ExecuteAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task ExecuteAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default)
         {
-            await _factory.GetInstance<ICommandHandler<TCommand>>().HandleAsync(command);
+            await _factory.GetInstance<ICommandHandler<TCommand>>().HandleAsync(command).ConfigureAwait(false);
         }
     }
 }

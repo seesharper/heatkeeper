@@ -1,23 +1,19 @@
-﻿using System.Diagnostics;
-using System.Threading.Tasks;
-using HeatKeeper.Server.Database;
+﻿using System;
+using System.Text;
 using HeatKeeper.Abstractions.Logging;
+using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Users;
 using LightInject;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Swashbuckle.AspNetCore.Swagger;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using HeatKeeper.Server.Users;
-using Microsoft.AspNetCore.Http;
-using System;
-using Microsoft.AspNetCore.Diagnostics;
-using System.Net;
+using Microsoft.OpenApi.Models;
 
 namespace HeatKeeper.Server.Host
 {
@@ -48,7 +44,7 @@ namespace HeatKeeper.Server.Host
             services.AddMvc(options =>
             {
                 options.Filters.Add<GlobalExceptionFilter>();
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddControllersAsServices();
+            }).AddControllersAsServices().AddNewtonsoftJson();
             services.Configure<Settings>(Configuration);
 
             // configure jwt authentication
@@ -60,8 +56,6 @@ namespace HeatKeeper.Server.Host
             }
 
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-
-
 
             services.AddAuthentication(x =>
             {
@@ -81,11 +75,9 @@ namespace HeatKeeper.Server.Host
                 };
             });
 
-
-
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "Heatkeeper", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Heatkeeper", Version = "v1" });
             });
         }
 
@@ -98,28 +90,16 @@ namespace HeatKeeper.Server.Host
             container.RegisterSingleton<LogFactory>(f =>
             {
                 var loggerFactory = f.GetInstance<ILoggerFactory>();
-                LogFactory factory = (type) => (l, m, e) => loggerFactory.CreateLogger(type).LogInformation(m);
-                return factory;
+                Logger Factory(Type type) => (l, m, e) => loggerFactory.CreateLogger(type).LogInformation(m);
+                return Factory;
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IDatabaseInitializer databaseInitializer)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseInitializer databaseInitializer)
         {
-            app.UseStaticFiles();
             databaseInitializer.Initialize();
 
-
-            if (env.IsDevelopment())
-            {
-                app.UseCors("DevelopmentPolicy");
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseDeveloperExceptionPage();
-                //app.UseHsts();
-            }
             app.UseSwagger();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
@@ -130,9 +110,31 @@ namespace HeatKeeper.Server.Host
                 c.RoutePrefix = "swagger";
             });
 
+            if (env.IsDevelopment())
+            {
+                app.UseCors("DevelopmentPolicy");
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            //app.UseStaticFiles();
+
+            app.UseRouting();
+
             app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+
+
             //app.UseHttpsRedirection();
-            app.UseMvc();
+
         }
     }
 

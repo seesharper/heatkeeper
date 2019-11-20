@@ -20,9 +20,9 @@ namespace HeatKeeper.Abstractions.CQRS
 
     public interface IBus
     {
-       Task ExecuteAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default(CancellationToken));
+        Task ExecuteAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default);
 
-       Task<TResult> ExecuteAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default(CancellationToken));
+        Task<TResult> ExecuteAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default);
     }
 
     public class Bus : IBus
@@ -36,12 +36,12 @@ namespace HeatKeeper.Abstractions.CQRS
             this.queryExecutor = queryExecutor;
         }
 
-        public async Task ExecuteAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task ExecuteAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default)
         {
             await commandExecutor.ExecuteAsync(command, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<TResult> ExecuteAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<TResult> ExecuteAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
         {
             return await queryExecutor.ExecuteAsync(query, cancellationToken).ConfigureAwait(false);
         }
