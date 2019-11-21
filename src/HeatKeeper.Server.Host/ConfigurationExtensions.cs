@@ -16,11 +16,24 @@ namespace HeatKeeper.Server.Host
             return applicationConfiguration;
         }
 
+        public static IServiceCollection AddCorsPolicy(this IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+
+                options.AddPolicy("DevelopmentPolicy", config =>
+                {
+                    config.AllowAnyOrigin();
+                    config.AllowAnyMethod();
+                    config.AllowAnyHeader();
+                });
+            });
+            return services;
+        }
+
 
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, ApplicationConfiguration applicationConfiguration)
         {
-            // configure jwt authentication
-
             var secret = applicationConfiguration.Secret;
             if (string.IsNullOrWhiteSpace(secret))
             {

@@ -26,16 +26,8 @@ namespace HeatKeeper.Server.Host
         public void ConfigureServices(IServiceCollection services)
         {
             var appConfig = services.AddApplicationConfiguration(Configuration);
-            services.AddCors(options =>
-            {
 
-                options.AddPolicy("DevelopmentPolicy", config =>
-                {
-                    config.AllowAnyOrigin();
-                    config.AllowAnyMethod();
-                    config.AllowAnyHeader();
-                });
-            });
+            services.AddCorsPolicy();
 
             services.AddRouting(options => options.LowercaseUrls = true);
 
@@ -43,7 +35,6 @@ namespace HeatKeeper.Server.Host
             {
                 options.Filters.Add<GlobalExceptionFilter>();
             }).AddControllersAsServices().AddNewtonsoftJson();
-            services.Configure<ApplicationConfiguration>(Configuration);
 
             services.AddJwtAuthentication(appConfig);
 
@@ -92,24 +83,13 @@ namespace HeatKeeper.Server.Host
                 app.UseDeveloperExceptionPage();
             }
 
-            //app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
-
-
-            //app.UseHttpsRedirection();
-
         }
     }
-
-
-
 }
