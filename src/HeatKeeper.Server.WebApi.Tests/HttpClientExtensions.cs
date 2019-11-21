@@ -40,7 +40,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
             var data = await response.Content.ReadAsStringAsync();
             return string.IsNullOrEmpty(data) ?
-                            default(T) :
+                            default :
                             JsonConvert.DeserializeObject<T>(data);
         }
 

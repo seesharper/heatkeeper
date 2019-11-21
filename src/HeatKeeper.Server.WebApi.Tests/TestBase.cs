@@ -18,7 +18,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             Factory = new WebApplicationFactory<Startup>()
             .WithWebHostBuilder(builder =>
             {
-                builder.ConfigureTestContainer<IServiceContainer>(c => c.EnableRollback())
+                builder.ConfigureTestContainer<IServiceContainer>(c => c.RegisterRollbackBehavior())
                 .ConfigureLogging(loggingBuilder => loggingBuilder.AddProvider(new TestLoggerProvider()));
             });
             testOutputHelper.Capture();

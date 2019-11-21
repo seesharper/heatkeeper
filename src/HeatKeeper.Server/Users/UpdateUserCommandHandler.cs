@@ -1,5 +1,5 @@
+using CQRS.Command.Abstractions;
 using DbReader;
-using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Database;
 using System.Data;
 using System.Threading;
@@ -18,7 +18,7 @@ namespace HeatKeeper.Server.Users
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task HandleAsync(UpdateUserCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(UpdateUserCommand command, CancellationToken cancellationToken = default)
         {
             await dbConnection.ExecuteAsync(sqlProvider.UpdateUser, command);
         }

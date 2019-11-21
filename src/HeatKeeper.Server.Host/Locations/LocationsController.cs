@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
-using HeatKeeper.Abstractions.CQRS;
+using CQRS.Command.Abstractions;
+using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Host.Zones;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Zones;

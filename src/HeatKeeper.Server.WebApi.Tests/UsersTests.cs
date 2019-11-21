@@ -59,8 +59,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         [Fact]
         public async Task ShouldCreateApiKey()
         {
-             var client = Factory.CreateClient();
-             var token = await client.AuthenticateAsAdminUser();
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
 
             var request = new HttpRequestBuilder()
                 .WithMethod(HttpMethod.Get)
@@ -75,21 +75,21 @@ namespace HeatKeeper.Server.WebApi.Tests
         [Fact]
         public async Task ShouldChangePasswordAndAuthenticate()
         {
-             const string newPassword = "^SzCzWW5D@EaU8veHkJaRqlY";
-             var client = Factory.CreateClient();
-             var token = await client.AuthenticateAsAdminUser();
+            const string NewPassword = "^SzCzWW5D@EaU8veHkJaRqlY";
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
 
-             var request = new HttpRequestBuilder()
-                .WithMethod(HttpMethod.Patch)
-                .AddRequestUri("api/users/password")
-                .AddBearerToken(token)
-                .AddContent(new JsonContent(new ChangePasswordRequest(AdminUser.DefaultPassword, newPassword, newPassword)))
-                .Build();
+            var request = new HttpRequestBuilder()
+               .WithMethod(HttpMethod.Patch)
+               .AddRequestUri("api/users/password")
+               .AddBearerToken(token)
+               .AddContent(new JsonContent(new ChangePasswordRequest(AdminUser.DefaultPassword, NewPassword, NewPassword)))
+               .Build();
 
             var responseMessage = await client.SendAsync(request);
             responseMessage.EnsureSuccessStatusCode();
 
-            var authenticateResponse = await client.PostAuthenticateRequest(AdminUser.UserName, newPassword);
+            var authenticateResponse = await client.PostAuthenticateRequest(AdminUser.UserName, NewPassword);
             authenticateResponse.EnsureSuccessStatusCode();
         }
 

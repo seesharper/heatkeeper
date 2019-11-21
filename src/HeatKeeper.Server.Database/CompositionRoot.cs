@@ -1,26 +1,37 @@
 using System.Data;
+using System.Data.SQLite;
+using DbReader;
 using LightInject;
-using HeatKeeper.Abstractions.Transactions;
 using ResourceReader;
 
 namespace HeatKeeper.Server.Database
 {
     public class CompositionRoot : ICompositionRoot
     {
+        static CompositionRoot()
+        {
+            DbReaderOptions.WhenReading<long?>().Use((rd, i) => rd.GetInt32(i));
+            DbReaderOptions.WhenReading<long>().Use((rd, i) => rd.GetInt32(i));
+            DbReaderOptions.WhenReading<string>().Use((rd, i) => (string)rd.GetValue(i));
+            DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) == 0 ? false : true);
+        }
+
+
         public void Compose(IServiceRegistry serviceRegistry)
         {
             serviceRegistry
                 .RegisterScoped(CreateConnection)
-                .RegisterSingleton<IDatabaseInitializer, DatabaseInitializer>()
-                .RegisterSingleton<IDbConnectionFactory, SqliteConnectionFactory>()
-                .RegisterSingleton<IConnectionStringProvider, SqliteConnectionStringProvider>()
-                .RegisterSingleton<ISqlProvider>(f => new ResourceBuilder().Build<ISqlProvider>());
+                .RegisterSingleton<IDatabaseMigrator, DatabaseMigrator>()
+                .RegisterSingleton(f => new ResourceBuilder().Build<ISqlProvider>());
         }
 
-        private IDbConnection CreateConnection(IServiceFactory factory)
+
+        private static IDbConnection CreateConnection(IServiceFactory serviceFactory)
         {
-            var connectionFactory = factory.GetInstance<IDbConnectionFactory>();
-            return connectionFactory.CreateConnection();
+            var configuration = serviceFactory.GetInstance<ApplicationConfiguration>();
+            var connection = new SQLiteConnection(configuration.ConnectionString);
+            connection.Open();
+            return connection;
         }
     }
 }

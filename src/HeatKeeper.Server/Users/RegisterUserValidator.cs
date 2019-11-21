@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Abstractions.CQRS;
+using CQRS.Command.Abstractions;
 
 namespace HeatKeeper.Server.Users
 {
@@ -15,7 +15,7 @@ namespace HeatKeeper.Server.Users
             this.passwordPolicy = passwordPolicy;
         }
 
-        public async Task HandleAsync(RegisterUserCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(RegisterUserCommand command, CancellationToken cancellationToken = default)
         {
             passwordPolicy.Apply(command.Password, command.ConfirmedPassword);
             await handler.HandleAsync(command, cancellationToken);

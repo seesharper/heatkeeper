@@ -1,8 +1,7 @@
+using CQRS.Command.Abstractions;
 using DbReader;
-using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Database;
 using System.Data;
-using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,7 +18,7 @@ namespace HeatKeeper.Server.Locations
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task HandleAsync(InsertUserLocationCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(InsertUserLocationCommand command, CancellationToken cancellationToken = default)
         {
             await dbConnection.ExecuteAsync(sqlProvider.InsertUserLocation, command);
             command.UserLocationId = await dbConnection.ExecuteScalarAsync<long>(sqlProvider.GetUserLocationId, command);
@@ -37,6 +36,6 @@ namespace HeatKeeper.Server.Locations
         public long UserId { get; }
         public long LocationId { get; }
 
-        public long UserLocationId { get; set;}
+        public long UserLocationId { get; set; }
     }
 }

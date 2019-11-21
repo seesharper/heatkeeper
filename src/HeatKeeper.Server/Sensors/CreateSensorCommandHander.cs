@@ -2,8 +2,8 @@ using System.Data;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using CQRS.Command.Abstractions;
 using DbReader;
-using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Database;
 
 namespace HeatKeeper.Server.Sensors
@@ -19,7 +19,7 @@ namespace HeatKeeper.Server.Sensors
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task HandleAsync(CreateSensorCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(CreateSensorCommand command, CancellationToken cancellationToken = default)
             => await ((DbCommand)dbConnection.CreateCommand(sqlProvider.InsertSensor, command)).ExecuteNonQueryAsync();
     }
 }

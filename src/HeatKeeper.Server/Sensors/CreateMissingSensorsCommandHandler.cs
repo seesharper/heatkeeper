@@ -1,8 +1,8 @@
-using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Abstractions.CQRS;
+using CQRS.Command.Abstractions;
+using CQRS.Query.Abstractions;
 
 namespace HeatKeeper.Server.Sensors
 {
@@ -17,13 +17,13 @@ namespace HeatKeeper.Server.Sensors
             this.commandExecutor = commandExecutor;
         }
 
-        public async Task HandleAsync(CreateMissingSensorsCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(CreateMissingSensorsCommand command, CancellationToken cancellationToken = default)
         {
             var allSensors = await queryExecutor.ExecuteAsync(new GetAllExternalSensorsQuery());
             var unknownExternalSensorIds = command.ExternalSensorIds.Distinct().Except(allSensors.Select(s => s.ExternalId)).ToArray();
             foreach (var unknownExternalSensorId in unknownExternalSensorIds)
             {
-                await commandExecutor.ExecuteAsync(new CreateSensorCommand(unknownExternalSensorId,"New sensor", "This sensor need to be assigned to a zone"));
+                await commandExecutor.ExecuteAsync(new CreateSensorCommand(unknownExternalSensorId, "New sensor", "This sensor need to be assigned to a zone"));
             }
         }
     }

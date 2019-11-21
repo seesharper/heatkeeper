@@ -1,4 +1,4 @@
-using HeatKeeper.Abstractions.CQRS;
+using CQRS.Query.Abstractions;
 
 namespace HeatKeeper.Server.Zones
 {

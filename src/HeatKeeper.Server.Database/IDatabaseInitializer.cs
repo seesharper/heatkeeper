@@ -4,23 +4,23 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HeatKeeper.Server.Database
 {
-    public interface IDatabaseInitializer
+    public interface IDatabaseMigrator
     {
-        void Initialize();
+        void Migrate();
     }
 
-    public class DatabaseInitializer : IDatabaseInitializer
+    public class DatabaseMigrator : IDatabaseMigrator
     {
-        private readonly IConnectionStringProvider connectionStringProvider;
+        private readonly ApplicationConfiguration configuration;
 
-        public DatabaseInitializer(IConnectionStringProvider connectionStringProvider)
+        public DatabaseMigrator(ApplicationConfiguration configuration)
         {
-            this.connectionStringProvider = connectionStringProvider;
+            this.configuration = configuration;
         }
 
-        public void Initialize()
+        public void Migrate()
         {
-            var serviceProvider = CreateServices(connectionStringProvider.GetConnectionString());
+            var serviceProvider = CreateServices(configuration.ConnectionString);
 
             // Put the database update into a scope to ensure
             // that all resources will be disposed.
@@ -30,7 +30,7 @@ namespace HeatKeeper.Server.Database
             }
         }
 
-         private static IServiceProvider CreateServices(string connectionString)
+        private static IServiceProvider CreateServices(string connectionString)
         {
             return new ServiceCollection()
                 // Add common FluentMigrator services
@@ -41,12 +41,13 @@ namespace HeatKeeper.Server.Database
                     // Set the connection string
                     .WithGlobalConnectionString(connectionString)
                     // Define the assembly containing the migrations
-                    .ScanIn(typeof(DatabaseInitializer).Assembly).For.Migrations())
+                    .ScanIn(typeof(DatabaseMigrator).Assembly).For.Migrations())
                 // Enable logging to console in the FluentMigrator way
                 .AddLogging(lb => lb.AddFluentMigratorConsole())
                 // Build the service provider
                 .BuildServiceProvider(false);
         }
+
 
         private static void UpdateDatabase(IServiceProvider serviceProvider)
         {

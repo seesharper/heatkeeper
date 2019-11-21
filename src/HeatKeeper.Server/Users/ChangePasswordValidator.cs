@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Abstractions.CQRS;
+using CQRS.Command.Abstractions;
+using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Users
@@ -20,7 +21,7 @@ namespace HeatKeeper.Server.Users
             this.passwordPolicy = passwordPolicy;
         }
 
-        public async Task HandleAsync(ChangePasswordCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(ChangePasswordCommand command, CancellationToken cancellationToken = default)
         {
             await queryExecutor.ExecuteAsync(new AuthenticatedUserQuery(userContext.Name, command.OldPassword));
             if (string.Equals(command.NewPassword, command.OldPassword))

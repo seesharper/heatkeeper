@@ -2,6 +2,7 @@
 using System.Text;
 using HeatKeeper.Abstractions.Logging;
 using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Host.Configuration;
 using HeatKeeper.Server.Users;
 using LightInject;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -28,6 +29,7 @@ namespace HeatKeeper.Server.Host
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddApplicationConfiguration(Configuration);
             services.AddCors(options =>
             {
 
@@ -45,10 +47,10 @@ namespace HeatKeeper.Server.Host
             {
                 options.Filters.Add<GlobalExceptionFilter>();
             }).AddControllersAsServices().AddNewtonsoftJson();
-            services.Configure<Settings>(Configuration);
+            services.Configure<ApplicationConfiguration>(Configuration);
 
             // configure jwt authentication
-            var appSettings = Configuration.Get<Settings>();
+            var appSettings = Configuration.Get<ApplicationConfiguration>();
             var secret = appSettings.Secret;
             if (string.IsNullOrWhiteSpace(secret))
             {
@@ -96,9 +98,9 @@ namespace HeatKeeper.Server.Host
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseInitializer databaseInitializer)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseMigrator databaseMigrator)
         {
-            databaseInitializer.Initialize();
+            databaseMigrator.Migrate();
 
             app.UseSwagger();
 

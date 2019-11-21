@@ -1,14 +1,13 @@
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Database;
 using DbReader;
-using System.Linq;
+using CQRS.Query.Abstractions;
 
 namespace HeatKeeper.Server.Locations
 {
-    public class LocationExistsQueryHandler : IQueryHandler<LocationExistsQuery,bool>
+    public class LocationExistsQueryHandler : IQueryHandler<LocationExistsQuery, bool>
     {
         private readonly IDbConnection dbConnection;
         private readonly ISqlProvider sqlProvider;
@@ -19,7 +18,7 @@ namespace HeatKeeper.Server.Locations
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task<bool> HandleAsync(LocationExistsQuery query, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<bool> HandleAsync(LocationExistsQuery query, CancellationToken cancellationToken = default)
         {
             return (await dbConnection.ExecuteScalarAsync<long>(sqlProvider.LocationExists, query)) == 1 ? true : false;
         }

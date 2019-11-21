@@ -1,20 +1,15 @@
-using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Abstractions.CQRS;
-using HeatKeeper.Server.Database;
-using DbReader;
-using System.Linq;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System;
+using CQRS.Query.Abstractions;
+using CQRS.Command.Abstractions;
 
 namespace HeatKeeper.Server.Users
 {
-    public class AuthenticatedUserQueryHandler : IQueryHandler<AuthenticatedUserQuery,AuthenticatedUserQueryResult>
+    public class AuthenticatedUserQueryHandler : IQueryHandler<AuthenticatedUserQuery, AuthenticatedUserQueryResult>
     {
-        private readonly IDbConnection dbConnection;
-        private readonly ISqlProvider sqlProvider;
         private readonly IPasswordManager passwordManager;
         private readonly ITokenProvider tokenProvider;
         private readonly IQueryExecutor queryExecutor;
@@ -28,12 +23,12 @@ namespace HeatKeeper.Server.Users
             this.commandExecutor = commandExecutor;
         }
 
-        public async Task<AuthenticatedUserQueryResult> HandleAsync(AuthenticatedUserQuery query, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<AuthenticatedUserQueryResult> HandleAsync(AuthenticatedUserQuery query, CancellationToken cancellationToken = default)
         {
             var user = await queryExecutor.ExecuteAsync(new GetUserQuery(query.UserName));
             if (user == null && query.UserName == AdminUser.UserName)
             {
-                await commandExecutor.ExecuteAsync(new RegisterUserCommand(AdminUser.UserName, "admin@no.org",true, AdminUser.DefaultPassword,AdminUser.DefaultPassword));
+                await commandExecutor.ExecuteAsync(new RegisterUserCommand(AdminUser.UserName, "admin@no.org", true, AdminUser.DefaultPassword, AdminUser.DefaultPassword));
                 return await HandleAsync(query);
             }
 
@@ -43,15 +38,17 @@ namespace HeatKeeper.Server.Users
             }
 
 
-            var claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Name, user.Name));
-            claims.Add(new Claim(ClaimTypes.Email, user.Email));
-            claims.Add(new Claim(ClaimTypes.Role, user.IsAdmin ? "admin" : "user"));
-            claims.Add(new Claim(ClaimTypes.Sid, user.Id.ToString()));
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.IsAdmin ? "admin" : "user"),
+                new Claim(ClaimTypes.Sid, user.Id.ToString())
+            };
 
             var token = tokenProvider.CreateToken(claims, DateTime.UtcNow.AddDays(7));
 
-            return new AuthenticatedUserQueryResult(token, user.Id, user.Name, user.Email, user.IsAdmin );
+            return new AuthenticatedUserQueryResult(token, user.Id, user.Name, user.Email, user.IsAdmin);
         }
     }
     public class AuthenticatedUserQuery : IQuery<AuthenticatedUserQueryResult>

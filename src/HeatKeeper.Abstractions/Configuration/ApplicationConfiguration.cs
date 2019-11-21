@@ -1,6 +1,6 @@
 namespace HeatKeeper.Server
 {
-    public class Settings
+    public class ApplicationConfiguration
     {
         public string ConnectionString { get; set; }
 

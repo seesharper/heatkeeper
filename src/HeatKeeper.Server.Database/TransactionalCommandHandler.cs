@@ -1,7 +1,7 @@
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Abstractions.CQRS;
+using CQRS.Command.Abstractions;
 using HeatKeeper.Abstractions.Logging;
 
 namespace HeatKeeper.Abstractions.Transactions
