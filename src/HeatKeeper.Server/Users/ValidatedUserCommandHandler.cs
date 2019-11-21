@@ -1,4 +1,5 @@
-using HeatKeeper.Abstractions.CQRS;
+using CQRS.Command.Abstractions;
+using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Exceptions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,10 +19,10 @@ namespace HeatKeeper.Server.Users
             this.queryExecutor = queryExecutor;
         }
 
-        public async Task HandleAsync(TCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(TCommand command, CancellationToken cancellationToken = default)
         {
             emailValidator.Validate(command.Email);
-            var userExists = await queryExecutor.ExecuteAsync(new UserExistsQuery(command.Id,command.Name));
+            var userExists = await queryExecutor.ExecuteAsync(new UserExistsQuery(command.Id, command.Name));
             if (userExists)
             {
                 throw new HeatKeeperConflictException($"User {command.Name} already exists");

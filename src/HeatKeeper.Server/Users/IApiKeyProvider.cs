@@ -22,11 +22,13 @@ namespace HeatKeeper.Server.Users
 
         public ApiKey CreateApiKey()
         {
-            var claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Name, userContext.Name));
-            claims.Add(new Claim(ClaimTypes.Email, userContext.Email));
-            claims.Add(new Claim(ClaimTypes.Role, "reporter"));
-            claims.Add(new Claim(ClaimTypes.Sid, userContext.Id.ToString()));
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, userContext.Name),
+                new Claim(ClaimTypes.Email, userContext.Email),
+                new Claim(ClaimTypes.Role, "reporter"),
+                new Claim(ClaimTypes.Sid, userContext.Id.ToString())
+            };
 
             var token = tokenProvider.CreateToken(claims, DateTime.MaxValue);
 

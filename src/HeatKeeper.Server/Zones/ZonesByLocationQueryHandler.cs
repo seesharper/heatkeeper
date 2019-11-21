@@ -1,10 +1,10 @@
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Abstractions.CQRS;
 using DbReader;
 using HeatKeeper.Server.Database;
 using System.Linq;
+using CQRS.Query.Abstractions;
 
 namespace HeatKeeper.Server.Zones
 {
@@ -19,7 +19,7 @@ namespace HeatKeeper.Server.Zones
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task<ZoneQueryResult[]> HandleAsync(ZonesByLocationQuery query, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<ZoneQueryResult[]> HandleAsync(ZonesByLocationQuery query, CancellationToken cancellationToken = default)
         {
             var result = await dbConnection.ReadAsync<ZoneQueryResult>(sqlProvider.ZonesByLocation, query);
             return result.ToArray();

@@ -15,8 +15,6 @@ namespace HeatKeeper.Server.WebApi.Tests
         private HttpContent content = null;
         private string bearerToken = "";
         private string acceptHeader = "application/json";
-        private TimeSpan timeout = new TimeSpan(0, 0, 15);
-        private bool allowAutoRedirect = false;
 
         public HttpRequestBuilder()
         {
@@ -58,17 +56,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             return this;
         }
 
-        public HttpRequestBuilder AddTimeout(TimeSpan timeout)
-        {
-            this.timeout = timeout;
-            return this;
-        }
 
-        public HttpRequestBuilder AddAllowAutoRedirect(bool allowAutoRedirect)
-        {
-            this.allowAutoRedirect = allowAutoRedirect;
-            return this;
-        }
 
         public HttpRequestMessage Build()
         {
@@ -81,7 +69,7 @@ namespace HeatKeeper.Server.WebApi.Tests
                 Method = this.method,
             };
 
-            request.RequestUri = new Uri(this.requestUri,UriKind.Relative);
+            request.RequestUri = new Uri(this.requestUri, UriKind.Relative);
 
             if (this.content != null)
                 request.Content = this.content;
@@ -93,7 +81,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             if (!string.IsNullOrEmpty(this.acceptHeader))
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(this.acceptHeader));
 
-           return request;
+            return request;
 
         }
 

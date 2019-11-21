@@ -1,7 +1,7 @@
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using HeatKeeper.Abstractions.CQRS;
+using CQRS.Command.Abstractions;
+using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

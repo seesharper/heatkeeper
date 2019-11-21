@@ -3,8 +3,8 @@ using System.Threading;
 using System.Data.Common;
 using System.Data;
 using HeatKeeper.Server.Database;
-using HeatKeeper.Abstractions.CQRS;
 using DbReader;
+using CQRS.Command.Abstractions;
 
 namespace HeatKeeper.Server.Measurements
 {
@@ -19,7 +19,7 @@ namespace HeatKeeper.Server.Measurements
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task HandleAsync(CreateMeasurementCommand[] commands, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(CreateMeasurementCommand[] commands, CancellationToken cancellationToken = default)
         {
             foreach (var command in commands)
             {

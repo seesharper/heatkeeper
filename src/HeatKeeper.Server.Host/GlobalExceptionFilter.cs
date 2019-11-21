@@ -13,17 +13,21 @@ namespace HeatKeeper.Server.Host
         {
             if (context.Exception is AuthenticationFailedException)
             {
-                ProblemDetails problemDetails = new ProblemDetails();
-                problemDetails.Status = (int)HttpStatusCode.Unauthorized;
-                problemDetails.Title = context.Exception.Message;
+                var problemDetails = new ProblemDetails
+                {
+                    Status = (int)HttpStatusCode.Unauthorized,
+                    Title = context.Exception.Message
+                };
                 context.Result = new UnauthorizedObjectResult(problemDetails);
             }
 
             if (context.Exception is HeatKeeperConflictException)
             {
-                ProblemDetails problemDetails = new ProblemDetails();
-                problemDetails.Status = (int)HttpStatusCode.Conflict;
-                problemDetails.Title = context.Exception.Message;
+                var problemDetails = new ProblemDetails
+                {
+                    Status = (int)HttpStatusCode.Conflict,
+                    Title = context.Exception.Message
+                };
                 context.Result = new ConflictObjectResult(problemDetails);
             }
         }

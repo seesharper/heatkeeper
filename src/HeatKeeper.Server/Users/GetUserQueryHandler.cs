@@ -1,14 +1,14 @@
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Database;
 using DbReader;
 using System.Linq;
+using CQRS.Query.Abstractions;
 
 namespace HeatKeeper.Server.Users
 {
-    public class GetUserQueryHandler : IQueryHandler<GetUserQuery,GetUserQueryResult>
+    public class GetUserQueryHandler : IQueryHandler<GetUserQuery, GetUserQueryResult>
     {
         private readonly IDbConnection dbConnection;
         private readonly ISqlProvider sqlProvider;
@@ -19,7 +19,7 @@ namespace HeatKeeper.Server.Users
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task<GetUserQueryResult> HandleAsync(GetUserQuery query, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<GetUserQueryResult> HandleAsync(GetUserQuery query, CancellationToken cancellationToken = default)
         {
             return (await dbConnection.ReadAsync<GetUserQueryResult>(sqlProvider.GetUser, query)).SingleOrDefault();
         }

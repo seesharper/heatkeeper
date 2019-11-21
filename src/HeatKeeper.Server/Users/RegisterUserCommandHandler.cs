@@ -1,6 +1,6 @@
-using HeatKeeper.Abstractions.CQRS;
 using System.Threading;
 using System.Threading.Tasks;
+using CQRS.Command.Abstractions;
 
 namespace HeatKeeper.Server.Users
 {
@@ -15,7 +15,7 @@ namespace HeatKeeper.Server.Users
             this.passwordManager = passwordManager;
         }
 
-        public async Task HandleAsync(RegisterUserCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(RegisterUserCommand command, CancellationToken cancellationToken = default)
         {
             var hashedPassword = passwordManager.GetHashedPassword(command.Password);
             var createUserCommand = new CreateUserCommand(command.Name, command.Email, command.IsAdmin, hashedPassword);
@@ -40,6 +40,6 @@ namespace HeatKeeper.Server.Users
         public bool IsAdmin { get; }
         public string Password { get; }
         public string ConfirmedPassword { get; }
-        public long Id { get; set;}
+        public long Id { get; set; }
     }
 }

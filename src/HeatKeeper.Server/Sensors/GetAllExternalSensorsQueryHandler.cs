@@ -1,14 +1,14 @@
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Abstractions.CQRS;
 using HeatKeeper.Server.Database;
 using DbReader;
 using System.Linq;
+using CQRS.Query.Abstractions;
 
 namespace HeatKeeper.Server.Sensors
 {
-    public class GetAllExternalSensorsQueryHandler : IQueryHandler<GetAllExternalSensorsQuery,ExternalSensorQueryResult[]>
+    public class GetAllExternalSensorsQueryHandler : IQueryHandler<GetAllExternalSensorsQuery, ExternalSensorQueryResult[]>
     {
         private readonly IDbConnection dbConnection;
         private readonly ISqlProvider sqlProvider;
@@ -19,7 +19,7 @@ namespace HeatKeeper.Server.Sensors
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task<ExternalSensorQueryResult[]> HandleAsync(GetAllExternalSensorsQuery query, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<ExternalSensorQueryResult[]> HandleAsync(GetAllExternalSensorsQuery query, CancellationToken cancellationToken = default)
         {
             var result = await dbConnection.ReadAsync<ExternalSensorQueryResult>(sqlProvider.GetAllExternalSensors, query);
             return result.ToArray();

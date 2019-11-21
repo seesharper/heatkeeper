@@ -3,6 +3,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CQRS.LightInject" Version="1.1.0" />
+    <PackageReference Include="CQRS.Transactions" Version="1.0.0" />
     <PackageReference Include="DbReader" Version="2.1.3" />
     <PackageReference Include="LightInject" Version="6.2.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />

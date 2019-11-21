@@ -1,8 +1,5 @@
+using CQRS.Command.Abstractions;
 using DbReader;
-using HeatKeeper.Abstractions.CQRS;
-using HeatKeeper.Server.Database;
-using System.Data;
-using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +18,7 @@ namespace HeatKeeper.Server.Users
             this.userContext = userContext;
         }
 
-        public async Task HandleAsync(ChangePasswordCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(ChangePasswordCommand command, CancellationToken cancellationToken = default)
         {
             var hashedPassword = passwordManager.GetHashedPassword(command.NewPassword);
             await commandExecutor.ExecuteAsync(new UpdatePasswordHashCommand(userContext.Id, hashedPassword));

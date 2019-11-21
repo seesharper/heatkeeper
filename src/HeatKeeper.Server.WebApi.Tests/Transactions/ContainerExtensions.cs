@@ -1,17 +1,24 @@
 using System.Data;
 using System.Linq;
-using HeatKeeper.Abstractions.CQRS;
+using CQRS.Transactions;
 using LightInject;
 
 namespace HeatKeeper.Server.WebApi.Tests.Transactions
 {
     public static class ContainerExtensions
     {
-        public static void EnableRollback(this IServiceContainer container)
+        public static IServiceRegistry RegisterRollbackBehavior(this IServiceRegistry serviceRegistry)
         {
-            var connectionRegistration = container.AvailableServices.Where(sr => sr.ServiceType == typeof(IDbConnection)).FirstOrDefault();
-            connectionRegistration.Lifetime = new PerContainerLifetime();
-            container.Decorate(typeof(ICommandHandler<>), typeof(RollbackCommandHandler<>));
+            // Find the IDbConnection registration and change the lifetime from scoped to singleton
+            // so that we use the same connection across all web api calls.
+            var dbConnectionRegistration = serviceRegistry.AvailableServices
+                .Single(sr => sr.ServiceType == typeof(IDbConnection));
+            dbConnectionRegistration.Lifetime = new PerContainerLifetime();
+
+            // Register the rollback behavior
+            serviceRegistry.RegisterSingleton<ICompletionBehavior, RollbackCompletionBehavior>();
+
+            return serviceRegistry;
         }
     }
 }

@@ -6,8 +6,7 @@ namespace HeatKeeper.Server.WebApi.Tests.Customizations
 {
     public class PasswordCustomization : ISpecimenBuilder
     {
-        private static string passWord = "aVe78!*PZ9&Lnqh1E4pG";
-
+        private const string Password = "aVe78!*PZ9&Lnqh1E4pG";
 
         public object Create(object request, ISpecimenContext context)
         {
@@ -15,7 +14,7 @@ namespace HeatKeeper.Server.WebApi.Tests.Customizations
             {
                 if (parameter.Name.Contains("password", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    return passWord;
+                    return Password;
                 }
             }
 

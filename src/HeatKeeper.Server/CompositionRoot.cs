@@ -1,8 +1,5 @@
 using System;
 using System.Data;
-using System.Net.Http;
-using HeatKeeper.Abstractions.CQRS;
-using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Abstractions.Logging;
 using HeatKeeper.Server.Users;
@@ -10,6 +7,10 @@ using LightInject;
 
 using Vibrant.InfluxDB.Client;
 using HeatKeeper.Server.Zones;
+using CQRS.Command.Abstractions;
+using CQRS.Transactions;
+using CQRS.LightInject;
+using HeatKeeper.Abstractions.Transactions;
 
 namespace HeatKeeper.Server
 {

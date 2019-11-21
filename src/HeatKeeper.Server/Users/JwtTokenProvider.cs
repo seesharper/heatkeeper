@@ -10,11 +10,11 @@ namespace HeatKeeper.Server.Users
 {
     public class JwtTokenProvider : ITokenProvider
     {
-        private readonly Settings settings;
+        private readonly ApplicationConfiguration settings;
 
-        public JwtTokenProvider(IOptions<Settings> settings)
+        public JwtTokenProvider(IOptions<ApplicationConfiguration> settings)
         {
-           this.settings = settings.Value;
+            this.settings = settings.Value;
         }
 
         public string CreateToken(IEnumerable<Claim> claims, DateTime expires)
