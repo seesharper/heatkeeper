@@ -1,9 +1,13 @@
 using System;
 using System.Text;
+using HeatKeeper.Abstractions.Logging;
+using LightInject;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using LogLevel = HeatKeeper.Abstractions.Logging.LogLevel;
 
 namespace HeatKeeper.Server.Host
 {
@@ -62,5 +66,45 @@ namespace HeatKeeper.Server.Host
 
             return services;
         }
+
+        public static IServiceRegistry ConfigureLogging(this IServiceRegistry registry)
+        {
+            registry.RegisterSingleton<LogFactory>(f =>
+            {
+                var loggerFactory = f.GetInstance<ILoggerFactory>();
+                return type =>
+                {
+                    var logger = loggerFactory.CreateLogger(type);
+                    return (logLevel, message, exception) => logger.Log(MapLogLevel(logLevel), exception, message);
+                };
+            });
+
+            return registry;
+
+            static Microsoft.Extensions.Logging.LogLevel MapLogLevel(LogLevel loglevel) => loglevel switch
+            {
+                LogLevel.Trace => Microsoft.Extensions.Logging.LogLevel.Trace,
+                LogLevel.Debug => Microsoft.Extensions.Logging.LogLevel.Debug,
+                LogLevel.Info => Microsoft.Extensions.Logging.LogLevel.Information,
+                LogLevel.Warning => Microsoft.Extensions.Logging.LogLevel.Warning,
+                LogLevel.Error => Microsoft.Extensions.Logging.LogLevel.Error,
+                LogLevel.Critical => Microsoft.Extensions.Logging.LogLevel.Critical,
+                _ => Microsoft.Extensions.Logging.LogLevel.Trace
+            };
+        }
+
+
+        // private static Microsoft.Extensions.Logging.LogLevel MapLogLevel(LogLevel loglevel) => loglevel switch
+        // {
+        //     LogLevel.Trace => Microsoft.Extensions.Logging.LogLevel.Trace,
+        //     LogLevel.Debug => Microsoft.Extensions.Logging.LogLevel.Debug,
+        //     LogLevel.Info => Microsoft.Extensions.Logging.LogLevel.Information,
+        //     LogLevel.Warning => Microsoft.Extensions.Logging.LogLevel.Warning,
+        //     LogLevel.Error => Microsoft.Extensions.Logging.LogLevel.Error,
+        //     LogLevel.Critical => Microsoft.Extensions.Logging.LogLevel.Critical,
+        //     _ => Microsoft.Extensions.Logging.LogLevel.Trace
+        // };
     }
+
+
 }

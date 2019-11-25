@@ -16,7 +16,6 @@ namespace HeatKeeper.Server.Host.Users
         private readonly ICommandExecutor commandExecutor;
         private readonly IQueryExecutor queryExecutor;
         private readonly IApiKeyProvider apiKeyProvider;
-        private readonly ITokenProvider tokenProvider;
 
         public UsersController(ICommandExecutor commandExecutor, IQueryExecutor queryExecutor, IApiKeyProvider apiKeyProvider)
         {

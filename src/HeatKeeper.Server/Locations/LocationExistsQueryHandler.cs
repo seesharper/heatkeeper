@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using HeatKeeper.Server.Database;
 using DbReader;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Locations
 {
@@ -23,6 +24,8 @@ namespace HeatKeeper.Server.Locations
             return (await dbConnection.ExecuteScalarAsync<long>(sqlProvider.LocationExists, query)) == 1 ? true : false;
         }
     }
+
+    [RequireUserRole]
     public class LocationExistsQuery : IQuery<bool>
     {
         public LocationExistsQuery(long id, string name)

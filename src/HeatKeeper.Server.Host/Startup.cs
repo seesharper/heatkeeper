@@ -1,6 +1,4 @@
-﻿using System;
-using HeatKeeper.Abstractions.Logging;
-using HeatKeeper.Server.Database;
+﻿using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Users;
 using LightInject;
 using Microsoft.AspNetCore.Builder;
@@ -9,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 namespace HeatKeeper.Server.Host
@@ -48,14 +45,9 @@ namespace HeatKeeper.Server.Host
         {
             container.RegisterSingleton<IUserContext, UserContext>();
             container.RegisterSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            container.RegisterFrom<HeatKeeper.Server.Database.CompositionRoot>();
-            container.RegisterFrom<HeatKeeper.Server.CompositionRoot>();
-            container.RegisterSingleton<LogFactory>(f =>
-            {
-                var loggerFactory = f.GetInstance<ILoggerFactory>();
-                Logger Factory(Type type) => (l, m, e) => loggerFactory.CreateLogger(type).LogInformation(m);
-                return Factory;
-            });
+            container.RegisterFrom<DatabaseCompositionRoot>();
+            container.RegisterFrom<ServerCompositionRoot>();
+            container.ConfigureLogging();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

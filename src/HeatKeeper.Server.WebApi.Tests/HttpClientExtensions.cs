@@ -7,6 +7,7 @@ using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
 using HeatKeeper.Server.Host.Zones;
+using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Users;
 
 using Newtonsoft.Json;
@@ -47,8 +48,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task<string> AuthenticateAsAdminUser(this HttpClient client)
         {
-            var request = new AuthenticateUserRequest(AdminUser.UserName, AdminUser.DefaultPassword);
-            var response = await client.PostAsync("api/users/authenticate", new JsonContent(request));
+            var response = await client.AuthenticateUser(TestData.AuthenticateAdminUserRequest);
             var content = await response.ContentAs<AuthenticateUserResponse>();
             return content.Token;
         }
@@ -61,6 +61,16 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .AddRequestUri("api/users")
                 .AddBearerToken(token)
                 .AddContent(new JsonContent(createUserRequest))
+                .Build();
+            return await client.SendAsync(postRequest);
+        }
+
+        public static async Task<HttpResponseMessage> AuthenticateUser(this HttpClient client, AuthenticateUserRequest authenticateUserRequest)
+        {
+            var postRequest = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Post)
+                .AddRequestUri("api/users/authenticate")
+                .AddContent(new JsonContent(authenticateUserRequest))
                 .Build();
             return await client.SendAsync(postRequest);
         }
@@ -148,6 +158,29 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .AddBearerToken(token)
                 .WithMethod(HttpMethod.Get)
                 .AddRequestUri($"api/locations/{locationId}/zones")
+                .Build();
+            return await client.SendAsync(httpRequest);
+        }
+
+        public static async Task<string> GetApiKey(this HttpClient client, string token)
+        {
+            var request = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Get)
+                .AddRequestUri("api/users/apikey")
+                .AddBearerToken(token)
+                .Build();
+            var responseMessage = await client.SendAsync(request);
+            var content = await responseMessage.ContentAs<GetApiKeyResponse>();
+            return content.ApiKey;
+        }
+
+        public static async Task<HttpResponseMessage> CreateMeasurement(this HttpClient client, CreateMeasurementRequest[] requests, string token)
+        {
+            var httpRequest = new HttpRequestBuilder()
+                .AddBearerToken(token)
+                .AddJsonContent(requests)
+                .WithMethod(HttpMethod.Post)
+                .AddRequestUri($"api/measurements")
                 .Build();
             return await client.SendAsync(httpRequest);
         }

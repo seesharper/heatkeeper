@@ -5,6 +5,7 @@ using HeatKeeper.Server.Database;
 using DbReader;
 using System.Linq;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Sensors
 {
@@ -25,6 +26,8 @@ namespace HeatKeeper.Server.Sensors
             return result.ToArray();
         }
     }
+
+    [RequireReporterRole]
     public class GetAllExternalSensorsQuery : IQuery<ExternalSensorQueryResult[]>
     {
     }

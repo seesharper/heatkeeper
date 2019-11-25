@@ -11,10 +11,12 @@ using CQRS.Command.Abstractions;
 using CQRS.Transactions;
 using CQRS.LightInject;
 using HeatKeeper.Abstractions.Transactions;
+using HeatKeeper.Server.Security;
+using CQRS.Query.Abstractions;
 
 namespace HeatKeeper.Server
 {
-    public class CompositionRoot : ICompositionRoot
+    public class ServerCompositionRoot : ICompositionRoot
     {
         public void Compose(IServiceRegistry serviceRegistry)
         {
@@ -33,7 +35,9 @@ namespace HeatKeeper.Server
                 .Decorate<ICommandHandler<ChangePasswordCommand>, ChangePasswordValidator>()
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidatedLocationCommandHandler<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidatedZoneCommandHandler<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(ValidatedUserCommandHandler<>));
+                .Decorate(typeof(ICommandHandler<>), typeof(ValidatedUserCommandHandler<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(AuthorizedCommandHandler<>))
+                .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>));
         }
     }
 }

@@ -17,4 +17,6 @@ public class UserContext : IUserContext
     public string Email => httpContextAccessor.HttpContext.User.FindFirst(c => c.Type == ClaimTypes.Email).Value;
 
     public bool IsAdmin => bool.Parse(httpContextAccessor.HttpContext.User.FindFirst(c => c.Type == ClaimTypes.Email).Value);
+
+    public string Role => (httpContextAccessor.HttpContext.User?.FindFirst(c => c.Type == ClaimTypes.Role)?.Value) ?? "anonymous";
 }

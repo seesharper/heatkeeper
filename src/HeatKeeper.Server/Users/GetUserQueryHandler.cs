@@ -5,6 +5,7 @@ using HeatKeeper.Server.Database;
 using DbReader;
 using System.Linq;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Users
 {
@@ -24,6 +25,8 @@ namespace HeatKeeper.Server.Users
             return (await dbConnection.ReadAsync<GetUserQueryResult>(sqlProvider.GetUser, query)).SingleOrDefault();
         }
     }
+
+    [RequireNoRole]
     public class GetUserQuery : IQuery<GetUserQueryResult>
     {
         public GetUserQuery(string name)

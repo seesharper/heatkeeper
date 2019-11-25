@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
+using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Users
 {
@@ -24,6 +25,7 @@ namespace HeatKeeper.Server.Users
         }
     }
 
+    [RequireAdminRole]
     public class RegisterUserCommand
     {
         public RegisterUserCommand(string name, string email, bool isAdmin, string password, string confirmedPassword)

@@ -1,4 +1,6 @@
+using System.Net;
 using System.Threading.Tasks;
+using FluentAssertions;
 using HeatKeeper.Server.Measurements;
 using Xunit;
 using Xunit.Abstractions;
@@ -7,19 +9,20 @@ namespace HeatKeeper.Server.WebApi.Tests
 {
     public class MeasurementsTests : TestBase
     {
-        private const string SensorID = "S1";
-
         public MeasurementsTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
         [Fact]
-        public async Task ShouldCreateMeasurement()
+        public async Task ShouldCreateMeasurementUsingApiKey()
         {
-            var createMeasurementRequest = new CreateMeasurementRequest(SensorID, MeasurementType.Temperature, 23.7);
-            var measurements = new []{createMeasurementRequest};
             var client = Factory.CreateClient();
-            var response = await client.PostAsync("api/measurements", new JsonContent(measurements));
+            var token = await client.AuthenticateAsAdminUser();
+            var apiKey = await client.GetApiKey(token);
+
+            var response = await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, apiKey);
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
             response.EnsureSuccessStatusCode();
         }
     }

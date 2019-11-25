@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System;
 using CQRS.Query.Abstractions;
 using CQRS.Command.Abstractions;
+using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Users
 {
@@ -13,30 +14,22 @@ namespace HeatKeeper.Server.Users
         private readonly IPasswordManager passwordManager;
         private readonly ITokenProvider tokenProvider;
         private readonly IQueryExecutor queryExecutor;
-        private readonly ICommandExecutor commandExecutor;
 
-        public AuthenticatedUserQueryHandler(IPasswordManager passwordManager, ITokenProvider tokenProvider, IQueryExecutor queryExecutor, ICommandExecutor commandExecutor)
+        public AuthenticatedUserQueryHandler(IPasswordManager passwordManager, ITokenProvider tokenProvider, IQueryExecutor queryExecutor)
         {
             this.passwordManager = passwordManager;
             this.tokenProvider = tokenProvider;
             this.queryExecutor = queryExecutor;
-            this.commandExecutor = commandExecutor;
         }
 
         public async Task<AuthenticatedUserQueryResult> HandleAsync(AuthenticatedUserQuery query, CancellationToken cancellationToken = default)
         {
             var user = await queryExecutor.ExecuteAsync(new GetUserQuery(query.UserName));
-            if (user == null && query.UserName == AdminUser.UserName)
-            {
-                await commandExecutor.ExecuteAsync(new RegisterUserCommand(AdminUser.UserName, "admin@no.org", true, AdminUser.DefaultPassword, AdminUser.DefaultPassword));
-                return await HandleAsync(query);
-            }
 
             if (user == null || !passwordManager.VerifyPassword(query.Password, user.HashedPassword))
             {
                 throw new AuthenticationFailedException("Invalid username/password");
             }
-
 
             var claims = new List<Claim>
             {
@@ -51,6 +44,8 @@ namespace HeatKeeper.Server.Users
             return new AuthenticatedUserQueryResult(token, user.Id, user.Name, user.Email, user.IsAdmin);
         }
     }
+
+    [RequireNoRole]
     public class AuthenticatedUserQuery : IQuery<AuthenticatedUserQueryResult>
     {
         public AuthenticatedUserQuery(string userName, string password)

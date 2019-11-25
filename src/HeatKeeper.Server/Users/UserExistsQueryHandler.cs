@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using HeatKeeper.Server.Database;
 using DbReader;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Users
 {
@@ -23,6 +24,8 @@ namespace HeatKeeper.Server.Users
             return (await dbConnection.ExecuteScalarAsync<long>(sqlProvider.UserExists, query)) == 1 ? true : false;
         }
     }
+
+    [RequireUserRole]
     public class UserExistsQuery : IQuery<bool>
     {
         public UserExistsQuery(long id, string name)
