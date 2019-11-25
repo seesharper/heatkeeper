@@ -1,6 +1,7 @@
 using CQRS.Command.Abstractions;
 using DbReader;
 using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Security;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,5 +24,16 @@ namespace HeatKeeper.Server.Users
             await dbConnection.ExecuteAsync(sqlProvider.InsertUser, command);
             command.Id = await dbConnection.ExecuteScalarAsync<long>(sqlProvider.GetUserId, new { command.Name });
         }
+    }
+
+    [RequireAdminRole]
+    public class CreateUserCommand : UserCommand
+    {
+        public CreateUserCommand(string name, string email, bool isAdmin, string hashedPassword) : base(name, email, isAdmin)
+        {
+            HashedPassword = hashedPassword;
+        }
+
+        public string HashedPassword { get; }
     }
 }
