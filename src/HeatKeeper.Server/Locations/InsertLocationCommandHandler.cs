@@ -5,6 +5,7 @@ using CQRS.Command.Abstractions;
 using DbReader;
 
 using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Locations
 {
@@ -24,5 +25,21 @@ namespace HeatKeeper.Server.Locations
             await dbConnection.ExecuteAsync(sqlProvider.InsertLocation, command);
             command.Id = await dbConnection.ExecuteScalarAsync<long>(sqlProvider.GetLocationId, new { command.Name });
         }
+    }
+
+    [RequireAdminRole]
+    public class InsertLocationCommand
+    {
+        public InsertLocationCommand(string name, string description)
+        {
+            Name = name;
+            Description = description;
+        }
+
+        public string Name { get; }
+
+        public string Description { get; }
+
+        public long Id { get; set; }
     }
 }

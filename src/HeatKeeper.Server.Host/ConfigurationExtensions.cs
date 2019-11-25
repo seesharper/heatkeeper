@@ -92,19 +92,5 @@ namespace HeatKeeper.Server.Host
                 _ => Microsoft.Extensions.Logging.LogLevel.Trace
             };
         }
-
-
-        // private static Microsoft.Extensions.Logging.LogLevel MapLogLevel(LogLevel loglevel) => loglevel switch
-        // {
-        //     LogLevel.Trace => Microsoft.Extensions.Logging.LogLevel.Trace,
-        //     LogLevel.Debug => Microsoft.Extensions.Logging.LogLevel.Debug,
-        //     LogLevel.Info => Microsoft.Extensions.Logging.LogLevel.Information,
-        //     LogLevel.Warning => Microsoft.Extensions.Logging.LogLevel.Warning,
-        //     LogLevel.Error => Microsoft.Extensions.Logging.LogLevel.Error,
-        //     LogLevel.Critical => Microsoft.Extensions.Logging.LogLevel.Critical,
-        //     _ => Microsoft.Extensions.Logging.LogLevel.Trace
-        // };
     }
-
-
 }

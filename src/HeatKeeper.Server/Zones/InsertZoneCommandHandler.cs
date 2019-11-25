@@ -1,6 +1,7 @@
 using CQRS.Command.Abstractions;
 using DbReader;
 using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Security;
 using System.Data;
 using System.Data.Common;
 using System.Threading;
@@ -22,6 +23,14 @@ namespace HeatKeeper.Server.Zones
         public async Task HandleAsync(InsertZoneCommand command, CancellationToken cancellationToken = default)
         {
             await ((DbCommand)dbConnection.CreateCommand(sqlProvider.InsertZone, command)).ExecuteNonQueryAsync();
+        }
+    }
+
+    [RequireUserRole]
+    public class InsertZoneCommand : ZoneCommand
+    {
+        public InsertZoneCommand(string name, string description, long locationId) : base(name, description, locationId)
+        {
         }
     }
 }

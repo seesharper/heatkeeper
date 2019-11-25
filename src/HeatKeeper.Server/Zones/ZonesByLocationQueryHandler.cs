@@ -5,6 +5,7 @@ using DbReader;
 using HeatKeeper.Server.Database;
 using System.Linq;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Zones
 {
@@ -24,5 +25,16 @@ namespace HeatKeeper.Server.Zones
             var result = await dbConnection.ReadAsync<ZoneQueryResult>(sqlProvider.ZonesByLocation, query);
             return result.ToArray();
         }
+    }
+
+    [RequireUserRole]
+    public class ZonesByLocationQuery : IQuery<ZoneQueryResult[]>
+    {
+        public ZonesByLocationQuery(long locationId)
+        {
+            LocationId = locationId;
+        }
+
+        public long LocationId { get; }
     }
 }

@@ -5,6 +5,7 @@ using System.Data;
 using HeatKeeper.Server.Database;
 using DbReader;
 using CQRS.Command.Abstractions;
+using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Measurements
 {
@@ -26,5 +27,20 @@ namespace HeatKeeper.Server.Measurements
                 await ((DbCommand)dbConnection.CreateCommand(sqlProvider.InsertMeasurement, command)).ExecuteNonQueryAsync();
             }
         }
+    }
+
+    [RequireReporterRole]
+    public class CreateMeasurementCommand
+    {
+        public CreateMeasurementCommand(string sensorId, int measurementType, double value)
+        {
+            SensorId = sensorId;
+            MeasurementType = measurementType;
+            Value = value;
+        }
+
+        public string SensorId { get; }
+        public int MeasurementType { get; }
+        public double Value { get; }
     }
 }

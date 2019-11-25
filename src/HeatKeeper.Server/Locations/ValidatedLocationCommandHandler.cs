@@ -22,7 +22,7 @@ namespace HeatKeeper.Server.Locations
             var userExists = await queryExecutor.ExecuteAsync(new LocationExistsQuery(command.Id, command.Name));
             if (userExists)
             {
-                throw new HeatKeeperConflictException($"User {command.Name} already exists");
+                throw new HeatKeeperConflictException($"Location {command.Name} already exists");
             }
             await handler.HandleAsync(command);
         }

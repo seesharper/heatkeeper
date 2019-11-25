@@ -5,6 +5,7 @@ using HeatKeeper.Server.Database;
 using DbReader;
 using System.Linq;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Locations
 {
@@ -23,5 +24,18 @@ namespace HeatKeeper.Server.Locations
         {
             return (await dbConnection.ReadAsync<LocationQueryResult>(sqlProvider.GetAllLocations, query)).ToArray();
         }
+    }
+
+
+    [RequireUserRole]
+    public class GetAllLocationsQuery : IQuery<LocationQueryResult[]>
+    {
+
+    }
+
+    public class LocationQueryResult
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
     }
 }
