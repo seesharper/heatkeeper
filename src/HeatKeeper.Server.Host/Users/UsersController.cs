@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HeatKeeper.Server.Host.Users
 {
-    [Authorize(Roles = "admin")]
+
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
@@ -24,7 +24,6 @@ namespace HeatKeeper.Server.Host.Users
             this.apiKeyProvider = apiKeyProvider;
         }
 
-        [AllowAnonymous]
         [HttpPost("authenticate")]
         public async Task<ActionResult<AuthenticateUserResponse>> Authenticate([FromBody]AuthenticateUserRequest request)
         {

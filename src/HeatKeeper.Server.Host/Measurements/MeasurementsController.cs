@@ -19,7 +19,6 @@ namespace HeatKeeper.Server.Measurements
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin,reporter")]
         public async Task<IActionResult> Post([FromBody] CreateMeasurementCommand[] createMeasurementCommands)
         {
             await commandExecutor.ExecuteAsync(new CreateMissingSensorsCommand(createMeasurementCommands.Select(cmr => cmr.SensorId)));
