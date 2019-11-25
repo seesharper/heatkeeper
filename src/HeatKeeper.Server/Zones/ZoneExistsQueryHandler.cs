@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using HeatKeeper.Server.Database;
 using DbReader;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Zones
 {
@@ -23,6 +24,8 @@ namespace HeatKeeper.Server.Zones
             return (await dbConnection.ExecuteScalarAsync<long>(sqlProvider.ZoneExists, query)) == 1 ? true : false;
         }
     }
+
+    [RequireUserRole]
     public class ZoneExistsQuery : IQuery<bool>
     {
         public ZoneExistsQuery(long id, long locationId, string name)

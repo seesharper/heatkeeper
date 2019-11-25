@@ -1,6 +1,7 @@
 using CQRS.Command.Abstractions;
 using DbReader;
 using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Security;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace HeatKeeper.Server.Locations
         }
     }
 
+    [RequireAdminRole]
     public class InsertUserLocationCommand
     {
         public InsertUserLocationCommand(long userId, long locationId)

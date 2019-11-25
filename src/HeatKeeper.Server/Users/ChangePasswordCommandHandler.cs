@@ -1,5 +1,6 @@
 using CQRS.Command.Abstractions;
 using DbReader;
+using HeatKeeper.Server.Security;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,6 +26,7 @@ namespace HeatKeeper.Server.Users
         }
     }
 
+    [RequireUserRole]
     public class ChangePasswordCommand
     {
         public ChangePasswordCommand(string oldPassword, string newPassword, string confirmedPassword)

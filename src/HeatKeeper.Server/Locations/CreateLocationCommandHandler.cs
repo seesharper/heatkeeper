@@ -1,5 +1,6 @@
 using CQRS.Command.Abstractions;
 using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Security;
 using HeatKeeper.Server.Users;
 using System.Data;
 using System.Threading;
@@ -46,6 +47,7 @@ namespace HeatKeeper.Server.Locations
     }
 
 
+    [RequireAdminRole]
     public class CreateLocationCommand : LocationCommand
     {
         public CreateLocationCommand(string name, string description) : base(name, description)

@@ -3,24 +3,23 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace HeatKeeper.Server.Users
 {
     public class JwtTokenProvider : ITokenProvider
     {
-        private readonly ApplicationConfiguration settings;
+        private readonly ApplicationConfiguration configuration;
 
-        public JwtTokenProvider(IOptions<ApplicationConfiguration> settings)
+        public JwtTokenProvider(ApplicationConfiguration configuration)
         {
-            this.settings = settings.Value;
+            this.configuration = configuration;
         }
 
         public string CreateToken(IEnumerable<Claim> claims, DateTime expires)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(settings.Secret);
+            var key = Encoding.ASCII.GetBytes(configuration.Secret);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

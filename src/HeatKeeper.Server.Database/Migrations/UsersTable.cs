@@ -13,6 +13,7 @@ namespace HeatKeeper.Server.Database.Migrations
                 .WithColumn("Email").AsString(255)
                 .WithColumn("IsAdmin").AsBoolean().NotNullable()
                 .WithColumn("HashedPassword").AsString(255).NotNullable();
+            Insert.IntoTable("Users").Row(new { Name = AdminUser.UserName, Email = AdminUser.DefaultEmail, IsAdmin = true, HashedPassword = AdminUser.DefaultPasswordHash });
         }
 
         public override void Down()

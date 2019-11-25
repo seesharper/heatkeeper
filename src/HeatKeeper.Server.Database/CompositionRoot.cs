@@ -6,9 +6,9 @@ using ResourceReader;
 
 namespace HeatKeeper.Server.Database
 {
-    public class CompositionRoot : ICompositionRoot
+    public class DatabaseCompositionRoot : ICompositionRoot
     {
-        static CompositionRoot()
+        static DatabaseCompositionRoot()
         {
             DbReaderOptions.WhenReading<long?>().Use((rd, i) => rd.GetInt32(i));
             DbReaderOptions.WhenReading<long>().Use((rd, i) => rd.GetInt32(i));

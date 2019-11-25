@@ -12,7 +12,6 @@ namespace HeatKeeper.Server.Host.Locations
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "admin")]
     public class LocationsController : ControllerBase
     {
         private readonly IQueryExecutor queryExecutor;

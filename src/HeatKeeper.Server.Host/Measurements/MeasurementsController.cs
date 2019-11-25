@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using HeatKeeper.Server.Sensors;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatKeeper.Server.Measurements

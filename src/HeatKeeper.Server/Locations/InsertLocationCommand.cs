@@ -1,5 +1,8 @@
+using HeatKeeper.Server.Security;
+
 namespace HeatKeeper.Server.Locations
 {
+    [RequireAdminRole]
     public class InsertLocationCommand
     {
         public InsertLocationCommand(string name, string description)
@@ -12,6 +15,6 @@ namespace HeatKeeper.Server.Locations
 
         public string Description { get; }
 
-        public long Id { get; set;}
+        public long Id { get; set; }
     }
 }

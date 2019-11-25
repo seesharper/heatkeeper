@@ -22,6 +22,21 @@ namespace HeatKeeper.Server.WebApi.Tests
         }
 
         [Fact]
+        public async Task ShouldCreateLocation()
+        {
+            var client = Factory.CreateClient();
+            var request = Fixture.Create<CreateLocationRequest>();
+
+            var response = await client.CreateLocation(request);
+
+            response.StatusCode.Should().Be(HttpStatusCode.Created);
+            var content = await response.ContentAs<CreateLocationResponse>();
+            content.Id.Should().Be(1);
+            response.Headers.Should().Contain(header => header.Key == "Location");
+        }
+
+
+        [Fact]
         public async Task ShouldCreateAndGetLocations()
         {
             var client = Factory.CreateClient();

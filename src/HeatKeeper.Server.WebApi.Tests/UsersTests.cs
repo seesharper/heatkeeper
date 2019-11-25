@@ -2,7 +2,9 @@ using AutoFixture;
 using FluentAssertions;
 using HeatKeeper.Server.Host.Users;
 using HeatKeeper.Server.Users;
+using HeatKeeper.Server.Database;
 using HeatKeeper.Server.WebApi.Tests.Customizations;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -11,7 +13,6 @@ using Xunit.Abstractions;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
-
     public class UsersTests : TestBase
     {
         public UsersTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -23,22 +24,23 @@ namespace HeatKeeper.Server.WebApi.Tests
         [Fact]
         public async Task ShouldAuthenticateAdminUser()
         {
-            var request = new AuthenticateUserRequest(AdminUser.UserName, AdminUser.DefaultPassword);
             var client = Factory.CreateClient();
-            var response = await client.PostAsync("api/users/authenticate", new JsonContent(request));
-            var content = response.ContentAs<AuthenticateUserResponse>();
-            response.EnsureSuccessStatusCode();
+            var response = await client.AuthenticateUser(TestData.AuthenticateAdminUserRequest);
+            var content = await response.ContentAs<AuthenticateUserResponse>();
+
+            content.IsAdmin.Should().BeTrue();
+            content.Name.Should().Be(AdminUser.UserName);
+            content.Email.Should().Be(AdminUser.DefaultEmail);
+            content.Token.Should().NotBeEmpty();
         }
 
         [Fact]
         public async Task ShouldNotAuthenticateAdminUserWithInvalidPassword()
         {
-            var request = new AuthenticateUserRequest(AdminUser.UserName, "InvalidPassword");
             var client = Factory.CreateClient();
-            var response = await client.PostAsync("api/users/authenticate", new JsonContent(request));
+            var response = await client.AuthenticateUser(TestData.InvalidAuthenticateAdminUserRequest);
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
-
 
         [Fact]
         public async Task ShouldCreateAndGetAllUsers()
@@ -52,9 +54,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             var response = await client.GetAllUsers();
             var users = await response.ContentAs<GetUserResponse[]>();
 
-            users.Length.Should().Be(4);
+            users.Where(u => u.Email != AdminUser.DefaultEmail).Count().Should().Be(3);
         }
-
 
         [Fact]
         public async Task ShouldCreateApiKey()
@@ -92,7 +93,5 @@ namespace HeatKeeper.Server.WebApi.Tests
             var authenticateResponse = await client.PostAuthenticateRequest(AdminUser.UserName, NewPassword);
             authenticateResponse.EnsureSuccessStatusCode();
         }
-
-
     }
 }

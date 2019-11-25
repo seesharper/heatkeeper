@@ -9,5 +9,7 @@ namespace HeatKeeper.Server.Users
         string Email { get; }
 
         bool IsAdmin { get; }
+
+        string Role { get; }
     }
 }

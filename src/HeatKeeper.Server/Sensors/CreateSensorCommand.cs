@@ -1,5 +1,8 @@
+using HeatKeeper.Server.Security;
+
 namespace HeatKeeper.Server.Sensors
 {
+    [RequireReporterRole]
     public class CreateSensorCommand
     {
         public CreateSensorCommand(string externalId, string name, string description)
