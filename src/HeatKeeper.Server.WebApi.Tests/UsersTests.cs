@@ -46,15 +46,15 @@ namespace HeatKeeper.Server.WebApi.Tests
         public async Task ShouldCreateAndGetAllUsers()
         {
             var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
 
-            await client.CreateUser(Fixture.Create<RegisterUserRequest>());
-            await client.CreateUser(Fixture.Create<RegisterUserRequest>());
-            await client.CreateUser(Fixture.Create<RegisterUserRequest>());
+            await client.RegisterUser(TestData.Users.StandardUser, token);
+            await client.RegisterUser(TestData.Users.AnotherStandardUser, token);
 
             var response = await client.GetAllUsers();
-            var users = await response.ContentAs<GetUserResponse[]>();
+            var users = await response.ContentAs<User[]>();
 
-            users.Where(u => u.Email != AdminUser.DefaultEmail).Count().Should().Be(3);
+            users.Where(u => u.Email != AdminUser.DefaultEmail).Count().Should().Be(2);
         }
 
         [Fact]

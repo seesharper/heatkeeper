@@ -11,7 +11,7 @@ using LogLevel = HeatKeeper.Abstractions.Logging.LogLevel;
 
 namespace HeatKeeper.Server.Host
 {
-    public static class ConfigurationExtensions
+    internal static class ConfigurationExtensions
     {
         public static ApplicationConfiguration AddApplicationConfiguration(this IServiceCollection services, IConfiguration configuration)
         {

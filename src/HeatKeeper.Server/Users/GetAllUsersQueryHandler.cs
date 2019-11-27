@@ -9,7 +9,7 @@ using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Users
 {
-    public class AllUsersQueryHandler : IQueryHandler<AllUsersQuery, UserQueryResult[]>
+    public class AllUsersQueryHandler : IQueryHandler<AllUsersQuery, User[]>
     {
         private readonly IDbConnection dbConnection;
         private readonly ISqlProvider sqlProvider;
@@ -20,18 +20,18 @@ namespace HeatKeeper.Server.Users
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task<UserQueryResult[]> HandleAsync(AllUsersQuery query, CancellationToken cancellationToken = default)
+        public async Task<User[]> HandleAsync(AllUsersQuery query, CancellationToken cancellationToken = default)
         {
-            return (await dbConnection.ReadAsync<UserQueryResult>(sqlProvider.GetAllUsers)).ToArray();
+            return (await dbConnection.ReadAsync<User>(sqlProvider.GetAllUsers)).ToArray();
         }
     }
 
     [RequireUserRole]
-    public class AllUsersQuery : IQuery<UserQueryResult[]>
+    public class AllUsersQuery : IQuery<User[]>
     {
     }
 
-    public class UserQueryResult
+    public class User
     {
         public long Id { get; set; }
         public string Name { get; set; }
