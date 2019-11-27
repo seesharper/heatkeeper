@@ -41,13 +41,14 @@ namespace HeatKeeper.Server.Host.Users
         }
 
         [HttpGet]
-        public async Task<ActionResult<GetUserResponse[]>> Get()
+        public async Task<ActionResult<User[]>> Get()
         {
-            var allUsersQuery = new AllUsersQuery();
-            var result = await queryExecutor.ExecuteAsync(allUsersQuery);
-            return result.Select(r => new GetUserResponse(r.Id, r.Name, r.Email, r.IsAdmin)).ToArray();
+            return Ok(await queryExecutor.ExecuteAsync(new AllUsersQuery()));
         }
 
+        /// <summary>
+        /// Changes the password for the current user.
+        /// </summary>
         [HttpPatch("password")]
         public async Task<IActionResult> ChangePassword([FromBody]ChangePasswordRequest request)
         {
@@ -56,7 +57,9 @@ namespace HeatKeeper.Server.Host.Users
             return Ok();
         }
 
-
+        /// <summary>
+        /// Creates an API key to be used when posting measurements.
+        /// </summary>
         [HttpGet("apikey")]
         public ActionResult<GetApiKeyResponse> GetApiKey()
         {

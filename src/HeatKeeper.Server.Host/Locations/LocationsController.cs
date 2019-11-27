@@ -1,11 +1,14 @@
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Host.Zones;
 using HeatKeeper.Server.Locations;
+using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatKeeper.Server.Host.Locations
@@ -32,20 +35,13 @@ namespace HeatKeeper.Server.Host.Locations
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
-        {
-            var result = await queryExecutor.ExecuteAsync(new GetAllLocationsQuery());
-            return Ok(result);
-        }
+        public async Task<ActionResult<Location[]>> Get() =>
+            Ok(await queryExecutor.ExecuteAsync(new GetAllLocationsQuery()));
 
         [HttpGet("{locationId}/zones")]
-        public async Task<ActionResult<ZoneResponse[]>> Zones(long locationId)
-        {
-            var zonesByLocationQuery = new ZonesByLocationQuery(locationId);
-            var result = await queryExecutor.ExecuteAsync(zonesByLocationQuery);
-            var response = result.Select(zrq => new ZoneResponse(zrq.Id, zrq.Name, zrq.Description)).ToArray();
-            return Ok(response);
-        }
+        public async Task<ActionResult<Zone[]>> Zones(long locationId) =>
+            Ok(await queryExecutor.ExecuteAsync(new ZonesByLocationQuery(locationId)));
+
 
         [HttpPost("{locationId}/zones")]
         public async Task<IActionResult> Post(long locationId, [FromBody] CreateZoneRequest createZoneRequest)
@@ -55,20 +51,25 @@ namespace HeatKeeper.Server.Host.Locations
             return CreatedAtAction(nameof(Post), new { id = createZoneRequest.Name });
         }
 
-        [HttpPost("users")]
-        public async Task<IActionResult> AddUser([FromBody] AddUserLocationRequest request)
+        [HttpPost("{locationId}/users")]
+        public async Task<IActionResult> AddUser(long locationId, [FromBody] AddUserLocationRequest request)
         {
-            var addUserCommand = new InsertUserLocationCommand(request.UserId, request.LocationId);
+            var addUserCommand = new InsertUserLocationCommand(request.UserId, locationId);
             await commandExecutor.ExecuteAsync(addUserCommand);
             return CreatedAtAction(nameof(AddUser), new AddUserLocationResponse(addUserCommand.UserLocationId));
         }
 
-        [HttpDelete("users")]
-        public async Task<IActionResult> RemoveUser([FromBody] RemoveUserRequest request)
+        [HttpGet("{locationId}/users")]
+        public async Task<ActionResult<User[]>> GetUsers(long locationId) =>
+            Ok(await queryExecutor.ExecuteAsync(new UsersByLocationQuery(locationId)));
+
+
+        [HttpDelete("{locationId}/users/{userId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> RemoveUser(long locationId, long userId)
         {
-            var removeUserCommand = new DeleteUserLocationCommand(request.UserLocationId);
-            await commandExecutor.ExecuteAsync(removeUserCommand);
-            return Ok();
+            await commandExecutor.ExecuteAsync(new DeleteUserLocationCommand(locationId, userId));
+            return NoContent();
         }
     }
 }

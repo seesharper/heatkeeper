@@ -1,2 +1,2 @@
 DELETE FROM UserLocations
-WHERE Id = @Id
+WHERE UserID = @UserId and LocationId = @LocationId

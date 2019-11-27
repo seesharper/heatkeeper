@@ -1,5 +1,6 @@
 using System.Net;
 using HeatKeeper.Server.Exceptions;
+using HeatKeeper.Server.Security;
 using HeatKeeper.Server.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -12,6 +13,16 @@ namespace HeatKeeper.Server.Host
         public void OnException(ExceptionContext context)
         {
             if (context.Exception is AuthenticationFailedException)
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Status = (int)HttpStatusCode.Unauthorized,
+                    Title = context.Exception.Message
+                };
+                context.Result = new UnauthorizedObjectResult(problemDetails);
+            }
+
+            if (context.Exception is AuthorizationFailedException)
             {
                 var problemDetails = new ProblemDetails
                 {

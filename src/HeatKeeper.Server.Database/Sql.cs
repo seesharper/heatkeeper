@@ -47,10 +47,14 @@ namespace HeatKeeper.Server.Database
 
         string UserExists { get; }
 
+        string GetUsersByLocation { get; }
+
         string LocationExists { get; }
 
         string ZonesByLocation { get; }
 
         string ZoneExists { get; }
+
+        string LocationUserExists { get; }
     }
 }

@@ -29,7 +29,7 @@ namespace HeatKeeper.Server.Security
             }
             else
             {
-                throw new HeatKeeperSecurityException("");
+                throw new AuthorizationFailedException($"Failed to authorize access to '{query.GetType()}' for user '{userContext.Name}({userContext.Role})'");
             }
         }
     }

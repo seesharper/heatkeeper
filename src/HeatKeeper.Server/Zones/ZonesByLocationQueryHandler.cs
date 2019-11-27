@@ -9,7 +9,7 @@ using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Zones
 {
-    public class ZonesByLocationQueryHandler : IQueryHandler<ZonesByLocationQuery, ZoneQueryResult[]>
+    public class ZonesByLocationQueryHandler : IQueryHandler<ZonesByLocationQuery, Zone[]>
     {
         private readonly IDbConnection dbConnection;
         private readonly ISqlProvider sqlProvider;
@@ -20,15 +20,15 @@ namespace HeatKeeper.Server.Zones
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task<ZoneQueryResult[]> HandleAsync(ZonesByLocationQuery query, CancellationToken cancellationToken = default)
+        public async Task<Zone[]> HandleAsync(ZonesByLocationQuery query, CancellationToken cancellationToken = default)
         {
-            var result = await dbConnection.ReadAsync<ZoneQueryResult>(sqlProvider.ZonesByLocation, query);
+            var result = await dbConnection.ReadAsync<Zone>(sqlProvider.ZonesByLocation, query);
             return result.ToArray();
         }
     }
 
     [RequireUserRole]
-    public class ZonesByLocationQuery : IQuery<ZoneQueryResult[]>
+    public class ZonesByLocationQuery : IQuery<Zone[]>
     {
         public ZonesByLocationQuery(long locationId)
         {
