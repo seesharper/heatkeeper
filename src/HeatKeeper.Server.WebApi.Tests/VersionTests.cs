@@ -1,17 +1,12 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using Xunit.Abstractions;
 using FluentAssertions;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
     public class VersionTests : TestBase
     {
-        public VersionTests()
-        {
-        }
-
         [Fact]
         public async Task ShouldGetVersion()
         {

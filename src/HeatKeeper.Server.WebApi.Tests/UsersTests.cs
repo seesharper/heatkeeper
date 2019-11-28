@@ -1,26 +1,18 @@
-using AutoFixture;
+
 using FluentAssertions;
 using HeatKeeper.Server.Host.Users;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Database;
-using HeatKeeper.Server.WebApi.Tests.Customizations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
     public class UsersTests : TestBase
     {
-        public UsersTests()
-        {
-            Fixture.Customizations.Add(new MailAddressCustomization());
-            Fixture.Customizations.Add(new PasswordCustomization());
-        }
-
         [Fact]
         public async Task ShouldAuthenticateAdminUser()
         {

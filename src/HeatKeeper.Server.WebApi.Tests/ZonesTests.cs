@@ -10,9 +10,6 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
         }
 
-
-
-
         [Fact]
         public async Task ShouldGetZonesForLocation()
         {

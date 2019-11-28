@@ -9,10 +9,6 @@ namespace HeatKeeper.Server.WebApi.Tests
 {
     public class MeasurementsTests : TestBase
     {
-        public MeasurementsTests()
-        {
-        }
-
         [Fact]
         public async Task ShouldCreateMeasurementUsingApiKey()
         {
