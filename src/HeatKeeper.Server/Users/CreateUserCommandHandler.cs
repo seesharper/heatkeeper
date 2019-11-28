@@ -22,14 +22,14 @@ namespace HeatKeeper.Server.Users
         public async Task HandleAsync(CreateUserCommand command, CancellationToken cancellationToken = default)
         {
             await dbConnection.ExecuteAsync(sqlProvider.InsertUser, command);
-            command.Id = await dbConnection.ExecuteScalarAsync<long>(sqlProvider.GetUserId, new { command.Name });
+            command.Id = await dbConnection.ExecuteScalarAsync<long>(sqlProvider.GetUserId, new { command.Email });
         }
     }
 
     [RequireAdminRole]
     public class CreateUserCommand : UserCommand
     {
-        public CreateUserCommand(string name, string email, bool isAdmin, string hashedPassword) : base(name, email, isAdmin)
+        public CreateUserCommand(string email, string firstName, string lastName, bool isAdmin, string hashedPassword) : base(email, firstName, lastName, isAdmin)
         {
             HashedPassword = hashedPassword;
         }

@@ -33,7 +33,8 @@ namespace HeatKeeper.Server.Users
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.GivenName, user.FirstName),
+                new Claim(ClaimTypes.Surname, user.LastName),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.IsAdmin ? "admin" : "user"),
                 new Claim(ClaimTypes.Sid, user.Id.ToString())
@@ -41,7 +42,7 @@ namespace HeatKeeper.Server.Users
 
             var token = tokenProvider.CreateToken(claims, DateTime.UtcNow.AddDays(7));
 
-            return new AuthenticatedUserQueryResult(token, user.Id, user.Name, user.Email, user.IsAdmin);
+            return new AuthenticatedUserQueryResult(token, user.Id, user.Email, user.FirstName, user.LastName, user.IsAdmin);
         }
     }
 
@@ -61,12 +62,13 @@ namespace HeatKeeper.Server.Users
 
     public class AuthenticatedUserQueryResult
     {
-        public AuthenticatedUserQueryResult(string token, long id, string name, string email, bool isAdmin)
+        public AuthenticatedUserQueryResult(string token, long id, string email, string firstName, string lastName, bool isAdmin)
         {
             Token = token;
             Id = id;
-            Name = name;
             Email = email;
+            FirstName = firstName;
+            LastName = lastName;
             IsAdmin = isAdmin;
         }
 
@@ -74,7 +76,8 @@ namespace HeatKeeper.Server.Users
         public long Id { get; }
         public string Name { get; }
         public string Email { get; }
-
+        public string FirstName { get; }
+        public string LastName { get; }
         public bool IsAdmin { get; }
     }
 

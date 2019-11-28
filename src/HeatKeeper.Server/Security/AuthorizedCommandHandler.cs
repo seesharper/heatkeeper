@@ -26,12 +26,12 @@ namespace HeatKeeper.Server.Security
         {
             if (RoleAttribute.IsSatisfiedBy(userContext.Role))
             {
-                logger.Info($"Successfully authorized access to '{command.GetType()}' for user '{userContext.Name}({userContext.Role})'");
+                logger.Info($"Successfully authorized access to '{command.GetType()}' for user '{userContext.Email}({userContext.Role})'");
                 await commandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                throw new AuthorizationFailedException($"Failed to authorize access to '{command.GetType()}' for user '{userContext.Name}({userContext.Role})'");
+                throw new AuthorizationFailedException($"Failed to authorize access to '{command.GetType()}' for user '{userContext.Email}({userContext.Role})'");
             }
 
         }

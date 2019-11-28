@@ -29,7 +29,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             var content = await response.ContentAs<AuthenticateUserResponse>();
 
             content.IsAdmin.Should().BeTrue();
-            content.Name.Should().Be(AdminUser.UserName);
+            content.FirstName.Should().Be(AdminUser.DefaultFirstName);
+            content.LastName.Should().Be(AdminUser.DefaultLastName);
             content.Email.Should().Be(AdminUser.DefaultEmail);
             content.Token.Should().NotBeEmpty();
         }
@@ -90,7 +91,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             var responseMessage = await client.SendAsync(request);
             responseMessage.EnsureSuccessStatusCode();
 
-            var authenticateResponse = await client.PostAuthenticateRequest(AdminUser.UserName, NewPassword);
+            var authenticateResponse = await client.PostAuthenticateRequest(AdminUser.DefaultEmail, NewPassword);
             authenticateResponse.EnsureSuccessStatusCode();
         }
     }

@@ -4,7 +4,9 @@ namespace HeatKeeper.Server.Users
     {
         long Id { get; }
 
-        string Name { get; }
+        string FirstName { get; }
+
+        string LastName { get; }
 
         string Email { get; }
 

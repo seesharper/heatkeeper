@@ -9,11 +9,12 @@ namespace HeatKeeper.Server.Database.Migrations
         {
             Create.Table("Users")
                 .WithColumn("Id").AsInt64().PrimaryKey().Identity()
-                .WithColumn("Name").AsString(255).Unique("idx_users_name").NotNullable()
-                .WithColumn("Email").AsString(255)
+                .WithColumn("Email").AsString(255).Unique("idx_users_email").NotNullable()
+                .WithColumn("FirstName").AsString(255).NotNullable()
+                .WithColumn("LastName").AsString(255).NotNullable()
                 .WithColumn("IsAdmin").AsBoolean().NotNullable()
                 .WithColumn("HashedPassword").AsString(255).NotNullable();
-            Insert.IntoTable("Users").Row(new { Name = AdminUser.UserName, Email = AdminUser.DefaultEmail, IsAdmin = true, HashedPassword = AdminUser.DefaultPasswordHash });
+            Insert.IntoTable("Users").Row(new { Email = AdminUser.DefaultEmail, FirstName = AdminUser.DefaultFirstName, LastName = AdminUser.DefaultLastName, IsAdmin = true, HashedPassword = AdminUser.DefaultPasswordHash });
         }
 
         public override void Down()

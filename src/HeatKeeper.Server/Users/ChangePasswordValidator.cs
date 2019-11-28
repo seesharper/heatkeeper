@@ -23,7 +23,7 @@ namespace HeatKeeper.Server.Users
 
         public async Task HandleAsync(ChangePasswordCommand command, CancellationToken cancellationToken = default)
         {
-            await queryExecutor.ExecuteAsync(new AuthenticatedUserQuery(userContext.Name, command.OldPassword));
+            await queryExecutor.ExecuteAsync(new AuthenticatedUserQuery(userContext.Email, command.OldPassword));
             if (string.Equals(command.NewPassword, command.OldPassword))
             {
                 throw new HeatKeeperSecurityException("The new password must be different from the old password");

@@ -1,10 +1,11 @@
 SELECT
     Id,
-    Name,
     Email,
+    FirstName,
+    LastName,
     IsAdmin,
     HashedPassword
 FROM
     Users
 WHERE
-    name = @name
+    email = @email

@@ -1,7 +1,8 @@
 SELECT
     u.Id,
-    Name,
     Email,
+    FirstName,
+    LastName,
     IsAdmin
 FROM
     Users u

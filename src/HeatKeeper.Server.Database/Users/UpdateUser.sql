@@ -1,7 +1,8 @@
 UPDATE Users
 SET
-    Name = @name,
     EMail = @eMail,
+    FirstName = @firstName,
+    LastName = @lastName
     IsAdmin = @isAdmin
 WHERE
     id = @id

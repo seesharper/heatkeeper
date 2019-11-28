@@ -26,7 +26,7 @@ namespace HeatKeeper.Server.Users
 
     public class UpdateUserCommand : UserCommand
     {
-        public UpdateUserCommand(long id, string name, string email, bool isAdmin) : base(name, email, isAdmin)
+        public UpdateUserCommand(long id, string email, string firstName, string lastName, bool isAdmin) : base(email, firstName, lastName, isAdmin)
         {
             Id = id;
         }
