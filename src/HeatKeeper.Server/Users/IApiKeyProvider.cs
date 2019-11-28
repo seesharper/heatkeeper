@@ -24,8 +24,9 @@ namespace HeatKeeper.Server.Users
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, userContext.Name),
                 new Claim(ClaimTypes.Email, userContext.Email),
+                new Claim(ClaimTypes.GivenName, userContext.FirstName),
+                new Claim(ClaimTypes.Surname, userContext.LastName),
                 new Claim(ClaimTypes.Role, "reporter"),
                 new Claim(ClaimTypes.Sid, userContext.Id.ToString())
             };

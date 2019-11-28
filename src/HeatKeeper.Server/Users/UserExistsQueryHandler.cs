@@ -28,13 +28,13 @@ namespace HeatKeeper.Server.Users
     [RequireUserRole]
     public class UserExistsQuery : IQuery<bool>
     {
-        public UserExistsQuery(long id, string name)
+        public UserExistsQuery(long id, string email)
         {
             Id = id;
-            Name = name;
+            Email = email;
         }
 
         public long Id { get; }
-        public string Name { get; }
+        public string Email { get; }
     }
 }

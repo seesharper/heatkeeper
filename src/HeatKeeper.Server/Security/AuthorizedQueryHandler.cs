@@ -24,12 +24,12 @@ namespace HeatKeeper.Server.Security
         {
             if (RoleAttribute.IsSatisfiedBy(userContext.Role))
             {
-                logger.Info($"Successfully authorized access to '{query.GetType()}' for user '{userContext.Name}({userContext.Role})'");
+                logger.Info($"Successfully authorized access to '{query.GetType()}' for user '{userContext.Email}({userContext.Role})'");
                 return await queryHandler.HandleAsync(query, cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                throw new AuthorizationFailedException($"Failed to authorize access to '{query.GetType()}' for user '{userContext.Name}({userContext.Role})'");
+                throw new AuthorizationFailedException($"Failed to authorize access to '{query.GetType()}' for user '{userContext.Email}({userContext.Role})'");
             }
         }
     }

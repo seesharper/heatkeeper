@@ -1,7 +1,8 @@
 SELECT
     Id,
-    Name,
     EMail,
+    FirstName,
+    LastName,
     IsAdmin
 FROM
     Users

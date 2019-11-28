@@ -2,17 +2,18 @@ namespace HeatKeeper.Server.Host.Users
 {
     public class RegisterUserRequest
     {
-        public RegisterUserRequest(string name, string email, bool isAdmin, string password, string confirmedPassword)
+        public RegisterUserRequest(string email, string firstName, string lastName, bool isAdmin, string password, string confirmedPassword)
         {
-            Name = name;
             Email = email;
+            FirstName = firstName;
+            LastName = lastName;
             IsAdmin = isAdmin;
             Password = password;
             ConfirmedPassword = confirmedPassword;
         }
-
-        public string Name { get; }
         public string Email { get; }
+        public string FirstName { get; }
+        public string LastName { get; }
         public bool IsAdmin { get; }
         public string Password { get; }
         public string ConfirmedPassword { get; }

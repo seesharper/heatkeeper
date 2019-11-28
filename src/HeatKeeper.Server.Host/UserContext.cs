@@ -12,9 +12,11 @@ public class UserContext : IUserContext
     }
     public long Id => long.Parse(httpContextAccessor.HttpContext.User.FindFirst(c => c.Type == ClaimTypes.Sid).Value);
 
-    public string Name => httpContextAccessor.HttpContext.User.Identity.Name;
+    public string FirstName => httpContextAccessor.HttpContext.User.FindFirst(c => c.Type == ClaimTypes.GivenName).Value;
 
-    public string Email => httpContextAccessor.HttpContext.User.FindFirst(c => c.Type == ClaimTypes.Email).Value;
+    public string LastName => httpContextAccessor.HttpContext.User.FindFirst(c => c.Type == ClaimTypes.Surname).Value;
+
+    public string Email => (httpContextAccessor.HttpContext.User?.FindFirst(c => c.Type == ClaimTypes.Email)?.Value) ?? "anonymous@tempuri.org";
 
     public bool IsAdmin => bool.Parse(httpContextAccessor.HttpContext.User.FindFirst(c => c.Type == ClaimTypes.Email).Value);
 

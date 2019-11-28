@@ -29,21 +29,23 @@ namespace HeatKeeper.Server.Users
     [RequireNoRole]
     public class GetUserQuery : IQuery<GetUserQueryResult>
     {
-        public GetUserQuery(string name)
+        public GetUserQuery(string email)
         {
-            Name = name;
+            Email = email;
         }
 
-        public string Name { get; }
+        public string Email { get; }
     }
 
     public class GetUserQueryResult
     {
         public long Id { get; set; }
 
-        public string Name { get; set; }
-
         public string Email { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
 
         public bool IsAdmin { get; set; }
 

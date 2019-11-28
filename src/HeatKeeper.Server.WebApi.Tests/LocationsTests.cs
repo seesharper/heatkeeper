@@ -1,31 +1,19 @@
-using AutoFixture;
 using FluentAssertions;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
-using HeatKeeper.Server.Host.Zones;
-using HeatKeeper.Server.WebApi.Tests.Customizations;
 using HeatKeeper.Server.Zones;
-using LightInject;
 using System.Net;
 using System.Threading.Tasks;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
     public class LocationsTests : TestBase
     {
-        public LocationsTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-        {
-            Fixture.Customizations.Add(new MailAddressCustomization());
-            Fixture.Customizations.Add(new PasswordCustomization());
-        }
-
         [Fact]
         public async Task ShouldCreateLocation()
         {
             var client = Factory.CreateClient();
-            var request = Fixture.Create<CreateLocationRequest>();
             var token = await client.AuthenticateAsAdminUser();
 
             var response = await client.CreateLocation(TestData.Locations.Home, token);

@@ -135,7 +135,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             var registerUserRequest = TestData.RegisterStandardUserRequest;
             var registerUserResponse = await client.RegisterUser(registerUserRequest, token);
             registerUserResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-            var authenticateResponse = await client.PostAuthenticateRequest(registerUserRequest.Name, registerUserRequest.Password);
+            var authenticateResponse = await client.PostAuthenticateRequest(registerUserRequest.Email, registerUserRequest.Password);
             authenticateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var content = await authenticateResponse.ContentAs<AuthenticateUserResponse>();
@@ -143,10 +143,10 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         }
 
-        public static async Task<HttpResponseMessage> PostAuthenticateRequest(this HttpClient client, string userName, string password)
+        public static async Task<HttpResponseMessage> PostAuthenticateRequest(this HttpClient client, string email, string password)
         {
             var authenticateRequest = new HttpRequestBuilder()
-                .AddJsonContent(new AuthenticateUserRequest(userName, password))
+                .AddJsonContent(new AuthenticateUserRequest(email, password))
                 .WithMethod(HttpMethod.Post)
                 .AddRequestUri("api/users/authenticate")
                 .Build();
