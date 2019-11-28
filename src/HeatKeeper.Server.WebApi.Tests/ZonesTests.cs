@@ -6,7 +6,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 {
     public class ZonesTests : TestBase
     {
-        public ZonesTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public ZonesTests()
         {
         }
 

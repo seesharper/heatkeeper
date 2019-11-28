@@ -8,7 +8,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 {
     public class VersionTests : TestBase
     {
-        public VersionTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public VersionTests()
         {
         }
 

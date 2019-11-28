@@ -15,7 +15,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 {
     public class LocationsTests : TestBase
     {
-        public LocationsTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public LocationsTests()
         {
             Fixture.Customizations.Add(new MailAddressCustomization());
             Fixture.Customizations.Add(new PasswordCustomization());
