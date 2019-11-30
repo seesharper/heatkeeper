@@ -23,7 +23,7 @@ namespace HeatKeeper.Server.Host.Locations
         }
 
         [HttpPost]
-        public async Task<ActionResult<CreateLocationResponse>> Post([FromBody] CreateLocationRequest request)
+        public async Task<ActionResult<CreateLocationResponse>> Post([FromBody] CreateLocationCommand request)
         {
             var command = new CreateLocationCommand(request.Name, request.Description);
             await commandExecutor.ExecuteAsync(command);

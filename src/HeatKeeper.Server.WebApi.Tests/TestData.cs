@@ -1,6 +1,7 @@
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
+using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
@@ -23,11 +24,11 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static class Locations
         {
-            public static CreateLocationRequest Home =>
-                new CreateLocationRequest("Home", "Description of the Home location");
+            public static CreateLocationCommand Home =>
+                new CreateLocationCommand("Home", "Description of the Home location");
 
-            public static CreateLocationRequest Cabin =>
-                new CreateLocationRequest("Cabin", "Description of the Cabin location");
+            public static CreateLocationCommand Cabin =>
+                new CreateLocationCommand("Cabin", "Description of the Cabin location");
         }
 
         public static class Zones

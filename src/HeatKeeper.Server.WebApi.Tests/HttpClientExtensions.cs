@@ -152,11 +152,11 @@ namespace HeatKeeper.Server.WebApi.Tests
             return await client.SendAsync(authenticateRequest);
         }
 
-        public static async Task<HttpResponseMessage> CreateLocation(this HttpClient client, CreateLocationRequest request, string token)
+        public static async Task<HttpResponseMessage> CreateLocation(this HttpClient client, CreateLocationCommand command, string token)
         {
             var httpRequest = new HttpRequestBuilder()
                 .AddBearerToken(token)
-                .AddContent(new JsonContent(request))
+                .AddContent(new JsonContent(command))
                 .WithMethod(HttpMethod.Post)
                 .AddRequestUri("api/locations")
                 .Build();
