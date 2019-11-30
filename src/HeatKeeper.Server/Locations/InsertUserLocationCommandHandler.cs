@@ -8,18 +8,18 @@ using System.Threading.Tasks;
 
 namespace HeatKeeper.Server.Locations
 {
-    public class InsertUserLocationCommandHandler : ICommandHandler<InsertUserLocationCommand>
+    public class AddUserToLocationCommandHandler : ICommandHandler<AddUserToLocationCommand>
     {
         private readonly IDbConnection dbConnection;
         private readonly ISqlProvider sqlProvider;
 
-        public InsertUserLocationCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
+        public AddUserToLocationCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
         {
             this.dbConnection = dbConnection;
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task HandleAsync(InsertUserLocationCommand command, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(AddUserToLocationCommand command, CancellationToken cancellationToken = default)
         {
             await dbConnection.ExecuteAsync(sqlProvider.InsertUserLocation, command);
             command.UserLocationId = await dbConnection.ExecuteScalarAsync<long>(sqlProvider.GetUserLocationId, command);
@@ -27,16 +27,15 @@ namespace HeatKeeper.Server.Locations
     }
 
     [RequireAdminRole]
-    public class InsertUserLocationCommand
+    public class AddUserToLocationCommand
     {
-        public InsertUserLocationCommand(long userId, long locationId)
+        public AddUserToLocationCommand(long userId)
         {
             UserId = userId;
-            LocationId = locationId;
         }
 
         public long UserId { get; }
-        public long LocationId { get; }
+        public long LocationId { get; set; }
 
         public long UserLocationId { get; set; }
     }

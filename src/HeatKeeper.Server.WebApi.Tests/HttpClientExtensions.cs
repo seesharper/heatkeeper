@@ -8,11 +8,10 @@ using FluentAssertions;
 using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
-using HeatKeeper.Server.Host.Zones;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Users;
-
+using HeatKeeper.Server.Zones;
 using Newtonsoft.Json;
 
 namespace HeatKeeper.Server.WebApi.Tests
@@ -52,27 +51,27 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<string> AuthenticateAsAdminUser(this HttpClient client)
         {
             var response = await client.AuthenticateUser(TestData.AuthenticateAdminUserRequest);
-            var content = await response.ContentAs<AuthenticateUserResponse>();
+            var content = await response.ContentAs<AuthenticatedUserQueryResult>();
             return content.Token;
         }
 
-        public static async Task<HttpResponseMessage> RegisterUser(this HttpClient client, RegisterUserRequest createUserRequest, string token)
+        public static async Task<HttpResponseMessage> RegisterUser(this HttpClient client, RegisterUserCommand command, string token)
         {
             var postRequest = new HttpRequestBuilder()
                 .WithMethod(HttpMethod.Post)
                 .AddRequestUri("api/users")
                 .AddBearerToken(token)
-                .AddContent(new JsonContent(createUserRequest))
+                .AddContent(new JsonContent(command))
                 .Build();
             return await client.SendAsync(postRequest);
         }
 
-        public static async Task<HttpResponseMessage> AuthenticateUser(this HttpClient client, AuthenticateUserRequest authenticateUserRequest)
+        public static async Task<HttpResponseMessage> AuthenticateUser(this HttpClient client, AuthenticatedUserQuery query)
         {
             var postRequest = new HttpRequestBuilder()
                 .WithMethod(HttpMethod.Post)
                 .AddRequestUri("api/users/authenticate")
-                .AddContent(new JsonContent(authenticateUserRequest))
+                .AddContent(new JsonContent(query))
                 .Build();
             return await client.SendAsync(postRequest);
         }
@@ -103,7 +102,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             return await client.SendAsync(request);
         }
 
-        public static async Task<HttpResponseMessage> AddUserToLocation(this HttpClient client, long locationId, AddUserLocationRequest addUserLocationRequest, string token)
+        public static async Task<HttpResponseMessage> AddUserToLocation(this HttpClient client, long locationId, AddUserToLocationCommand addUserLocationRequest, string token)
         {
             var postRequest = new HttpRequestBuilder()
                 .WithMethod(HttpMethod.Post)
@@ -138,7 +137,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             var authenticateResponse = await client.PostAuthenticateRequest(registerUserRequest.Email, registerUserRequest.Password);
             authenticateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var content = await authenticateResponse.ContentAs<AuthenticateUserResponse>();
+            var content = await authenticateResponse.ContentAs<AuthenticatedUserQueryResult>();
             return content.Token;
 
         }
@@ -146,18 +145,18 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<HttpResponseMessage> PostAuthenticateRequest(this HttpClient client, string email, string password)
         {
             var authenticateRequest = new HttpRequestBuilder()
-                .AddJsonContent(new AuthenticateUserRequest(email, password))
+                .AddJsonContent(new AuthenticatedUserQuery(email, password))
                 .WithMethod(HttpMethod.Post)
                 .AddRequestUri("api/users/authenticate")
                 .Build();
             return await client.SendAsync(authenticateRequest);
         }
 
-        public static async Task<HttpResponseMessage> CreateLocation(this HttpClient client, CreateLocationRequest request, string token)
+        public static async Task<HttpResponseMessage> CreateLocation(this HttpClient client, CreateLocationCommand command, string token)
         {
             var httpRequest = new HttpRequestBuilder()
                 .AddBearerToken(token)
-                .AddContent(new JsonContent(request))
+                .AddContent(new JsonContent(command))
                 .WithMethod(HttpMethod.Post)
                 .AddRequestUri("api/locations")
                 .Build();
@@ -176,7 +175,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         }
 
 
-        public static async Task<HttpResponseMessage> CreateZone(this HttpClient client, long locationId, CreateZoneRequest request)
+        public static async Task<HttpResponseMessage> CreateZone(this HttpClient client, long locationId, CreateZoneCommand request)
         {
             var token = await client.AuthenticateAsAdminUser();
             var httpRequest = new HttpRequestBuilder()
@@ -212,7 +211,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             return content.ApiKey;
         }
 
-        public static async Task<HttpResponseMessage> CreateMeasurement(this HttpClient client, CreateMeasurementRequest[] requests, string token)
+        public static async Task<HttpResponseMessage> CreateMeasurement(this HttpClient client, CreateMeasurementCommand[] requests, string token)
         {
             var httpRequest = new HttpRequestBuilder()
                 .AddBearerToken(token)

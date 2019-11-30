@@ -1,13 +1,9 @@
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
-using HeatKeeper.Server.Host.Zones;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,7 +23,7 @@ namespace HeatKeeper.Server.Host.Locations
         }
 
         [HttpPost]
-        public async Task<ActionResult<CreateLocationResponse>> Post([FromBody] CreateLocationRequest request)
+        public async Task<ActionResult<CreateLocationResponse>> Post([FromBody] CreateLocationCommand request)
         {
             var command = new CreateLocationCommand(request.Name, request.Description);
             await commandExecutor.ExecuteAsync(command);
@@ -44,19 +40,17 @@ namespace HeatKeeper.Server.Host.Locations
 
 
         [HttpPost("{locationId}/zones")]
-        public async Task<IActionResult> Post(long locationId, [FromBody] CreateZoneRequest createZoneRequest)
+        public async Task<IActionResult> Post([FromBodyAndRoute] CreateZoneCommand command)
         {
-            var createZoneCommand = new InsertZoneCommand(createZoneRequest.Name, createZoneRequest.Description, locationId);
-            await commandExecutor.ExecuteAsync(createZoneCommand);
-            return CreatedAtAction(nameof(Post), new { id = createZoneRequest.Name });
+            await commandExecutor.ExecuteAsync(command);
+            return CreatedAtAction(nameof(Post), new { id = command.Name });
         }
 
         [HttpPost("{locationId}/users")]
-        public async Task<IActionResult> AddUser(long locationId, [FromBody] AddUserLocationRequest request)
+        public async Task<IActionResult> AddUser([FromBodyAndRoute]AddUserToLocationCommand command)
         {
-            var addUserCommand = new InsertUserLocationCommand(request.UserId, locationId);
-            await commandExecutor.ExecuteAsync(addUserCommand);
-            return CreatedAtAction(nameof(AddUser), new AddUserLocationResponse(addUserCommand.UserLocationId));
+            await commandExecutor.ExecuteAsync(command);
+            return CreatedAtAction(nameof(AddUser), new AddUserLocationResponse(command.UserLocationId));
         }
 
         [HttpGet("{locationId}/users")]

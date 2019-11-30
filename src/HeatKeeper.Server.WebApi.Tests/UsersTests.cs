@@ -18,7 +18,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
             var client = Factory.CreateClient();
             var response = await client.AuthenticateUser(TestData.AuthenticateAdminUserRequest);
-            var content = await response.ContentAs<AuthenticateUserResponse>();
+            var content = await response.ContentAs<AuthenticatedUserQueryResult>();
 
             content.IsAdmin.Should().BeTrue();
             content.FirstName.Should().Be(AdminUser.DefaultFirstName);

@@ -24,7 +24,7 @@ namespace HeatKeeper.Server.Locations
             var insertLocationCommand = new InsertLocationCommand(command.Name, command.Description);
             await commandExecutor.ExecuteAsync(insertLocationCommand).ConfigureAwait(false);
 
-            var adduserCommand = new InsertUserLocationCommand(userContext.Id, insertLocationCommand.Id);
+            var adduserCommand = new AddUserToLocationCommand(userContext.Id) { LocationId = insertLocationCommand.Id };
             await commandExecutor.ExecuteAsync(adduserCommand).ConfigureAwait(false);
 
             command.Id = insertLocationCommand.Id;

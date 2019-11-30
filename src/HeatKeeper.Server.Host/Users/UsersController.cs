@@ -28,19 +28,14 @@ namespace HeatKeeper.Server.Host.Users
         }
 
         [HttpPost("authenticate")]
-        public async Task<ActionResult<AuthenticateUserResponse>> Authenticate([FromBody]AuthenticateUserRequest request)
-        {
-            var query = new AuthenticatedUserQuery(request.Email, request.Password);
-            var result = await queryExecutor.ExecuteAsync(query);
-            return Ok(new AuthenticateUserResponse(result.Token, result.Id, result.Email, result.FirstName, result.LastName, result.IsAdmin));
-        }
+        public async Task<ActionResult<AuthenticatedUserQueryResult>> Authenticate([FromBody]AuthenticatedUserQuery query)
+            => Ok(await queryExecutor.ExecuteAsync(query));
 
         [HttpPost()]
-        public async Task<ActionResult<RegisterUserResponse>> Post([FromBody]RegisterUserRequest request)
+        public async Task<ActionResult<RegisterUserResponse>> Post([FromBody]RegisterUserCommand command)
         {
-            var registerUserCommand = new RegisterUserCommand(request.Email, request.FirstName, request.LastName, request.IsAdmin, request.Password, request.ConfirmedPassword);
-            await commandExecutor.ExecuteAsync(registerUserCommand);
-            return Created(nameof(Post), new RegisterUserResponse(registerUserCommand.Id));
+            await commandExecutor.ExecuteAsync(command);
+            return Created(nameof(Post), new RegisterUserResponse(command.Id));
         }
 
 
