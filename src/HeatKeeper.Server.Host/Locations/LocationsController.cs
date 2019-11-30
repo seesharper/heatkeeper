@@ -1,13 +1,9 @@
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
-using HeatKeeper.Server.Host.Zones;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,11 +40,10 @@ namespace HeatKeeper.Server.Host.Locations
 
 
         [HttpPost("{locationId}/zones")]
-        public async Task<IActionResult> Post(long locationId, [FromBody] CreateZoneRequest createZoneRequest)
+        public async Task<IActionResult> Post([FromBodyAndRoute] CreateZoneCommand command)
         {
-            var createZoneCommand = new InsertZoneCommand(createZoneRequest.Name, createZoneRequest.Description, locationId);
-            await commandExecutor.ExecuteAsync(createZoneCommand);
-            return CreatedAtAction(nameof(Post), new { id = createZoneRequest.Name });
+            await commandExecutor.ExecuteAsync(command);
+            return CreatedAtAction(nameof(Post), new { id = command.Name });
         }
 
         [HttpPost("{locationId}/users")]

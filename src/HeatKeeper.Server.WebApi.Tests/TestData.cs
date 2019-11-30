@@ -1,9 +1,9 @@
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
-using HeatKeeper.Server.Host.Zones;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Users;
+using HeatKeeper.Server.Zones;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
@@ -32,11 +32,11 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static class Zones
         {
-            public static CreateZoneRequest LivingRoom =>
-                new CreateZoneRequest("LivingRoom", "This is the description of the LivingRoom zone");
+            public static CreateZoneCommand LivingRoom =>
+                new CreateZoneCommand("LivingRoom", "This is the description of the LivingRoom zone");
 
-            public static CreateZoneRequest Kitchen =>
-                new CreateZoneRequest("Kitchen", "This is the description of the Kitchen zone");
+            public static CreateZoneCommand Kitchen =>
+                new CreateZoneCommand("Kitchen", "This is the description of the Kitchen zone");
         }
 
         public static class Users

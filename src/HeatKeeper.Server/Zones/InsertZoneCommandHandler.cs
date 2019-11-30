@@ -9,28 +9,29 @@ using System.Threading.Tasks;
 
 namespace HeatKeeper.Server.Zones
 {
-    public class InsertZoneCommandHandler : ICommandHandler<InsertZoneCommand>
+    public class CreateZoneCommandHandler : ICommandHandler<CreateZoneCommand>
     {
         private readonly IDbConnection dbConnection;
         private readonly ISqlProvider sqlProvider;
 
-        public InsertZoneCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
+        public CreateZoneCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
         {
             this.dbConnection = dbConnection;
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task HandleAsync(InsertZoneCommand command, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(CreateZoneCommand command, CancellationToken cancellationToken = default)
         {
             await ((DbCommand)dbConnection.CreateCommand(sqlProvider.InsertZone, command)).ExecuteNonQueryAsync();
         }
     }
 
     [RequireUserRole]
-    public class InsertZoneCommand : ZoneCommand
+    public class CreateZoneCommand : ZoneCommand
     {
-        public InsertZoneCommand(string name, string description, long locationId) : base(name, description, locationId)
+        public CreateZoneCommand(string name, string description) : base(name, description)
         {
+
         }
     }
 }

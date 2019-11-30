@@ -8,11 +8,10 @@ using FluentAssertions;
 using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
-using HeatKeeper.Server.Host.Zones;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Users;
-
+using HeatKeeper.Server.Zones;
 using Newtonsoft.Json;
 
 namespace HeatKeeper.Server.WebApi.Tests
@@ -176,7 +175,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         }
 
 
-        public static async Task<HttpResponseMessage> CreateZone(this HttpClient client, long locationId, CreateZoneRequest request)
+        public static async Task<HttpResponseMessage> CreateZone(this HttpClient client, long locationId, CreateZoneCommand request)
         {
             var token = await client.AuthenticateAsAdminUser();
             var httpRequest = new HttpRequestBuilder()
