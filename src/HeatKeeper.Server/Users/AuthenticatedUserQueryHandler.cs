@@ -24,7 +24,7 @@ namespace HeatKeeper.Server.Users
 
         public async Task<AuthenticatedUserQueryResult> HandleAsync(AuthenticatedUserQuery query, CancellationToken cancellationToken = default)
         {
-            var user = await queryExecutor.ExecuteAsync(new GetUserQuery(query.UserName));
+            var user = await queryExecutor.ExecuteAsync(new GetUserQuery(query.Email));
 
             if (user == null || !passwordManager.VerifyPassword(query.Password, user.HashedPassword))
             {
@@ -49,13 +49,13 @@ namespace HeatKeeper.Server.Users
     [RequireNoRole]
     public class AuthenticatedUserQuery : IQuery<AuthenticatedUserQueryResult>
     {
-        public AuthenticatedUserQuery(string userName, string password)
+        public AuthenticatedUserQuery(string email, string password)
         {
-            UserName = userName;
+            Email = email;
             Password = password;
         }
 
-        public string UserName { get; }
+        public string Email { get; }
         public string Password { get; }
 
     }

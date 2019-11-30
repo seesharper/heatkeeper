@@ -1,6 +1,7 @@
 using FluentAssertions;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
+using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Zones;
 using System.Net;
 using System.Threading.Tasks;
@@ -127,7 +128,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             var createUserResponse = await client.RegisterUser(TestData.Users.StandardUser, token);
             var user = await createUserResponse.ContentAs<RegisterUserResponse>();
 
-            var response = await client.AddUserToLocation(location.Id, new AddUserLocationRequest(user.Id), token);
+            var response = await client.AddUserToLocation(location.Id, new AddUserToLocationCommand(user.Id), token);
             response.StatusCode.Should().Be(HttpStatusCode.Created);
         }
 
@@ -143,10 +144,10 @@ namespace HeatKeeper.Server.WebApi.Tests
             var registerUserResponseMessage = await client.RegisterUser(TestData.Users.StandardUser, token);
             var userId = (await registerUserResponseMessage.ContentAs<RegisterUserResponse>()).Id;
 
-            var response = await client.AddUserToLocation(locationId, new AddUserLocationRequest(userId), token);
+            var response = await client.AddUserToLocation(locationId, new AddUserToLocationCommand(userId), token);
             response.StatusCode.Should().Be(HttpStatusCode.Created);
 
-            response = await client.AddUserToLocation(locationId, new AddUserLocationRequest(userId), token);
+            response = await client.AddUserToLocation(locationId, new AddUserToLocationCommand(userId), token);
 
             response.StatusCode.Should().Be(HttpStatusCode.Conflict);
         }
@@ -163,7 +164,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             var createUserResponseMessage = await client.RegisterUser(TestData.Users.StandardUser, token);
             var user = await createUserResponseMessage.ContentAs<RegisterUserResponse>();
 
-            var addUserLocationResponseMessage = await client.AddUserToLocation(location.Id, new AddUserLocationRequest(user.Id), token);
+            var addUserLocationResponseMessage = await client.AddUserToLocation(location.Id, new AddUserToLocationCommand(user.Id), token);
             addUserLocationResponseMessage.EnsureSuccessStatusCode();
 
             var removeUserFromLocationResponseMessage = await client.RemoveUserFromRequest(location.Id, user.Id);

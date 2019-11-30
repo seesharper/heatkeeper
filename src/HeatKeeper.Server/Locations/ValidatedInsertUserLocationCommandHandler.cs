@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HeatKeeper.Server.Locations
 {
-    public class ValidatedInsertUserLocationCommandHandler<TCommand> : ICommandHandler<TCommand> where TCommand : InsertUserLocationCommand
+    public class ValidatedInsertUserLocationCommandHandler<TCommand> : ICommandHandler<TCommand> where TCommand : AddUserToLocationCommand
     {
         private readonly ICommandHandler<TCommand> handler;
         private readonly IQueryExecutor queryExecutor;

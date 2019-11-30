@@ -33,7 +33,7 @@ namespace HeatKeeper.Server.Measurements
     [RequireReporterRole]
     public class CreateMeasurementCommand
     {
-        public CreateMeasurementCommand(string sensorId, int measurementType, double value)
+        public CreateMeasurementCommand(string sensorId, MeasurementType measurementType, double value)
         {
             SensorId = sensorId;
             MeasurementType = measurementType;
@@ -41,7 +41,7 @@ namespace HeatKeeper.Server.Measurements
         }
 
         public string SensorId { get; }
-        public int MeasurementType { get; }
+        public MeasurementType MeasurementType { get; }
         public double Value { get; }
     }
 }

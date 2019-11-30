@@ -10,17 +10,17 @@ namespace HeatKeeper.Server.WebApi.Tests
 {
     public static class TestData
     {
-        public static AuthenticateUserRequest InvalidAuthenticateAdminUserRequest =>
-            new AuthenticateUserRequest(AdminUser.DefaultEmail, "InvalidPassword");
+        public static AuthenticatedUserQuery InvalidAuthenticateAdminUserRequest =>
+            new AuthenticatedUserQuery(AdminUser.DefaultEmail, "InvalidPassword");
 
-        public static AuthenticateUserRequest AuthenticateAdminUserRequest =>
-            new AuthenticateUserRequest(AdminUser.DefaultEmail, AdminUser.DefaultPassword);
+        public static AuthenticatedUserQuery AuthenticateAdminUserRequest =>
+            new AuthenticatedUserQuery(AdminUser.DefaultEmail, AdminUser.DefaultPassword);
 
-        public static CreateMeasurementRequest[] TemperatureMeasurementRequests =>
-            new[] { new CreateMeasurementRequest("SensorID1", MeasurementType.Temperature, 23.7) };
+        public static CreateMeasurementCommand[] TemperatureMeasurementRequests =>
+            new[] { new CreateMeasurementCommand("SensorID1", MeasurementType.Temperature, 23.7) };
 
-        public static RegisterUserRequest RegisterStandardUserRequest =>
-            new RegisterUserRequest("StandardUser@tempuri.org", "Standard User First Name", "Standard User Last name", isAdmin: false, "aVe78!*PZ9&Lnqh1E4pG", "aVe78!*PZ9&Lnqh1E4pG");
+        public static RegisterUserCommand RegisterStandardUserRequest =>
+            new RegisterUserCommand("StandardUser@tempuri.org", "Standard User First Name", "Standard User Last name", isAdmin: false, "aVe78!*PZ9&Lnqh1E4pG", "aVe78!*PZ9&Lnqh1E4pG");
 
         public static class Locations
         {
@@ -42,10 +42,10 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static class Users
         {
-            public static RegisterUserRequest StandardUser =>
-                new RegisterUserRequest("StandardUser@tempuri.org", "FirstName", "LastName", isAdmin: false, "aVe78!*PZ9&Lnqh1E4pG", "aVe78!*PZ9&Lnqh1E4pG");
-            public static RegisterUserRequest AnotherStandardUser =>
-                new RegisterUserRequest("AnotherStandardUser@tempuri.org", "FirstName", "LastName", isAdmin: false, "aVe78!*PZ9&Lnqh1E4pG", "aVe78!*PZ9&Lnqh1E4pG");
+            public static RegisterUserCommand StandardUser =>
+                new RegisterUserCommand("StandardUser@tempuri.org", "FirstName", "LastName", isAdmin: false, "aVe78!*PZ9&Lnqh1E4pG", "aVe78!*PZ9&Lnqh1E4pG");
+            public static RegisterUserCommand AnotherStandardUser =>
+                new RegisterUserCommand("AnotherStandardUser@tempuri.org", "FirstName", "LastName", isAdmin: false, "aVe78!*PZ9&Lnqh1E4pG", "aVe78!*PZ9&Lnqh1E4pG");
         }
     }
 }
