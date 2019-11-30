@@ -222,5 +222,27 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .Build();
             return await client.SendAsync(httpRequest);
         }
+
+        public static async Task<HttpResponseMessage> PatchUser(this HttpClient client, UpdateUserCommand command, long userId, string token)
+        {
+            var request = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Patch)
+                .AddRequestUri($"api/users/{userId}")
+                .AddBearerToken(token)
+                .AddContent(new JsonContent(command))
+                .Build();
+            return await client.SendAsync(request);
+        }
+
+        public static async Task<HttpResponseMessage> PatchCurrentUser(this HttpClient client, UpdateCurrentUserCommand command, string token)
+        {
+            var request = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Patch)
+                .AddRequestUri($"api/users")
+                .AddBearerToken(token)
+                .AddContent(new JsonContent(command))
+                .Build();
+            return await client.SendAsync(request);
+        }
     }
 }

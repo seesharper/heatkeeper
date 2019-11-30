@@ -2,7 +2,6 @@ UPDATE Users
 SET
     EMail = @eMail,
     FirstName = @firstName,
-    LastName = @lastName,
-    IsAdmin = @isAdmin
+    LastName = @lastName
 WHERE
-    id = @userId
+    id = @id

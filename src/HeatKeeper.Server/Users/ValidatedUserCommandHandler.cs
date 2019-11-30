@@ -22,7 +22,7 @@ namespace HeatKeeper.Server.Users
         public async Task HandleAsync(TCommand command, CancellationToken cancellationToken = default)
         {
             emailValidator.Validate(command.Email);
-            var userExists = await queryExecutor.ExecuteAsync(new UserExistsQuery(command.Id, command.Email));
+            var userExists = await queryExecutor.ExecuteAsync(new UserExistsQuery(command.UserId, command.Email));
             if (userExists)
             {
                 throw new HeatKeeperConflictException($"User {command.Email} already exists");

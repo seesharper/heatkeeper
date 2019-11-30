@@ -1,12 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Users;
 using LightInject;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +41,8 @@ namespace HeatKeeper.Server.Host
             services.AddMvc(options =>
             {
                 options.Filters.Add<GlobalExceptionFilter>();
+                var bodyModelBinderProvider = options.ModelBinderProviders.Single(p => p.GetType() == typeof(BodyModelBinderProvider));
+                options.ModelBinderProviders.Insert(0, new RouteAndBodyBinderProvider(bodyModelBinderProvider));
             }).AddControllersAsServices().AddNewtonsoftJson();
 
             services.AddJwtAuthentication(appConfig);
@@ -91,5 +99,61 @@ namespace HeatKeeper.Server.Host
                 endpoints.MapControllers();
             });
         }
+    }
+
+
+    public class RouteAndBodyModelBinder : IModelBinder
+    {
+        private readonly IModelBinder bodyModelBinder;
+
+        public RouteAndBodyModelBinder(IModelBinder bodyModelBinder)
+        {
+            this.bodyModelBinder = bodyModelBinder;
+        }
+
+        public async Task BindModelAsync(ModelBindingContext bindingContext)
+        {
+
+            await bodyModelBinder.BindModelAsync(bindingContext);
+
+            var routeValues = bindingContext.HttpContext.Request.RouteValues.Select(rv => rv.Key);
+
+            var routeProperties = bindingContext.ModelMetadata.Properties.Where(p => routeValues.Contains(p.Name, StringComparer.OrdinalIgnoreCase)).ToArray(); ;
+            foreach (var routeProperty in routeProperties)
+            {
+                var routeValue = bindingContext.ValueProvider.GetValue(routeProperty.Name).FirstValue;
+                var convertedValue = Convert.ChangeType(routeValue, routeProperty.UnderlyingOrModelType);
+                routeProperty.PropertySetter(bindingContext.Result.Model, convertedValue);
+            }
+        }
+    }
+
+    public class RouteAndBodyBinderProvider : IModelBinderProvider
+    {
+        private readonly IModelBinderProvider bodyModelBinderProvider;
+
+        public RouteAndBodyBinderProvider(IModelBinderProvider bodyModelBinderProvider)
+        {
+            this.bodyModelBinderProvider = bodyModelBinderProvider;
+        }
+
+        public IModelBinder GetBinder(ModelBinderProviderContext context)
+        {
+            var identity = (ModelMetadataIdentity)typeof(ModelMetadata).GetProperty("Identity", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(context.Metadata);
+            if (identity.MetadataKind == ModelMetadataKind.Parameter)
+            {
+                if (identity.ParameterInfo.IsDefined(typeof(FromBodyAndRouteAttribute)))
+                {
+                    return new RouteAndBodyModelBinder(bodyModelBinderProvider.GetBinder(context));
+                }
+            }
+
+            return null;
+        }
+    }
+
+    public class FromBodyAndRouteAttribute : Attribute
+    {
+
     }
 }

@@ -1,6 +1,7 @@
 using CQRS.Command.Abstractions;
 using DbReader;
 using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Security;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,11 +25,10 @@ namespace HeatKeeper.Server.Users
         }
     }
 
+    [RequireAdminRole]
     public class UpdateUserCommand : UserCommand
     {
-        public UpdateUserCommand(long id, string email, string firstName, string lastName, bool isAdmin) : base(email, firstName, lastName, isAdmin)
-        {
-            Id = id;
-        }
+        public bool IsAdmin { get; set; }
     }
+
 }
