@@ -77,7 +77,7 @@ namespace HeatKeeper.Server.WebApi.Tests
                .WithMethod(HttpMethod.Patch)
                .AddRequestUri("api/users/password")
                .AddBearerToken(token)
-               .AddContent(new JsonContent(new ChangePasswordRequest(AdminUser.DefaultPassword, NewPassword, NewPassword)))
+               .AddContent(new JsonContent(new ChangePasswordCommand(AdminUser.DefaultPassword, NewPassword, NewPassword)))
                .Build();
 
             var responseMessage = await client.SendAsync(request);
@@ -85,6 +85,42 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var authenticateResponse = await client.PostAuthenticateRequest(AdminUser.DefaultEmail, NewPassword);
             authenticateResponse.EnsureSuccessStatusCode();
+        }
+
+        [Fact]
+        public async Task ShouldUpdateUser()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+            var registerUserResponseMessage = await client.RegisterUser(TestData.Users.StandardUser, token);
+            var registerUserResponse = await registerUserResponseMessage.ContentAs<RegisterUserResponse>();
+
+            var updateCommand = new UpdateUserCommand()
+            {
+                FirstName = TestData.Users.StandardUser.FirstName,
+                LastName = TestData.Users.StandardUser.LastName,
+                Email = TestData.Users.StandardUser.Email,
+                IsAdmin = true
+            };
+
+            var response = await client.PatchUser(updateCommand, registerUserResponse.Id, token);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        [Fact]
+        public async Task ShouldUpdateCurrentUser()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.CreateAndAuthenticateStandardUser();
+            var updateCommand = new UpdateCurrentUserCommand()
+            {
+                FirstName = TestData.Users.StandardUser.FirstName,
+                LastName = TestData.Users.StandardUser.LastName,
+                Email = TestData.Users.StandardUser.Email,
+            };
+
+            var response = await client.PatchCurrentUser(updateCommand, token);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
     }
 }

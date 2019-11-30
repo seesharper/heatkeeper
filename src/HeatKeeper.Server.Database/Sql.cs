@@ -45,6 +45,8 @@ namespace HeatKeeper.Server.Database
 
         string UpdateUser { get; }
 
+        string UpdateCurrentUser { get; }
+
         string UserExists { get; }
 
         string GetUsersByLocation { get; }

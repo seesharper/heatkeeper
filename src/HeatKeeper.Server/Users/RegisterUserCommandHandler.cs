@@ -19,9 +19,9 @@ namespace HeatKeeper.Server.Users
         public async Task HandleAsync(RegisterUserCommand command, CancellationToken cancellationToken = default)
         {
             var hashedPassword = passwordManager.GetHashedPassword(command.Password);
-            var createUserCommand = new CreateUserCommand(command.Email, command.FirstName, command.LastName, command.IsAdmin, hashedPassword);
+            var createUserCommand = new CreateUserCommand() { Email = command.Email, FirstName = command.FirstName, LastName = command.LastName, IsAdmin = command.IsAdmin, HashedPassword = hashedPassword };
             await commandExecutor.ExecuteAsync(createUserCommand);
-            command.Id = createUserCommand.Id;
+            command.Id = createUserCommand.UserId;
         }
     }
 
