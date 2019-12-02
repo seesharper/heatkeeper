@@ -1,10 +1,7 @@
-using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using HeatKeeper.Abstractions.Logging;
-using HeatKeeper.Server.Users;
 
 namespace HeatKeeper.Server.Authorization
 {
