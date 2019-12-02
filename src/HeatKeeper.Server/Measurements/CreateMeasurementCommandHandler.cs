@@ -5,8 +5,8 @@ using System.Data;
 using HeatKeeper.Server.Database;
 using DbReader;
 using CQRS.Command.Abstractions;
-using HeatKeeper.Server.Security;
 using System;
+using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Measurements
 {

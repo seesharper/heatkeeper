@@ -1,3 +1,4 @@
+using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
@@ -46,6 +47,12 @@ namespace HeatKeeper.Server.WebApi.Tests
                 new RegisterUserCommand("StandardUser@tempuri.org", "FirstName", "LastName", isAdmin: false, "aVe78!*PZ9&Lnqh1E4pG", "aVe78!*PZ9&Lnqh1E4pG");
             public static RegisterUserCommand AnotherStandardUser =>
                 new RegisterUserCommand("AnotherStandardUser@tempuri.org", "FirstName", "LastName", isAdmin: false, "aVe78!*PZ9&Lnqh1E4pG", "aVe78!*PZ9&Lnqh1E4pG");
+
+            public static RegisterUserCommand StandardUserWithWeakPassord =>
+                new RegisterUserCommand("StandardUser@tempuri.org", "FirstName", "LastName", isAdmin: false, "abc123", "abc123");
+
+            public static RegisterUserCommand StandardUserWithGivenPassword(string password) =>
+                new RegisterUserCommand("StandardUser@tempuri.org", "FirstName", "LastName", isAdmin: false, password, password);
         }
     }
 }

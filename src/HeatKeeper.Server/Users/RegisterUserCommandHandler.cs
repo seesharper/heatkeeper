@@ -1,8 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
-using HeatKeeper.Server.Security;
-
+using HeatKeeper.Server.Authentication;
+using HeatKeeper.Server.Authorization;
 namespace HeatKeeper.Server.Users
 {
     public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand>

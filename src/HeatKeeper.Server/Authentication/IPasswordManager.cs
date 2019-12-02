@@ -1,4 +1,4 @@
-namespace HeatKeeper.Server.Users
+namespace HeatKeeper.Server.Authentication
 {
     public interface IPasswordManager
     {

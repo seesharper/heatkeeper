@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System;
 using CQRS.Query.Abstractions;
-using CQRS.Command.Abstractions;
-using HeatKeeper.Server.Security;
+using HeatKeeper.Server.Authorization;
+using HeatKeeper.Server.Authentication;
 
 namespace HeatKeeper.Server.Users
 {

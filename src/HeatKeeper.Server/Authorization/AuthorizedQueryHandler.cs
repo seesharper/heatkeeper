@@ -4,7 +4,7 @@ using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Abstractions.Logging;
 
-namespace HeatKeeper.Server.Security
+namespace HeatKeeper.Server.Authorization
 {
     public class AuthorizedQueryHandler<TQuery, TResult> : IQueryHandler<TQuery, TResult> where TQuery : IQuery<TResult>
     {

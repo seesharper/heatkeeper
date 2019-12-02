@@ -6,7 +6,7 @@ using CQRS.Command.Abstractions;
 using HeatKeeper.Abstractions.Logging;
 using HeatKeeper.Server.Users;
 
-namespace HeatKeeper.Server.Security
+namespace HeatKeeper.Server.Authorization
 {
     public class AuthorizedCommandHandler<TCommand> : ICommandHandler<TCommand>
     {

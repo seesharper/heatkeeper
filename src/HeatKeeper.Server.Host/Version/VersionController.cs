@@ -8,14 +8,14 @@ namespace HeatKeeper.Server.Measurements
     [ApiController]
     public class VersionController : ControllerBase
     {
-        /// <summary>
-        /// Gets the product version.
-        /// </summary>
-        [HttpGet]
-        public IActionResult Get()
-        {
-            var versionAttribute = typeof(VersionController).Assembly.GetCustomAttributes<AssemblyInformationalVersionAttribute>().Single();
-            return Ok(versionAttribute.InformationalVersion);
-        }
+        // /// <summary>
+        // /// Gets the product version.
+        // /// </summary>
+        // [HttpGet]
+        // public IActionResult Get()
+        // {
+        //     var versionAttribute = typeof(VersionController).Assembly.GetCustomAttributes<AssemblyInformationalVersionAttribute>().Single();
+        //     return Ok(versionAttribute.InformationalVersion);
+        // }
     }
 }

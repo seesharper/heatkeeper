@@ -1,8 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
-namespace HeatKeeper.Server.Security
+namespace HeatKeeper.Server.Authorization
 {
     public static class TypeExtensions
     {

@@ -1,8 +1,5 @@
 using CQRS.Command.Abstractions;
-using HeatKeeper.Server.Database;
-using HeatKeeper.Server.Security;
-using HeatKeeper.Server.Users;
-using System.Data;
+using HeatKeeper.Server.Authorization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -47,6 +44,9 @@ namespace HeatKeeper.Server.Locations
     }
 
 
+    /// <summary>
+    /// Creates a new location.
+    /// </summary>
     [RequireAdminRole]
     public class CreateLocationCommand : LocationCommand
     {

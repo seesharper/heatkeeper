@@ -1,4 +1,4 @@
-namespace HeatKeeper.Server.Users
+namespace HeatKeeper.Server.Authorization
 {
     public interface IUserContext
     {

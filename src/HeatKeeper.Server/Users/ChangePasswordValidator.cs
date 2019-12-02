@@ -2,7 +2,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
-using HeatKeeper.Server.Security;
+using HeatKeeper.Server.Authorization;
+using HeatKeeper.Server.Authentication;
+using HeatKeeper.Server.Exceptions;
 
 namespace HeatKeeper.Server.Users
 {
@@ -26,7 +28,7 @@ namespace HeatKeeper.Server.Users
             await queryExecutor.ExecuteAsync(new AuthenticatedUserQuery(userContext.Email, command.OldPassword));
             if (string.Equals(command.NewPassword, command.OldPassword))
             {
-                throw new HeatKeeperSecurityException("The new password must be different from the old password");
+                throw new AuthenticationFailedException("The new password must be different from the old password");
             }
 
             passwordPolicy.Apply(command.NewPassword, command.ConfirmedPassword);

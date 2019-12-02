@@ -1,10 +1,11 @@
 using System.Net;
+using HeatKeeper.Server.Authorization;
+using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Exceptions;
-using HeatKeeper.Server.Security;
-using HeatKeeper.Server.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Newtonsoft.Json;
+using HeatKeeper.Server.Validation;
+using System.Linq;
 
 namespace HeatKeeper.Server.Host
 {
@@ -40,6 +41,25 @@ namespace HeatKeeper.Server.Host
                     Title = context.Exception.Message
                 };
                 context.Result = new ConflictObjectResult(problemDetails);
+            }
+
+            if (context.Exception is ValidationFailedException exception)
+            {
+                var validationProblemDetails = new ValidationProblemDetails
+                {
+                    Title = "Request Validation Error",
+                    Detail = "See `errors` for details",
+                    Status = (int?)HttpStatusCode.BadRequest,
+                    Instance = context.HttpContext.TraceIdentifier
+                };
+
+                var errorsGroupedByMemberName = exception.ValidationErrors.GroupBy(e => e.MemberName);
+                foreach (var errorGroup in errorsGroupedByMemberName)
+                {
+                    validationProblemDetails.Errors.Add(errorGroup.Key, errorGroup.Select(e => e.ErrorMessage).ToArray());
+                }
+
+                context.Result = new BadRequestObjectResult(validationProblemDetails);
             }
         }
     }

@@ -5,7 +5,7 @@ using HeatKeeper.Server.Database;
 using DbReader;
 using System.Linq;
 using CQRS.Query.Abstractions;
-using HeatKeeper.Server.Security;
+using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Sensors
 {

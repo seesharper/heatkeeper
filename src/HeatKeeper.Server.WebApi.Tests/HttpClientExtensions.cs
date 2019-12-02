@@ -243,5 +243,16 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .Build();
             return await client.SendAsync(request);
         }
+
+        public static async Task<HttpResponseMessage> ChangePassword(this HttpClient client, ChangePasswordCommand command, string token)
+        {
+            var request = new HttpRequestBuilder()
+               .WithMethod(HttpMethod.Patch)
+               .AddRequestUri("api/users/password")
+               .AddBearerToken(token)
+               .AddContent(new JsonContent(command))
+               .Build();
+            return await client.SendAsync(request);
+        }
     }
 }

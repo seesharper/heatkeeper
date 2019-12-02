@@ -6,6 +6,7 @@ using DbReader;
 using System.Linq;
 using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Users;
+using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Locations
 {
@@ -25,14 +26,11 @@ namespace HeatKeeper.Server.Locations
             return (await dbConnection.ReadAsync<User>(sqlProvider.GetUsersByLocation, query)).ToArray();
         }
     }
+
+    [RequireUserRole]
     public class UsersByLocationQuery : IQuery<User[]>
     {
-        public UsersByLocationQuery(long locationId)
-        {
-            LocationId = locationId;
-        }
-
-        public long LocationId { get; }
+        public long LocationId { get; set; }
     }
 
 

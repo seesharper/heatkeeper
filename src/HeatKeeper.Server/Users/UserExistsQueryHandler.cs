@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using HeatKeeper.Server.Database;
 using DbReader;
 using CQRS.Query.Abstractions;
-using HeatKeeper.Server.Security;
+using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Users
 {

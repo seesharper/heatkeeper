@@ -1,7 +1,7 @@
 using CQRS.Command.Abstractions;
 using DbReader;
 using HeatKeeper.Server.Database;
-using HeatKeeper.Server.Security;
+using HeatKeeper.Server.Authorization;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,13 +28,7 @@ namespace HeatKeeper.Server.Locations
     [RequireAdminRole]
     public class DeleteUserLocationCommand
     {
-        public DeleteUserLocationCommand(long userId, long locationId)
-        {
-            UserId = userId;
-            LocationId = locationId;
-        }
-
-        public long UserId { get; }
-        public long LocationId { get; }
+        public long UserId { get; set; }
+        public long LocationId { get; set; }
     }
 }
