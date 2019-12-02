@@ -60,7 +60,7 @@ namespace HeatKeeper.Server.Host.Users
         }
 
         [HttpGet]
-        public async Task<ActionResult<User[]>> Get(AllUsersQuery query) =>
+        public async Task<ActionResult<User[]>> Get([FromQuery]AllUsersQuery query) =>
             Ok(await queryExecutor.ExecuteAsync(query));
 
         /// <summary>
@@ -70,12 +70,12 @@ namespace HeatKeeper.Server.Host.Users
         public async Task ChangePassword([FromBody]ChangePasswordCommand command)
             => await commandExecutor.ExecuteAsync(command);
 
-        // /// <summary>
-        // /// Creates an API key to be used when posting measurements.
-        // /// </summary>
-        // [HttpGet("apikey")]
-        // public ActionResult<GetApiKeyResponse> GetApiKey()
-        //     => new GetApiKeyResponse(apiKeyProvider.CreateApiKey().Token);
+        /// <summary>
+        /// Creates an API key to be used when posting measurements.
+        /// </summary>
+        [HttpGet("apikey")]
+        public async Task<ApiKey> GetApiKey([FromQuery]ApiKeyQuery query)
+            => await queryExecutor.ExecuteAsync(query);
     }
 
 

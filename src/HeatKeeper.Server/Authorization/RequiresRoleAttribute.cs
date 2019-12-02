@@ -43,9 +43,9 @@ namespace HeatKeeper.Server.Authorization
         }
     }
 
-    public class RequireNoRoleAttribute : RequireRoleAttribute
+    public class RequireAnonymousRole : RequireRoleAttribute
     {
-        public RequireNoRoleAttribute() : base(Array.Empty<string>())
+        public RequireAnonymousRole() : base(Array.Empty<string>())
         {
         }
 

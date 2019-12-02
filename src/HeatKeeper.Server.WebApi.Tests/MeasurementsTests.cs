@@ -1,4 +1,5 @@
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Measurements;
@@ -12,6 +13,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         [Fact]
         public async Task ShouldCreateMeasurementUsingApiKey()
         {
+
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
             var apiKey = await client.GetApiKey(token);

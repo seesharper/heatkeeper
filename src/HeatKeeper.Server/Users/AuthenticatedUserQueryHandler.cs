@@ -46,7 +46,7 @@ namespace HeatKeeper.Server.Users
         }
     }
 
-    [RequireNoRole]
+    [RequireAnonymousRole]
     public class AuthenticatedUserQuery : IQuery<AuthenticatedUserQueryResult>
     {
         public AuthenticatedUserQuery(string email, string password)

@@ -56,7 +56,7 @@ namespace HeatKeeper.Server.Host
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
-                //c.OperationFilter<OperationFilter>();
+                c.OperationFilter<OperationFilter>();
             });
         }
 
@@ -138,15 +138,16 @@ namespace HeatKeeper.Server.Host
 
             var routeValues = bindingContext.HttpContext.Request.RouteValues.Select(rv => rv.Key);
 
-            var routeProperties = bindingContext.ModelMetadata.Properties.Where(p => routeValues.Contains(p.Name, StringComparer.OrdinalIgnoreCase)).ToArray(); ;
+            var routeProperties = bindingContext.ModelMetadata.Properties.Where(p => routeValues.Contains(p.Name, StringComparer.OrdinalIgnoreCase)).ToArray();
+
+            if (bindingContext.Result.Model == null)
+            {
+                bindingContext.Result = ModelBindingResult.Success(Activator.CreateInstance(bindingContext.ModelType));
+            }
             foreach (var routeProperty in routeProperties)
             {
                 var routeValue = bindingContext.ValueProvider.GetValue(routeProperty.Name).FirstValue;
                 var convertedValue = Convert.ChangeType(routeValue, routeProperty.UnderlyingOrModelType);
-                if (bindingContext.Model == null)
-                {
-                    bindingContext.Model = Activator.CreateInstance(bindingContext.ModelType);
-                }
                 routeProperty.PropertySetter(bindingContext.Result.Model, convertedValue);
             }
         }

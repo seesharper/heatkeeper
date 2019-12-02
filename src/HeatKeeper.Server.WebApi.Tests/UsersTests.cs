@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 using Microsoft.AspNetCore.Mvc;
+using HeatKeeper.Server.Authentication;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
@@ -64,7 +65,9 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .Build();
 
             var responseMessage = await client.SendAsync(request);
+            var apiKey = await responseMessage.ContentAs<ApiKey>();
             responseMessage.EnsureSuccessStatusCode();
+            apiKey.Token.Should().NotBeEmpty();
         }
 
         [Fact]

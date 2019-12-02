@@ -26,7 +26,7 @@ namespace HeatKeeper.Server.Users
         }
     }
 
-    [RequireNoRole]
+    [RequireAnonymousRole]
     public class GetUserQuery : IQuery<GetUserQueryResult>
     {
         public GetUserQuery(string email)

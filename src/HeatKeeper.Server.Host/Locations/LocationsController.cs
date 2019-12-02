@@ -31,13 +31,16 @@ namespace HeatKeeper.Server.Host.Locations
         }
 
         [HttpGet]
-        public async Task<ActionResult<Location[]>> Get(GetAllLocationsQuery query) =>
-            Ok(await queryExecutor.ExecuteAsync(query));
+        public async Task<ActionResult<Location[]>> Get([FromQuery]GetAllLocationsQuery query)
+        {
+            return Ok(await queryExecutor.ExecuteAsync(query));
+        }
 
         [HttpGet("{locationId}/zones")]
-        public async Task<ActionResult<Zone[]>> Zones([FromBodyAndRoute]ZonesByLocationQuery query) =>
-            Ok(await queryExecutor.ExecuteAsync(query));
-
+        public async Task<ActionResult<Zone[]>> Zones([FromRoute]ZonesByLocationQuery query)
+        {
+            return Ok(await queryExecutor.ExecuteAsync(query));
+        }
 
         [HttpPost("{locationId}/zones")]
         public async Task<IActionResult> Post([FromBodyAndRoute] CreateZoneCommand command)
@@ -54,13 +57,13 @@ namespace HeatKeeper.Server.Host.Locations
         }
 
         [HttpGet("{locationId}/users")]
-        public async Task<ActionResult<User[]>> GetUsers([FromBodyAndRoute]UsersByLocationQuery query) =>
+        public async Task<ActionResult<User[]>> GetUsers([FromRoute]UsersByLocationQuery query) =>
             Ok(await queryExecutor.ExecuteAsync(query));
 
 
         [HttpDelete("{locationId}/users/{userId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> RemoveUser([FromBodyAndRoute]DeleteUserLocationCommand command)
+        public async Task<IActionResult> RemoveUser([FromRoute]DeleteUserLocationCommand command)
         {
             await commandExecutor.ExecuteAsync(command);
             return NoContent();
