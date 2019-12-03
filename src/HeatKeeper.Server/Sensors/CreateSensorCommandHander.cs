@@ -4,8 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using DbReader;
+using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Database;
-using HeatKeeper.Server.Security;
 
 namespace HeatKeeper.Server.Sensors
 {

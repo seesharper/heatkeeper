@@ -1,8 +1,9 @@
 using System;
 using System.Text.RegularExpressions;
-using HeatKeeper.Server.Security;
+using HeatKeeper.Server.Exceptions;
+using HeatKeeper.Server.Validation;
 
-namespace HeatKeeper.Server.Users
+namespace HeatKeeper.Server.Authentication
 {
     public class PasswordPolicy : IPasswordPolicy
     {
@@ -17,14 +18,14 @@ namespace HeatKeeper.Server.Users
         {
             if (!string.Equals(password, confirmedPassword))
             {
-                throw new HeatKeeperSecurityException("The password does not match confirmed password");
+                throw new ValidationFailedException(nameof(password), "The password does not match confirmed password");
             }
 
             var input = password;
 
             if (string.IsNullOrWhiteSpace(input))
             {
-                throw new Exception("Password should not be empty");
+                throw new ValidationFailedException(nameof(password), "Password should not be empty");
             }
 
             var hasNumber = new Regex(@"[0-9]+");
@@ -35,25 +36,25 @@ namespace HeatKeeper.Server.Users
 
             if (!hasLowerChar.IsMatch(input))
             {
-                throw new HeatKeeperSecurityException("Password should contain at least one lower case letter");
+                throw new ValidationFailedException(nameof(password), "Password should contain at least one lower case letter");
             }
             if (!hasUpperChar.IsMatch(input))
             {
-                throw new HeatKeeperSecurityException("Password should contain at least one upper case letter");
+                throw new ValidationFailedException(nameof(password), "Password should contain at least one upper case letter");
             }
 
             if (!hasMiniMaxChars.IsMatch(input))
             {
-                throw new HeatKeeperSecurityException("Password should not be less than 8 or greater than 64 characters");
+                throw new ValidationFailedException(nameof(password), "Password should not be less than 8 or greater than 64 characters");
             }
             if (!hasNumber.IsMatch(input))
             {
-                throw new HeatKeeperSecurityException("Password should contain At least one numeric value");
+                throw new ValidationFailedException(nameof(password), "Password should contain at least one numeric value");
             }
 
             if (!hasSymbols.IsMatch(input))
             {
-                throw new HeatKeeperSecurityException("Password should contain at least one special case characters");
+                throw new ValidationFailedException(nameof(password), "Password should contain at least one special case characters");
             }
         }
 

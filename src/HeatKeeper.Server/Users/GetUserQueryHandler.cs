@@ -5,7 +5,7 @@ using HeatKeeper.Server.Database;
 using DbReader;
 using System.Linq;
 using CQRS.Query.Abstractions;
-using HeatKeeper.Server.Security;
+using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Users
 {
@@ -26,7 +26,7 @@ namespace HeatKeeper.Server.Users
         }
     }
 
-    [RequireNoRole]
+    [RequireAnonymousRole]
     public class GetUserQuery : IQuery<GetUserQueryResult>
     {
         public GetUserQuery(string email)

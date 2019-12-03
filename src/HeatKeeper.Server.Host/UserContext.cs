@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Users;
 using Microsoft.AspNetCore.Http;
 

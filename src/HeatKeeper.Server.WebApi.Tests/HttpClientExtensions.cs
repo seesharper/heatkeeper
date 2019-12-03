@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using FluentAssertions;
+using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
@@ -207,8 +208,8 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .AddBearerToken(token)
                 .Build();
             var responseMessage = await client.SendAsync(request);
-            var content = await responseMessage.ContentAs<GetApiKeyResponse>();
-            return content.ApiKey;
+            var content = await responseMessage.ContentAs<ApiKey>();
+            return content.Token;
         }
 
         public static async Task<HttpResponseMessage> CreateMeasurement(this HttpClient client, CreateMeasurementCommand[] requests, string token)
@@ -241,6 +242,17 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .AddBearerToken(token)
                 .AddContent(new JsonContent(command))
                 .Build();
+            return await client.SendAsync(request);
+        }
+
+        public static async Task<HttpResponseMessage> ChangePassword(this HttpClient client, ChangePasswordCommand command, string token)
+        {
+            var request = new HttpRequestBuilder()
+               .WithMethod(HttpMethod.Patch)
+               .AddRequestUri("api/users/password")
+               .AddBearerToken(token)
+               .AddContent(new JsonContent(command))
+               .Build();
             return await client.SendAsync(request);
         }
     }

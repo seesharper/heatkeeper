@@ -1,4 +1,4 @@
-namespace HeatKeeper.Server.Security
+namespace HeatKeeper.Server.Authorization
 {
     public static class Roles
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace HeatKeeper.Server.Security
+namespace HeatKeeper.Server.Authorization
 {
     public class AuthorizationFailedException : Exception
     {

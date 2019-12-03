@@ -1,7 +1,7 @@
 using CQRS.Command.Abstractions;
 using DbReader;
 using HeatKeeper.Server.Database;
-using HeatKeeper.Server.Security;
+using HeatKeeper.Server.Authorization;
 using System.Data;
 using System.Data.Common;
 using System.Threading;

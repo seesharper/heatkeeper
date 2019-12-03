@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HeatKeeper.Server.Users
+namespace HeatKeeper.Server.Authentication
 {
     public class JwtTokenProvider : ITokenProvider
     {

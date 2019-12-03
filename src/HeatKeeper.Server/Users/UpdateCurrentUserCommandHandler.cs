@@ -1,10 +1,10 @@
 using CQRS.Command.Abstractions;
 using DbReader;
 using HeatKeeper.Server.Database;
-using HeatKeeper.Server.Security;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
+using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Users
 {

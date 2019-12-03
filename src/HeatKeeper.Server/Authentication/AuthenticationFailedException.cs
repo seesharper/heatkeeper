@@ -1,6 +1,6 @@
 using System;
 
-namespace HeatKeeper.Server.Users
+namespace HeatKeeper.Server.Authentication
 {
     public class AuthenticationFailedException : Exception
     {

@@ -11,8 +11,9 @@ using CQRS.Command.Abstractions;
 using CQRS.Transactions;
 using CQRS.LightInject;
 using HeatKeeper.Abstractions.Transactions;
-using HeatKeeper.Server.Security;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Authentication;
+using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server
 {

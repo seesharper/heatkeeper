@@ -23,21 +23,20 @@ namespace HeatKeeper.Server.Host.Locations
         }
 
         [HttpPost]
-        public async Task<ActionResult<CreateLocationResponse>> Post([FromBody] CreateLocationCommand request)
+        public async Task<ActionResult<CreateLocationResponse>> Post([FromBody] CreateLocationCommand command)
         {
-            var command = new CreateLocationCommand(request.Name, request.Description);
             await commandExecutor.ExecuteAsync(command);
             return CreatedAtAction(nameof(Post), new CreateLocationResponse(command.Id));
         }
 
         [HttpGet]
-        public async Task<ActionResult<Location[]>> Get() =>
-            Ok(await queryExecutor.ExecuteAsync(new GetAllLocationsQuery()));
+        public async Task<Location[]> Get([FromQuery]GetAllLocationsQuery query)
+            => await queryExecutor.ExecuteAsync(query);
+
 
         [HttpGet("{locationId}/zones")]
-        public async Task<ActionResult<Zone[]>> Zones(long locationId) =>
-            Ok(await queryExecutor.ExecuteAsync(new ZonesByLocationQuery(locationId)));
-
+        public async Task<Zone[]> Zones([FromRoute]ZonesByLocationQuery query)
+            => await queryExecutor.ExecuteAsync(query);
 
         [HttpPost("{locationId}/zones")]
         public async Task<IActionResult> Post([FromBodyAndRoute] CreateZoneCommand command)
@@ -54,15 +53,15 @@ namespace HeatKeeper.Server.Host.Locations
         }
 
         [HttpGet("{locationId}/users")]
-        public async Task<ActionResult<User[]>> GetUsers(long locationId) =>
-            Ok(await queryExecutor.ExecuteAsync(new UsersByLocationQuery(locationId)));
+        public async Task<User[]> GetUsers([FromRoute]UsersByLocationQuery query) =>
+            await queryExecutor.ExecuteAsync(query);
 
 
         [HttpDelete("{locationId}/users/{userId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> RemoveUser(long locationId, long userId)
+        public async Task<IActionResult> RemoveUser([FromRoute]DeleteUserLocationCommand command)
         {
-            await commandExecutor.ExecuteAsync(new DeleteUserLocationCommand(locationId, userId));
+            await commandExecutor.ExecuteAsync(command);
             return NoContent();
         }
     }

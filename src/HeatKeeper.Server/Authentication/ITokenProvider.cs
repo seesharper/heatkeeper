@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace HeatKeeper.Server.Users
+namespace HeatKeeper.Server.Authentication
 {
     public interface ITokenProvider
     {

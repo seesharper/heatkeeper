@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace HeatKeeper.Server.Users
+namespace HeatKeeper.Server.Authentication
 {
     public class PasswordManager : IPasswordManager
     {

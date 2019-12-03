@@ -78,7 +78,7 @@ namespace HeatKeeper.Server.Host
                     return (logLevel, message, exception) => logger.Log(MapLogLevel(logLevel), exception, message);
                 };
             });
-
+            // TODO Register constructor dependency here.
             return registry;
 
             static Microsoft.Extensions.Logging.LogLevel MapLogLevel(LogLevel loglevel) => loglevel switch

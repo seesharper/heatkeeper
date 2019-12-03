@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
+using HeatKeeper.Server.Authentication;
 
 namespace HeatKeeper.Server.Users
 {

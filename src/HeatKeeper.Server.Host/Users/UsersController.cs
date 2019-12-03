@@ -2,6 +2,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Authentication;
+using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -43,11 +45,8 @@ namespace HeatKeeper.Server.Host.Users
         /// Updates user information for any user. [AccessLevel:AdminRole]
         /// </summary>
         [HttpPatch("{userId}")]
-        public async Task<IActionResult> PatchUser([FromBodyAndRoute]UpdateUserCommand command)
-        {
-            await commandExecutor.ExecuteAsync(command);
-            return Ok();
-        }
+        public async Task PatchUser([FromBodyAndRoute]UpdateUserCommand command)
+            => await commandExecutor.ExecuteAsync(command);
 
         /// <summary>
         /// Updates user information for the current user. [AccessLevel:StandardRole]
@@ -61,28 +60,22 @@ namespace HeatKeeper.Server.Host.Users
         }
 
         [HttpGet]
-        public async Task<ActionResult<User[]>> Get() =>
-            Ok(await queryExecutor.ExecuteAsync(new AllUsersQuery()));
+        public async Task<ActionResult<User[]>> Get([FromQuery]AllUsersQuery query) =>
+            Ok(await queryExecutor.ExecuteAsync(query));
 
         /// <summary>
         /// Changes the password for the current user.
         /// </summary>
         [HttpPatch("password")]
-        public async Task<IActionResult> ChangePassword([FromBody]ChangePasswordCommand command)
-        {
-            await commandExecutor.ExecuteAsync(command);
-            return Ok();
-        }
+        public async Task ChangePassword([FromBody]ChangePasswordCommand command)
+            => await commandExecutor.ExecuteAsync(command);
 
         /// <summary>
         /// Creates an API key to be used when posting measurements.
         /// </summary>
         [HttpGet("apikey")]
-        public ActionResult<GetApiKeyResponse> GetApiKey()
-        {
-            var apiKey = apiKeyProvider.CreateApiKey();
-            return new GetApiKeyResponse(apiKey.Token);
-        }
+        public async Task<ApiKey> GetApiKey([FromQuery]ApiKeyQuery query)
+            => await queryExecutor.ExecuteAsync(query);
     }
 
 

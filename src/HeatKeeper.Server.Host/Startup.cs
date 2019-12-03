@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Host.Swagger;
 using HeatKeeper.Server.Users;
 using LightInject;
 using Microsoft.AspNetCore.Builder;
@@ -54,6 +56,7 @@ namespace HeatKeeper.Server.Host
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
+                c.OperationFilter<OperationFilter>();
             });
         }
 
@@ -101,6 +104,23 @@ namespace HeatKeeper.Server.Host
         }
     }
 
+    // public class CustomModelNameProvider : IModelMetadataProvider
+    // {
+    //     public IEnumerable<ModelMetadata> GetMetadataForProperties(Type modelType)
+    //     {
+    //         throw new NotImplementedException();
+    //     }
+
+    //     public ModelMetadata GetMetadataForType(Type modelType)
+    //     {
+    //         ModelMetadata metadata;
+    //         metadata.de
+
+    //         throw new NotImplementedException();
+    //     }
+    // }
+
+
 
     public class RouteAndBodyModelBinder : IModelBinder
     {
@@ -118,7 +138,12 @@ namespace HeatKeeper.Server.Host
 
             var routeValues = bindingContext.HttpContext.Request.RouteValues.Select(rv => rv.Key);
 
-            var routeProperties = bindingContext.ModelMetadata.Properties.Where(p => routeValues.Contains(p.Name, StringComparer.OrdinalIgnoreCase)).ToArray(); ;
+            var routeProperties = bindingContext.ModelMetadata.Properties.Where(p => routeValues.Contains(p.Name, StringComparer.OrdinalIgnoreCase)).ToArray();
+
+            if (bindingContext.Result.Model == null)
+            {
+                bindingContext.Result = ModelBindingResult.Success(Activator.CreateInstance(bindingContext.ModelType));
+            }
             foreach (var routeProperty in routeProperties)
             {
                 var routeValue = bindingContext.ValueProvider.GetValue(routeProperty.Name).FirstValue;

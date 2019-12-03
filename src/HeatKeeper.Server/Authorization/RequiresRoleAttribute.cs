@@ -1,7 +1,8 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
-namespace HeatKeeper.Server.Security
+namespace HeatKeeper.Server.Authorization
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = true)]
     public class RequireRoleAttribute : Attribute
@@ -17,6 +18,8 @@ namespace HeatKeeper.Server.Security
         {
             return satisfiedByRoles.Contains(role);
         }
+
+        public string DisplayName => Regex.Match(this.GetType().Name, "^Require(.*)Attribute$").Groups[1].Value;
     }
 
     public class RequireAdminRoleAttribute : RequireRoleAttribute
@@ -40,9 +43,9 @@ namespace HeatKeeper.Server.Security
         }
     }
 
-    public class RequireNoRoleAttribute : RequireRoleAttribute
+    public class RequireAnonymousRoleAttribute : RequireRoleAttribute
     {
-        public RequireNoRoleAttribute() : base(Array.Empty<string>())
+        public RequireAnonymousRoleAttribute() : base(Array.Empty<string>())
         {
         }
 

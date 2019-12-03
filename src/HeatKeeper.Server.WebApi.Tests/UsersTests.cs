@@ -8,6 +8,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.AspNetCore.Mvc;
+using HeatKeeper.Server.Authentication;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
@@ -63,7 +65,9 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .Build();
 
             var responseMessage = await client.SendAsync(request);
+            var apiKey = await responseMessage.ContentAs<ApiKey>();
             responseMessage.EnsureSuccessStatusCode();
+            apiKey.Token.Should().NotBeEmpty();
         }
 
         [Fact]
@@ -121,6 +125,43 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var response = await client.PatchCurrentUser(updateCommand, token);
             response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        [Theory]
+        [InlineData("PASSWORD", "Password should contain at least one lower case letter")]
+        [InlineData("password", "Password should contain at least one upper case letter")]
+        [InlineData("Pwd", "Password should not be less than 8 or greater than 64 characters")]
+        [InlineData("Password", "Password should contain at least one numeric value")]
+        [InlineData("Password1", "Password should contain at least one special case characters")]
+        public async Task ShouldEnforcePasswordPoliciesForNewUsers(string password, string errorMessage)
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+
+            var responseMessage = await client.RegisterUser(TestData.Users.StandardUserWithGivenPassword(password), token);
+
+            responseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            var problemDetails = await responseMessage.ContentAs<ValidationProblemDetails>();
+            problemDetails.Errors.Single().Value.Single().Should().Be(errorMessage);
+        }
+
+        [Theory]
+        [InlineData("PASSWORD", "Password should contain at least one lower case letter")]
+        [InlineData("password", "Password should contain at least one upper case letter")]
+        [InlineData("Pwd", "Password should not be less than 8 or greater than 64 characters")]
+        [InlineData("Password", "Password should contain at least one numeric value")]
+        [InlineData("Password1", "Password should contain at least one special case characters")]
+        public async Task ShouldEnforcePasswordPoliciesWhenChangingPassword(string password, string errorMessage)
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+            var changePasswordCommand = new ChangePasswordCommand(AdminUser.DefaultPassword, password, password);
+
+            var responseMessage = await client.ChangePassword(changePasswordCommand, token);
+
+            responseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            var problemDetails = await responseMessage.ContentAs<ValidationProblemDetails>();
+            problemDetails.Errors.Single().Value.Single().Should().Be(errorMessage);
         }
     }
 }

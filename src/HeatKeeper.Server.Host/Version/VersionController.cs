@@ -1,5 +1,8 @@
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Version;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatKeeper.Server.Measurements
@@ -8,14 +11,17 @@ namespace HeatKeeper.Server.Measurements
     [ApiController]
     public class VersionController : ControllerBase
     {
-        /// <summary>
-        /// Gets the product version.
-        /// </summary>
-        [HttpGet]
-        public IActionResult Get()
+        private readonly IQueryExecutor queryExecutor;
+
+        public VersionController(IQueryExecutor queryExecutor)
         {
-            var versionAttribute = typeof(VersionController).Assembly.GetCustomAttributes<AssemblyInformationalVersionAttribute>().Single();
-            return Ok(versionAttribute.InformationalVersion);
+            this.queryExecutor = queryExecutor;
+        }
+
+        [HttpGet]
+        public async Task<AppVersion> Get([FromQuery]VersionQuery query)
+        {
+            return await queryExecutor.ExecuteAsync(query);
         }
     }
 }
