@@ -14,7 +14,7 @@ AsyncStep dockerImage = async () =>
 {
     test();
     testcoverage();
-    await Docker.BuildAsync("bernhardrichter/heatkeeper", "v1.0.0", BuildContext.RepositoryFolder);
+    await Docker.BuildAsync("bernhardrichter/heatkeeper", BuildContext.LatestTag, BuildContext.RepositoryFolder);
 };
 
 [DefaultStep]
