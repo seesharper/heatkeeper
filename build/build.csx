@@ -27,6 +27,7 @@ AsyncStep deploy = async () =>
         await Docker.PushAsync("bernhardrichter/heatkeeper", BuildContext.LatestTag, BuildContext.RepositoryFolder);
     }
 
+    await Artifacts.Deploy();
 };
 
 await StepRunner.Execute(Args);
