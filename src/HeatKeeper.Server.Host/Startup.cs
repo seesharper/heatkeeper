@@ -60,15 +60,6 @@ namespace HeatKeeper.Server.Host
             });
         }
 
-        public void ConfigureContainer(IServiceContainer container)
-        {
-            container.RegisterSingleton<IUserContext, UserContext>();
-            container.RegisterSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            container.RegisterFrom<DatabaseCompositionRoot>();
-            container.RegisterFrom<ServerCompositionRoot>();
-            container.ConfigureLogging();
-        }
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseMigrator databaseMigrator)
         {
@@ -103,24 +94,6 @@ namespace HeatKeeper.Server.Host
             });
         }
     }
-
-    // public class CustomModelNameProvider : IModelMetadataProvider
-    // {
-    //     public IEnumerable<ModelMetadata> GetMetadataForProperties(Type modelType)
-    //     {
-    //         throw new NotImplementedException();
-    //     }
-
-    //     public ModelMetadata GetMetadataForType(Type modelType)
-    //     {
-    //         ModelMetadata metadata;
-    //         metadata.de
-
-    //         throw new NotImplementedException();
-    //     }
-    // }
-
-
 
     public class RouteAndBodyModelBinder : IModelBinder
     {

@@ -1,8 +1,8 @@
-﻿using System;
-using LightInject.Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using GenericHost = Microsoft.Extensions.Hosting.Host;
 
 namespace HeatKeeper.Server.Host
 {
@@ -10,12 +10,13 @@ namespace HeatKeeper.Server.Host
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseLightInject()
-                .UseStartup<Startup>();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            GenericHost.CreateDefaultBuilder(args)
+                .UseLightInject(services => services.RegisterFrom<HostCompositionRoot>())
+                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
+                .ConfigureAppConfiguration(config => config.AddEnvironmentVariables(prefix: "HEATKEEPER_"));
     }
 }

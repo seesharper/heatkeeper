@@ -14,7 +14,7 @@ namespace HeatKeeper.Server.Authentication
             this.apiKeyProvider = apiKeyProvider;
         }
 
-        public Task<ApiKey> HandleAsync(ApiKeyQuery query, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<ApiKey> HandleAsync(ApiKeyQuery query, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(apiKeyProvider.CreateApiKey());
         }
