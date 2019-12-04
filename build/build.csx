@@ -12,8 +12,6 @@ Step test = () => DotNet.Test();
 [StepDescription("Creates the NuGet packages")]
 AsyncStep dockerImage = async () =>
 {
-    test();
-    testcoverage();
     await Docker.BuildAsync("bernhardrichter/heatkeeper", BuildContext.LatestTag, BuildContext.RepositoryFolder);
 };
 
@@ -21,6 +19,8 @@ AsyncStep dockerImage = async () =>
 [StepDescription("Deploys packages if we are on a tag commit in a secure environment.")]
 AsyncStep deploy = async () =>
 {
+    test();
+    testcoverage();
     await dockerImage();
     if (BuildEnvironment.IsSecure && BuildEnvironment.IsTagCommit)
     {

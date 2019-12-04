@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using HeatKeeper.Abstractions.Logging;
+using HeatKeeper.Server.Authentication;
 using LightInject;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +17,13 @@ namespace HeatKeeper.Server.Host
         public static ApplicationConfiguration AddApplicationConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             var applicationConfiguration = configuration.Get<ApplicationConfiguration>(c => c.BindNonPublicProperties = true);
+            if (string.IsNullOrWhiteSpace(applicationConfiguration.Secret))
+            {
+                applicationConfiguration.Secret = DefaultSecret.Value;
+            }
+
             services.AddSingleton(applicationConfiguration);
+
             return applicationConfiguration;
         }
 
@@ -39,10 +46,6 @@ namespace HeatKeeper.Server.Host
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, ApplicationConfiguration applicationConfiguration)
         {
             var secret = applicationConfiguration.Secret;
-            if (string.IsNullOrWhiteSpace(secret))
-            {
-                throw new InvalidOperationException("Unable to find secret");
-            }
 
             var key = Encoding.ASCII.GetBytes(applicationConfiguration.Secret);
 

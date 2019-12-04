@@ -25,6 +25,28 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "build container",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "script",
+        "${workspaceFolder}/../build/build.csx",
+        "dockerImage"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      }
+    },
+    {
       "label": "test",
       "command": "dotnet",
       "type": "process",
