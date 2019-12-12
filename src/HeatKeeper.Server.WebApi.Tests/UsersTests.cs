@@ -163,5 +163,19 @@ namespace HeatKeeper.Server.WebApi.Tests
             var problemDetails = await responseMessage.ContentAs<ValidationProblemDetails>();
             problemDetails.Errors.Single().Value.Single().Should().Be(errorMessage);
         }
+
+        [Fact]
+        public async Task ShouldEnforceValidEmail()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+
+            var responseMessage = await client.RegisterUser(TestData.Users.StandardUserWithInvalidEmail, token);
+
+            responseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            var problemDetails = await responseMessage.ContentAs<ValidationProblemDetails>();
+            problemDetails.Errors.Single().Value.Single().Should().Be("The mail address 'InvalidMailAddress' is not correctly formatted.");
+        }
+
     }
 }

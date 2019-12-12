@@ -53,6 +53,9 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             public static RegisterUserCommand StandardUserWithGivenPassword(string password) =>
                 new RegisterUserCommand("StandardUser@tempuri.org", "FirstName", "LastName", isAdmin: false, password, password);
+
+            public static RegisterUserCommand StandardUserWithInvalidEmail =>
+                new RegisterUserCommand("InvalidMailAddress", "FirstName", "LastName", isAdmin: false, "aVe78!*PZ9&Lnqh1E4pG", "aVe78!*PZ9&Lnqh1E4pG");
         }
     }
 }

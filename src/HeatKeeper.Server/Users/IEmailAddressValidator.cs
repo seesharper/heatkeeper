@@ -1,6 +1,7 @@
 using System;
 using System.Net.Mail;
 using HeatKeeper.Server.Exceptions;
+using HeatKeeper.Server.Validation;
 
 namespace HeatKeeper.Server.Users
 {
@@ -19,7 +20,7 @@ namespace HeatKeeper.Server.Users
             }
             catch (FormatException)
             {
-                throw new HeatKeeperValidationException($"The mail address {email} is not correctly formatted.");
+                throw new ValidationFailedException("email", $"The mail address '{email}' is not correctly formatted.");
             }
         }
     }
