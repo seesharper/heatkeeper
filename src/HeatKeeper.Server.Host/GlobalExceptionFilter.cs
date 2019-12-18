@@ -28,7 +28,8 @@ namespace HeatKeeper.Server.Host
                 var problemDetails = new ProblemDetails
                 {
                     Status = (int)HttpStatusCode.Unauthorized,
-                    Title = context.Exception.Message
+                    Title = "Authorization Failed",
+                    Detail = context.Exception.Message
                 };
                 context.Result = new UnauthorizedObjectResult(problemDetails);
             }
@@ -38,26 +39,27 @@ namespace HeatKeeper.Server.Host
                 var problemDetails = new ProblemDetails
                 {
                     Status = (int)HttpStatusCode.Conflict,
-                    Title = context.Exception.Message
+                    Title = "Conflict",
+                    Detail = context.Exception.Message
                 };
                 context.Result = new ConflictObjectResult(problemDetails);
             }
 
             if (context.Exception is ValidationFailedException exception)
             {
-                var validationProblemDetails = new ValidationProblemDetails
+                var validationProblemDetails = new ProblemDetails()
                 {
                     Title = "Request Validation Error",
-                    Detail = "See `errors` for details",
+                    Detail = exception.ValidationErrors.First().ErrorMessage,
                     Status = (int?)HttpStatusCode.BadRequest,
                     Instance = context.HttpContext.TraceIdentifier
                 };
 
-                var errorsGroupedByMemberName = exception.ValidationErrors.GroupBy(e => e.MemberName);
-                foreach (var errorGroup in errorsGroupedByMemberName)
-                {
-                    validationProblemDetails.Errors.Add(errorGroup.Key, errorGroup.Select(e => e.ErrorMessage).ToArray());
-                }
+                // var errorsGroupedByMemberName = exception.ValidationErrors.GroupBy(e => e.MemberName);
+                // foreach (var errorGroup in errorsGroupedByMemberName)
+                // {
+                //     validationProblemDetails.Errors.Add(errorGroup.Key, errorGroup.Select(e => e.ErrorMessage).ToArray());
+                // }
 
                 context.Result = new BadRequestObjectResult(validationProblemDetails);
             }

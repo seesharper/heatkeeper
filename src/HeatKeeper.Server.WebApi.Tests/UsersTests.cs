@@ -43,11 +43,13 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            await client.RegisterUser(TestData.Users.StandardUser, token);
-            await client.RegisterUser(TestData.Users.AnotherStandardUser, token);
+            var response = await client.RegisterUser(TestData.Users.StandardUser, token);
+            response.StatusCode.Should().Be(HttpStatusCode.Created);
+            response = await client.RegisterUser(TestData.Users.AnotherStandardUser, token);
+            response.StatusCode.Should().Be(HttpStatusCode.Created);
 
-            var response = await client.GetAllUsers();
-            var users = await response.ContentAs<User[]>();
+            var allUsersResponse = await client.GetAllUsers(token);
+            var users = await allUsersResponse.ContentAs<User[]>();
 
             users.Where(u => u.Email != AdminUser.DefaultEmail).Count().Should().Be(2);
         }
@@ -78,6 +80,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             var token = await client.AuthenticateAsAdminUser();
 
             var request = new HttpRequestBuilder()
+
                .WithMethod(HttpMethod.Patch)
                .AddRequestUri("api/users/password")
                .AddBearerToken(token)
@@ -101,13 +104,14 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var updateCommand = new UpdateUserCommand()
             {
+                UserId = registerUserResponse.Id,
                 FirstName = TestData.Users.StandardUser.FirstName,
                 LastName = TestData.Users.StandardUser.LastName,
                 Email = TestData.Users.StandardUser.Email,
                 IsAdmin = true
             };
 
-            var response = await client.PatchUser(updateCommand, registerUserResponse.Id, token);
+            var response = await client.PatchUser(updateCommand, token);
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
@@ -141,9 +145,10 @@ namespace HeatKeeper.Server.WebApi.Tests
             var responseMessage = await client.RegisterUser(TestData.Users.StandardUserWithGivenPassword(password), token);
 
             responseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            var problemDetails = await responseMessage.ContentAs<ValidationProblemDetails>();
-            problemDetails.Errors.Single().Value.Single().Should().Be(errorMessage);
+            var problemDetails = await responseMessage.ContentAs<ProblemDetails>();
+            problemDetails.Detail.Should().Be(errorMessage);
         }
+
 
         [Theory]
         [InlineData("PASSWORD", "Password should contain at least one lower case letter")]
@@ -160,8 +165,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             var responseMessage = await client.ChangePassword(changePasswordCommand, token);
 
             responseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            var problemDetails = await responseMessage.ContentAs<ValidationProblemDetails>();
-            problemDetails.Errors.Single().Value.Single().Should().Be(errorMessage);
+            var problemDetails = await responseMessage.ContentAs<ProblemDetails>();
+            problemDetails.Detail.Should().Be(errorMessage);
         }
 
         [Fact]
@@ -173,8 +178,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             var responseMessage = await client.RegisterUser(TestData.Users.StandardUserWithInvalidEmail, token);
 
             responseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            var problemDetails = await responseMessage.ContentAs<ValidationProblemDetails>();
-            problemDetails.Errors.Single().Value.Single().Should().Be("The mail address 'InvalidMailAddress' is not correctly formatted.");
+            var problemDetails = await responseMessage.ContentAs<ProblemDetails>();
+            problemDetails.Detail.Should().Be("The mail address 'InvalidMailAddress' is not correctly formatted.");
         }
 
     }

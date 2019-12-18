@@ -37,7 +37,7 @@ namespace HeatKeeper.Server.Host.Users
         public async Task<ActionResult<RegisterUserResponse>> Post([FromBody]RegisterUserCommand command)
         {
             await commandExecutor.ExecuteAsync(command);
-            return Created(nameof(Post), new RegisterUserResponse(command.Id));
+            return Created(nameof(Post), new RegisterUserResponse(command.UserId));
         }
 
 
