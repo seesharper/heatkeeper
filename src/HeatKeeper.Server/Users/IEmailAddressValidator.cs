@@ -20,7 +20,7 @@ namespace HeatKeeper.Server.Users
             }
             catch (FormatException)
             {
-                throw new ValidationFailedException("email", $"The mail address '{email}' is not correctly formatted.");
+                throw new ValidationFailedException($"The mail address '{email}' is not correctly formatted.");
             }
         }
     }

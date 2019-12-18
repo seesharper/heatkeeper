@@ -11,6 +11,8 @@ namespace HeatKeeper.Server.WebApi.Tests
 {
     public static class TestData
     {
+        public static string ValidPassword => "aVe78!*PZ9&Lnqh1E4pG";
+
         public static AuthenticatedUserQuery InvalidAuthenticateAdminUserRequest =>
             new AuthenticatedUserQuery(AdminUser.DefaultEmail, "InvalidPassword");
 
@@ -41,9 +43,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static class Users
         {
             public static RegisterUserCommand StandardUser =>
-                new RegisterUserCommand() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = "aVe78!*PZ9&Lnqh1E4pG", ConfirmedPassword = "aVe78!*PZ9&Lnqh1E4pG" };
+                new RegisterUserCommand() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
             public static RegisterUserCommand AnotherStandardUser =>
-                new RegisterUserCommand() { Email = "AnotherStandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = "aVe78!*PZ9&Lnqh1E4pG", ConfirmedPassword = "aVe78!*PZ9&Lnqh1E4pG" };
+                new RegisterUserCommand() { Email = "AnotherStandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
 
             public static RegisterUserCommand StandardUserWithWeakPassord =>
                 new RegisterUserCommand() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = "abc123", ConfirmedPassword = "abc123" };
@@ -52,7 +54,7 @@ namespace HeatKeeper.Server.WebApi.Tests
                 new RegisterUserCommand() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = password, ConfirmedPassword = password };
 
             public static RegisterUserCommand StandardUserWithInvalidEmail =>
-                new RegisterUserCommand() { Email = "InvalidMailAddress", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = "aVe78!*PZ9&Lnqh1E4pG", ConfirmedPassword = "aVe78!*PZ9&Lnqh1E4pG" };
+                new RegisterUserCommand() { Email = "InvalidMailAddress", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
         }
     }
 }

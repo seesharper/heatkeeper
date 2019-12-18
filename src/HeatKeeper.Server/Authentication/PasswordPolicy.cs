@@ -18,14 +18,14 @@ namespace HeatKeeper.Server.Authentication
         {
             if (!string.Equals(password, confirmedPassword))
             {
-                throw new ValidationFailedException(nameof(password), "The password does not match confirmed password");
+                throw new ValidationFailedException("The password does not match confirmed password");
             }
 
             var input = password;
 
             if (string.IsNullOrWhiteSpace(input))
             {
-                throw new ValidationFailedException(nameof(password), "Password should not be empty");
+                throw new ValidationFailedException("Password should not be empty");
             }
 
             var hasNumber = new Regex(@"[0-9]+");
@@ -36,25 +36,25 @@ namespace HeatKeeper.Server.Authentication
 
             if (!hasLowerChar.IsMatch(input))
             {
-                throw new ValidationFailedException(nameof(password), "Password should contain at least one lower case letter");
+                throw new ValidationFailedException("Password should contain at least one lower case letter");
             }
             if (!hasUpperChar.IsMatch(input))
             {
-                throw new ValidationFailedException(nameof(password), "Password should contain at least one upper case letter");
+                throw new ValidationFailedException("Password should contain at least one upper case letter");
             }
 
             if (!hasMiniMaxChars.IsMatch(input))
             {
-                throw new ValidationFailedException(nameof(password), "Password should not be less than 8 or greater than 64 characters");
+                throw new ValidationFailedException("Password should not be less than 8 or greater than 64 characters");
             }
             if (!hasNumber.IsMatch(input))
             {
-                throw new ValidationFailedException(nameof(password), "Password should contain at least one numeric value");
+                throw new ValidationFailedException("Password should contain at least one numeric value");
             }
 
             if (!hasSymbols.IsMatch(input))
             {
-                throw new ValidationFailedException(nameof(password), "Password should contain at least one special case characters");
+                throw new ValidationFailedException("Password should contain at least one special case characters");
             }
         }
 

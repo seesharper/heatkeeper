@@ -55,12 +55,6 @@ namespace HeatKeeper.Server.Host
                     Instance = context.HttpContext.TraceIdentifier
                 };
 
-                // var errorsGroupedByMemberName = exception.ValidationErrors.GroupBy(e => e.MemberName);
-                // foreach (var errorGroup in errorsGroupedByMemberName)
-                // {
-                //     validationProblemDetails.Errors.Add(errorGroup.Key, errorGroup.Select(e => e.ErrorMessage).ToArray());
-                // }
-
                 context.Result = new BadRequestObjectResult(validationProblemDetails);
             }
         }

@@ -204,7 +204,21 @@ namespace HeatKeeper.Server.WebApi.Tests
             allUsers = await allUsersResponse.ContentAs<User[]>();
 
             allUsers.Should().NotContain(u => u.Email == TestData.Users.StandardUser.Email);
+        }
 
+        [Fact]
+        public async Task ShouldNotDeleteCurrentUser()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+
+            var allUsersResponse = await client.GetAllUsers(token);
+            var allUsers = await allUsersResponse.ContentAs<User[]>();
+
+            var adminUser = allUsers.Single(u => u.Email == AdminUser.DefaultEmail);
+
+            var deleteUserResponse = await client.DeleteUser(new DeleteUserCommand() { UserId = adminUser.Id }, token);
+            deleteUserResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
     }
