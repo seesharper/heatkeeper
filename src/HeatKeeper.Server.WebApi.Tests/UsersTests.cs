@@ -182,5 +182,30 @@ namespace HeatKeeper.Server.WebApi.Tests
             problemDetails.Detail.Should().Be("The mail address 'InvalidMailAddress' is not correctly formatted.");
         }
 
+        [Fact]
+        public async Task ShouldCreateAndDeleteUser()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+
+            var registerUserResponse = await client.RegisterUser(TestData.Users.StandardUser, token);
+            registerUserResponse.EnsureSuccessStatusCode();
+            var userId = (await registerUserResponse.ContentAs<RegisterUserResponse>()).Id;
+
+            var allUsersResponse = await client.GetAllUsers(token);
+            var allUsers = await allUsersResponse.ContentAs<User[]>();
+
+            allUsers.Should().Contain(u => u.Email == TestData.Users.StandardUser.Email);
+
+            var deleteUserResponse = await client.DeleteUser(new DeleteUserCommand() { UserId = userId }, token);
+            deleteUserResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            allUsersResponse = await client.GetAllUsers(token);
+            allUsers = await allUsersResponse.ContentAs<User[]>();
+
+            allUsers.Should().NotContain(u => u.Email == TestData.Users.StandardUser.Email);
+
+        }
+
     }
 }

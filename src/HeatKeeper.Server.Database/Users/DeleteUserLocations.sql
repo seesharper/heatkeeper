@@ -1,0 +1,1 @@
+DELETE FROM UserLocations WHERE UserId = @UserId

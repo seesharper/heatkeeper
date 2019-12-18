@@ -40,6 +40,11 @@ namespace HeatKeeper.Server.Host.Users
             return Created(nameof(Post), new RegisterUserResponse(command.UserId));
         }
 
+        [HttpDelete("{userId}")]
+        public async Task Delete([FromRoute] DeleteUserCommand command)
+        {
+            await commandExecutor.ExecuteAsync(command);
+        }
 
         /// <summary>
         /// Updates user information for any user. [AccessLevel:AdminRole]

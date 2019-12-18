@@ -67,6 +67,16 @@ namespace HeatKeeper.Server.WebApi.Tests
             return await client.SendAsync(postRequest);
         }
 
+        public static async Task<HttpResponseMessage> DeleteUser(this HttpClient client, DeleteUserCommand command, string token)
+        {
+            var postRequest = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Delete)
+                .AddRequestUri($"api/users/{command.UserId}")
+                .AddBearerToken(token)
+                .Build();
+            return await client.SendAsync(postRequest);
+        }
+
         public static async Task<HttpResponseMessage> AuthenticateUser(this HttpClient client, AuthenticatedUserQuery query)
         {
             var postRequest = new HttpRequestBuilder()

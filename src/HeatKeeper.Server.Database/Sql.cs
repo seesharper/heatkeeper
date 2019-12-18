@@ -33,11 +33,13 @@ namespace HeatKeeper.Server.Database
 
         string GetUser { get; }
 
+        string DeleteUser { get; }
+
+        string DeleteUserLocations { get; }
+
         string InsertUserLocation { get; }
 
         string UpdatePasswordHash { get; }
-
-        string DeleteUserLocation { get; }
 
         string GetUserLocationId { get; }
 
