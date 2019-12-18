@@ -5,8 +5,8 @@ namespace HeatKeeper.Server.Validation
 {
     public class ValidationFailedException : Exception
     {
-        public ValidationFailedException(string member, string message) :
-            this(new List<ValidationError>() { new ValidationError(member, message) })
+        public ValidationFailedException(string message) :
+            this(new List<ValidationError>() { new ValidationError(message) })
         {
 
         }

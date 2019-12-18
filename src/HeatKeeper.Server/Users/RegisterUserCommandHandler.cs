@@ -21,30 +21,15 @@ namespace HeatKeeper.Server.Users
             var hashedPassword = passwordManager.GetHashedPassword(command.Password);
             var createUserCommand = new CreateUserCommand() { Email = command.Email, FirstName = command.FirstName, LastName = command.LastName, IsAdmin = command.IsAdmin, HashedPassword = hashedPassword };
             await commandExecutor.ExecuteAsync(createUserCommand);
-            command.Id = createUserCommand.UserId;
+            command.UserId = createUserCommand.Id;
         }
     }
 
     [RequireAdminRole]
-    public class RegisterUserCommand
+    public class RegisterUserCommand : UserCommand
     {
-        public RegisterUserCommand(string email, string firstName, string lastName, bool isAdmin, string password, string confirmedPassword)
-        {
-            Email = email;
-            FirstName = firstName;
-            LastName = lastName;
-            IsAdmin = isAdmin;
-            Password = password;
-            ConfirmedPassword = confirmedPassword;
-        }
+        public string Password { get; set; }
 
-        public string Name { get; }
-        public string Email { get; }
-        public string FirstName { get; }
-        public string LastName { get; }
-        public bool IsAdmin { get; }
-        public string Password { get; }
-        public string ConfirmedPassword { get; }
-        public long Id { get; set; }
+        public string ConfirmedPassword { get; set; }
     }
 }

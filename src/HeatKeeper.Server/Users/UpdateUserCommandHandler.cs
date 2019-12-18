@@ -28,7 +28,6 @@ namespace HeatKeeper.Server.Users
     [RequireAdminRole]
     public class UpdateUserCommand : UserCommand
     {
-        public bool IsAdmin { get; set; }
     }
 
 }

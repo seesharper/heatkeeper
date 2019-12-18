@@ -67,6 +67,16 @@ namespace HeatKeeper.Server.WebApi.Tests
             return await client.SendAsync(postRequest);
         }
 
+        public static async Task<HttpResponseMessage> DeleteUser(this HttpClient client, DeleteUserCommand command, string token)
+        {
+            var postRequest = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Delete)
+                .AddRequestUri($"api/users/{command.UserId}")
+                .AddBearerToken(token)
+                .Build();
+            return await client.SendAsync(postRequest);
+        }
+
         public static async Task<HttpResponseMessage> AuthenticateUser(this HttpClient client, AuthenticatedUserQuery query)
         {
             var postRequest = new HttpRequestBuilder()
@@ -77,10 +87,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             return await client.SendAsync(postRequest);
         }
 
-        public static async Task<HttpResponseMessage> GetAllUsers(this HttpClient client)
+        public static async Task<HttpResponseMessage> GetAllUsers(this HttpClient client, string token)
         {
-            var token = await client.AuthenticateAsAdminUser();
-
             var request = new HttpRequestBuilder()
                 .WithMethod(HttpMethod.Get)
                 .AddRequestUri("api/users")
@@ -132,7 +140,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
             var token = await client.AuthenticateAsAdminUser();
 
-            var registerUserRequest = TestData.RegisterStandardUserRequest;
+            var registerUserRequest = TestData.Users.StandardUser;
             var registerUserResponse = await client.RegisterUser(registerUserRequest, token);
             registerUserResponse.StatusCode.Should().Be(HttpStatusCode.Created);
             var authenticateResponse = await client.PostAuthenticateRequest(registerUserRequest.Email, registerUserRequest.Password);
@@ -223,11 +231,11 @@ namespace HeatKeeper.Server.WebApi.Tests
             return await client.SendAsync(httpRequest);
         }
 
-        public static async Task<HttpResponseMessage> PatchUser(this HttpClient client, UpdateUserCommand command, long userId, string token)
+        public static async Task<HttpResponseMessage> PatchUser(this HttpClient client, UpdateUserCommand command, string token)
         {
             var request = new HttpRequestBuilder()
                 .WithMethod(HttpMethod.Patch)
-                .AddRequestUri($"api/users/{userId}")
+                .AddRequestUri($"api/users/{command.UserId}")
                 .AddBearerToken(token)
                 .AddContent(new JsonContent(command))
                 .Build();

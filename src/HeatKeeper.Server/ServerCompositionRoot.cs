@@ -33,13 +33,14 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
                 .Decorate<ICommandHandler<RegisterUserCommand>, RegisterUserValidator>()
-                .Decorate<ICommandHandler<ChangePasswordCommand>, ChangePasswordValidator>()
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidatedLocationCommandHandler<>))
+                .Decorate<ICommandHandler<ChangePasswordCommand>, ChangePasswordValidator>()
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidatedZoneCommandHandler<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidatedUserCommandHandler<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidatedInsertUserLocationCommandHandler<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(AuthorizedCommandHandler<>))
-                .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>));
+                .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>))
+                .Decorate<ICommandHandler<DeleteUserCommand>, ValidatedDeleteUserCommandHandler>();
         }
     }
 }

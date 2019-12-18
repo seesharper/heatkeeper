@@ -11,6 +11,8 @@ namespace HeatKeeper.Server.WebApi.Tests
 {
     public static class TestData
     {
+        public static string ValidPassword => "aVe78!*PZ9&Lnqh1E4pG";
+
         public static AuthenticatedUserQuery InvalidAuthenticateAdminUserRequest =>
             new AuthenticatedUserQuery(AdminUser.DefaultEmail, "InvalidPassword");
 
@@ -19,9 +21,6 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static CreateMeasurementCommand[] TemperatureMeasurementRequests =>
             new[] { new CreateMeasurementCommand("SensorID1", MeasurementType.Temperature, 23.7) };
-
-        public static RegisterUserCommand RegisterStandardUserRequest =>
-            new RegisterUserCommand("StandardUser@tempuri.org", "Standard User First Name", "Standard User Last name", isAdmin: false, "aVe78!*PZ9&Lnqh1E4pG", "aVe78!*PZ9&Lnqh1E4pG");
 
         public static class Locations
         {
@@ -44,15 +43,18 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static class Users
         {
             public static RegisterUserCommand StandardUser =>
-                new RegisterUserCommand("StandardUser@tempuri.org", "FirstName", "LastName", isAdmin: false, "aVe78!*PZ9&Lnqh1E4pG", "aVe78!*PZ9&Lnqh1E4pG");
+                new RegisterUserCommand() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
             public static RegisterUserCommand AnotherStandardUser =>
-                new RegisterUserCommand("AnotherStandardUser@tempuri.org", "FirstName", "LastName", isAdmin: false, "aVe78!*PZ9&Lnqh1E4pG", "aVe78!*PZ9&Lnqh1E4pG");
+                new RegisterUserCommand() { Email = "AnotherStandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
 
             public static RegisterUserCommand StandardUserWithWeakPassord =>
-                new RegisterUserCommand("StandardUser@tempuri.org", "FirstName", "LastName", isAdmin: false, "abc123", "abc123");
+                new RegisterUserCommand() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = "abc123", ConfirmedPassword = "abc123" };
 
             public static RegisterUserCommand StandardUserWithGivenPassword(string password) =>
-                new RegisterUserCommand("StandardUser@tempuri.org", "FirstName", "LastName", isAdmin: false, password, password);
+                new RegisterUserCommand() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = password, ConfirmedPassword = password };
+
+            public static RegisterUserCommand StandardUserWithInvalidEmail =>
+                new RegisterUserCommand() { Email = "InvalidMailAddress", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
         }
     }
 }
