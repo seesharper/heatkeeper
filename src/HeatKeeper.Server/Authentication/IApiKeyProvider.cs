@@ -29,7 +29,8 @@ namespace HeatKeeper.Server.Authentication
                 new Claim(ClaimTypes.GivenName, userContext.FirstName),
                 new Claim(ClaimTypes.Surname, userContext.LastName),
                 new Claim(ClaimTypes.Role, "reporter"),
-                new Claim(ClaimTypes.Sid, userContext.Id.ToString())
+                new Claim(ClaimTypes.Sid, userContext.Id.ToString()),
+                new Claim(ClaimTypes.Role, "reporter")
             };
 
             var token = tokenProvider.CreateToken(claims, DateTime.MaxValue);

@@ -221,5 +221,29 @@ namespace HeatKeeper.Server.WebApi.Tests
             deleteUserResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
+        [Fact]
+        public async Task ShouldNotChangeAdminStatusForCurrentUser()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+
+            var allUsersResponse = await client.GetAllUsers(token);
+            var allUsers = await allUsersResponse.ContentAs<User[]>();
+
+            var adminUser = allUsers.Single(u => u.Email == AdminUser.DefaultEmail);
+
+            var updateCommand = new UpdateUserCommand()
+            {
+                UserId = adminUser.Id,
+                FirstName = AdminUser.DefaultFirstName,
+                LastName = AdminUser.DefaultLastName,
+                Email = AdminUser.DefaultEmail,
+                IsAdmin = false
+            };
+
+            var response = await client.PatchUser(updateCommand, token);
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        }
     }
 }
