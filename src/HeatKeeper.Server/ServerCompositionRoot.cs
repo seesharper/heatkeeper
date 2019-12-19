@@ -32,6 +32,7 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
+                .Decorate<ICommandHandler<UpdateUserCommand>, ValidatedUpdateUserCommandHandler>()
                 .Decorate<ICommandHandler<RegisterUserCommand>, RegisterUserValidator>()
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidatedLocationCommandHandler<>))
                 .Decorate<ICommandHandler<ChangePasswordCommand>, ChangePasswordValidator>()
@@ -41,6 +42,7 @@ namespace HeatKeeper.Server
                 .Decorate(typeof(ICommandHandler<>), typeof(AuthorizedCommandHandler<>))
                 .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>))
                 .Decorate<ICommandHandler<DeleteUserCommand>, ValidatedDeleteUserCommandHandler>();
+
         }
     }
 }
