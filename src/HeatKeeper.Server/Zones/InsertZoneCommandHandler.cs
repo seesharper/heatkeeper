@@ -29,9 +29,5 @@ namespace HeatKeeper.Server.Zones
     [RequireUserRole]
     public class CreateZoneCommand : ZoneCommand
     {
-        public CreateZoneCommand(string name, string description) : base(name, description)
-        {
-
-        }
     }
 }

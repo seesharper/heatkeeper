@@ -2,16 +2,11 @@ namespace HeatKeeper.Server.Zones
 {
     public class ZoneCommand
     {
-        public ZoneCommand(string name, string description)
-        {
-            Name = name;
-            Description = description;
-        }
-
-        public string Name { get; }
-
-        public string Description { get; }
+        public long ZoneId { get; set; }
         public long LocationId { get; set; }
-        public long Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public bool UseAsDefaultInsideZone { get; set; }
+        public bool UseAsDefaultOutsideZone { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace HeatKeeper.Server.Zones
 
         public async Task HandleAsync(TCommand command, CancellationToken cancellationToken = default)
         {
-            var zoneExistsQuery = new ZoneExistsQuery(command.Id, command.LocationId, command.Name);
+            var zoneExistsQuery = new ZoneExistsQuery(command.ZoneId, command.LocationId, command.Name);
             var zoneExists = await queryExecutor.ExecuteAsync(zoneExistsQuery);
             if (zoneExists)
             {
