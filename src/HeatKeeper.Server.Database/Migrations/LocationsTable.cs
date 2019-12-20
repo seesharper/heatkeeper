@@ -10,7 +10,7 @@ namespace HeatKeeper.Server.Database.Migrations
             Create.Table("Locations")
                 .WithColumn("Id").AsInt64().PrimaryKey().Identity()
                 .WithColumn("SensorId").AsInt64().ReferencedBy("Sensors", "Id").Nullable()
-                .WithColumn("OutsideZoneId").AsInt64().ReferencedBy("Zones", "Id").Nullable()
+                .WithColumn("DefaultOutsideZoneId").AsInt64().ReferencedBy("Zones", "Id").Nullable()
                 .WithColumn("DefaultInsideZoneId").AsInt64().ReferencedBy("Zones", "Id").Nullable()
                 .WithColumn("Name").AsString(255).Unique("idx_locations_name").NotNullable()
                 .WithColumn("Description").AsString().Nullable();

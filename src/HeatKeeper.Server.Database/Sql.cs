@@ -60,5 +60,13 @@ namespace HeatKeeper.Server.Database
         string ZoneExists { get; }
 
         string LocationUserExists { get; }
+
+        string UpdateDefaultInsideZone { get; }
+
+        string UpdateDefaultOutsideZone { get; }
+
+        string ClearDefaultInsideZone { get; }
+
+        string ClearDefaultOutsideZone { get; }
     }
 }
