@@ -34,7 +34,10 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static class Zones
         {
             public static CreateZoneCommand LivingRoom =>
-                new CreateZoneCommand() { Name = "LivingRoom", Description = "This is the description of the LivingRoom zone" };
+                new CreateZoneCommand() { Name = "LivingRoom", Description = "This is the description of the LivingRoom zone", UseAsDefaultInsideZone = true };
+
+            public static CreateZoneCommand Outside =>
+                new CreateZoneCommand() { Name = "Outside", Description = "This is the description of the outside zone", UseAsDefaultOutsideZone = true };
 
             public static CreateZoneCommand Kitchen =>
                 new CreateZoneCommand() { Name = "Kitchen", Description = "This is the description of the Kitchen zone" };

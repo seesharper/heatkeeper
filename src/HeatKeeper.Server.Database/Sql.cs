@@ -9,9 +9,15 @@ namespace HeatKeeper.Server.Database
 {
     public interface ISqlProvider
     {
+        string CreateDatabase { get; }
+
         string InsertZone { get; }
 
         string GetAllZones { get; }
+
+        string GetZoneId { get; }
+
+        string GetZoneDetails { get; }
 
         string InsertLocation { get; }
 
@@ -28,6 +34,8 @@ namespace HeatKeeper.Server.Database
         string GetAllExternalSensors { get; }
 
         string InsertUser { get; }
+
+        string InsertAdminUser { get; }
 
         string GetUserId { get; }
 

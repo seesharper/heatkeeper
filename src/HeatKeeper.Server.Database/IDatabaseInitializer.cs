@@ -1,4 +1,6 @@
 using System;
+using System.Data.SQLite;
+using DbReader;
 using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,22 +14,31 @@ namespace HeatKeeper.Server.Database
     public class DatabaseMigrator : IDatabaseMigrator
     {
         private readonly ApplicationConfiguration configuration;
+        private readonly ISqlProvider sqlProvider;
 
-        public DatabaseMigrator(ApplicationConfiguration configuration)
+        public DatabaseMigrator(ApplicationConfiguration configuration, ISqlProvider sqlProvider)
         {
             this.configuration = configuration;
+            this.sqlProvider = sqlProvider;
         }
 
         public void Migrate()
         {
-            var serviceProvider = CreateServices(configuration.ConnectionString);
-
-            // Put the database update into a scope to ensure
-            // that all resources will be disposed.
-            using (var scope = serviceProvider.CreateScope())
+            using (var connection = new SQLiteConnection(configuration.ConnectionString))
             {
-                UpdateDatabase(scope.ServiceProvider);
+                connection.Open();
+                connection.Execute(sqlProvider.CreateDatabase);
+                connection.Execute(sqlProvider.InsertAdminUser, new { Email = AdminUser.DefaultEmail, Firstname = AdminUser.DefaultFirstName, Lastname = AdminUser.DefaultLastName, HashedPassword = AdminUser.DefaultPasswordHash });
             }
+
+            // var serviceProvider = CreateServices(configuration.ConnectionString);
+
+            // // Put the database update into a scope to ensure
+            // // that all resources will be disposed.
+            // using (var scope = serviceProvider.CreateScope())
+            // {
+            //     UpdateDatabase(scope.ServiceProvider);
+            // }
         }
 
         private static IServiceProvider CreateServices(string connectionString)

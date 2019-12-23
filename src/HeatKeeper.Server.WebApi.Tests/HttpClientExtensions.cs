@@ -208,6 +208,17 @@ namespace HeatKeeper.Server.WebApi.Tests
             return await client.SendAsync(httpRequest);
         }
 
+        public static async Task<HttpResponseMessage> GetZoneDetails(this HttpClient client, string token, long zoneId)
+        {
+            var request = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Get)
+                .AddRequestUri($"api/zones/{zoneId}")
+                .AddBearerToken(token)
+                .Build();
+
+            return await client.SendAsync(request);
+        }
+
         public static async Task<string> GetApiKey(this HttpClient client, string token)
         {
             var request = new HttpRequestBuilder()

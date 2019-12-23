@@ -1,5 +1,6 @@
 using CQRS.Command.Abstractions;
 using DbReader;
+using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Database;
 using System.Data;
 using System.Threading;
@@ -22,6 +23,7 @@ namespace HeatKeeper.Server.Locations
             => await dbConnection.ExecuteAsync(sqlProvider.UpdateDefaultInsideZone, command);
     }
 
+    [RequireAdminRole]
     public class UpdateDefaultInsideZoneCommand
     {
         public long LocationId { get; set; }

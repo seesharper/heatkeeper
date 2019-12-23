@@ -1,5 +1,6 @@
 using CQRS.Command.Abstractions;
 using DbReader;
+using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Database;
 using System.Data;
 using System.Threading;
@@ -24,6 +25,7 @@ namespace HeatKeeper.Server.Locations
         }
     }
 
+    [RequireAdminRole]
     public class ClearDefaultInsideZoneCommand
     {
         public long LocationId { get; set; }

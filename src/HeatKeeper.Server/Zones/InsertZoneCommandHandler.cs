@@ -23,6 +23,7 @@ namespace HeatKeeper.Server.Zones
         public async Task HandleAsync(CreateZoneCommand command, CancellationToken cancellationToken = default)
         {
             await ((DbCommand)dbConnection.CreateCommand(sqlProvider.InsertZone, command)).ExecuteNonQueryAsync();
+            command.ZoneId = await dbConnection.ExecuteScalarAsync<long>(sqlProvider.GetZoneId, new { command.Name });
         }
     }
 
