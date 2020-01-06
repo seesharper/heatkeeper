@@ -1,6 +1,6 @@
 using System;
-using FluentMigrator.Runner;
-using Microsoft.Extensions.DependencyInjection;
+using System.Data.SQLite;
+using DbReader;
 
 namespace HeatKeeper.Server.Database
 {
@@ -12,50 +12,27 @@ namespace HeatKeeper.Server.Database
     public class DatabaseMigrator : IDatabaseMigrator
     {
         private readonly ApplicationConfiguration configuration;
+        private readonly ISqlProvider sqlProvider;
 
-        public DatabaseMigrator(ApplicationConfiguration configuration)
+        public DatabaseMigrator(ApplicationConfiguration configuration, ISqlProvider sqlProvider)
         {
             this.configuration = configuration;
+            this.sqlProvider = sqlProvider;
         }
 
         public void Migrate()
         {
-            var serviceProvider = CreateServices(configuration.ConnectionString);
-
-            // Put the database update into a scope to ensure
-            // that all resources will be disposed.
-            using (var scope = serviceProvider.CreateScope())
+            using (var connection = new SQLiteConnection(configuration.ConnectionString))
             {
-                UpdateDatabase(scope.ServiceProvider);
+                connection.Open();
+                var isEmpty = connection.ExecuteScalar<long>(sqlProvider.IsEmptyDatabase) == 1 ? true : false;
+                if (isEmpty)
+                {
+                    connection.Execute(sqlProvider.CreateDatabase);
+                    connection.Execute(sqlProvider.InsertAdminUser, new { Email = AdminUser.DefaultEmail, Firstname = AdminUser.DefaultFirstName, Lastname = AdminUser.DefaultLastName, HashedPassword = AdminUser.DefaultPasswordHash });
+                    connection.Execute(sqlProvider.InsertVersionInfo, new VersionInfo() { Version = 1, AppliedOn = DateTime.UtcNow, Description = "Initial version" });
+                }
             }
-        }
-
-        private static IServiceProvider CreateServices(string connectionString)
-        {
-            return new ServiceCollection()
-                // Add common FluentMigrator services
-                .AddFluentMigratorCore()
-                .ConfigureRunner(rb => rb
-                    // Add SQLite support to FluentMigrator
-                    .AddSQLite()
-                    // Set the connection string
-                    .WithGlobalConnectionString(connectionString)
-                    // Define the assembly containing the migrations
-                    .ScanIn(typeof(DatabaseMigrator).Assembly).For.Migrations())
-                // Enable logging to console in the FluentMigrator way
-                .AddLogging(lb => lb.AddFluentMigratorConsole())
-                // Build the service provider
-                .BuildServiceProvider(false);
-        }
-
-
-        private static void UpdateDatabase(IServiceProvider serviceProvider)
-        {
-            // Instantiate the runner
-            var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
-
-            // Execute the migrations
-            runner.MigrateUp();
         }
     }
 }

@@ -1,17 +1,20 @@
-using System;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-
 namespace HeatKeeper.Server.Database
 {
     public interface ISqlProvider
     {
+        string CreateDatabase { get; }
+
+        string IsEmptyDatabase { get; }
+
+        string InsertVersionInfo { get; }
+
         string InsertZone { get; }
 
         string GetAllZones { get; }
+
+        string GetZoneId { get; }
+
+        string GetZoneDetails { get; }
 
         string InsertLocation { get; }
 
@@ -25,9 +28,17 @@ namespace HeatKeeper.Server.Database
 
         string GetAllSensors { get; }
 
+        string AddSensorToZone { get; }
+
+        string RemoveSensorFromZone { get; }
+
+        string GetSensorsByZone { get; }
+
         string GetAllExternalSensors { get; }
 
         string InsertUser { get; }
+
+        string InsertAdminUser { get; }
 
         string GetUserId { get; }
 
@@ -60,5 +71,13 @@ namespace HeatKeeper.Server.Database
         string ZoneExists { get; }
 
         string LocationUserExists { get; }
+
+        string UpdateDefaultInsideZone { get; }
+
+        string UpdateDefaultOutsideZone { get; }
+
+        string ClearDefaultInsideZone { get; }
+
+        string ClearDefaultOutsideZone { get; }
     }
 }

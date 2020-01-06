@@ -3,6 +3,7 @@ using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Zones;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Xunit;
@@ -114,6 +115,30 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             zoneRequestMessage.StatusCode.Should().Be(HttpStatusCode.Conflict);
         }
+
+        [Fact]
+        public async Task ShouldSetZoneAsDefaultOutsideZone()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+
+            var locationRequestMessage = await client.CreateLocation(TestData.Locations.Home, token);
+            var locationId = (await locationRequestMessage.ContentAs<CreateLocationResponse>()).Id;
+
+            await client.CreateZone(locationId, TestData.Zones.Outside);
+            await client.CreateZone(locationId, TestData.Zones.LivingRoom);
+
+            var zones = await (await client.GetZones(locationId)).ContentAs<Zone[]>();
+
+            var outsideZone = zones.Single(z => z.Name == TestData.Zones.Outside.Name);
+
+            var zoneDetailsResponse = await client.GetZoneDetails(token, outsideZone.Id);
+            var zoneDetail = await zoneDetailsResponse.ContentAs<ZoneDetails>();
+
+            zoneDetail.IsDefaultOutsideZone.Should().Be(true);
+        }
+
+
 
         [Fact]
         public async Task ShouldAddUserToLocation()

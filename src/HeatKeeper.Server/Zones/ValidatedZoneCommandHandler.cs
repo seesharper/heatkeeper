@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Exceptions;
+using HeatKeeper.Server.Validation;
 
 namespace HeatKeeper.Server.Zones
 {
@@ -19,11 +20,16 @@ namespace HeatKeeper.Server.Zones
 
         public async Task HandleAsync(TCommand command, CancellationToken cancellationToken = default)
         {
-            var zoneExistsQuery = new ZoneExistsQuery(command.Id, command.LocationId, command.Name);
+            var zoneExistsQuery = new ZoneExistsQuery(command.ZoneId, command.LocationId, command.Name);
             var zoneExists = await queryExecutor.ExecuteAsync(zoneExistsQuery);
             if (zoneExists)
             {
                 throw new HeatKeeperConflictException($"Zone {command.Name} already exists for location {command.Name}");
+            }
+
+            if (command.UseAsDefaultInsideZone && command.UseAsDefaultOutsideZone)
+            {
+                throw new ValidationFailedException("A zone cannot be a default outside zone and a default inside zone at the same time.");
             }
 
             await handler.HandleAsync(command, cancellationToken);
