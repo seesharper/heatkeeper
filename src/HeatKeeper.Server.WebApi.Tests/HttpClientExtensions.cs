@@ -11,6 +11,7 @@ using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
+using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
 using Newtonsoft.Json;
@@ -218,6 +219,40 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             return await client.SendAsync(request);
         }
+
+        public static async Task<HttpResponseMessage> GetSensors(this HttpClient client, string token, long zoneId)
+        {
+            var request = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Get)
+                .AddRequestUri($"api/zones/{zoneId}/sensors")
+                .AddBearerToken(token)
+                .Build();
+
+            return await client.SendAsync(request);
+        }
+
+        public static async Task<HttpResponseMessage> AddSensorToZone(this HttpClient client, AddSensorToZoneCommand command, string token)
+        {
+            var request = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Post)
+                .AddRequestUri($"api/zones/{command.ZoneId}/sensors")
+                .AddJsonContent(command)
+                .AddBearerToken(token)
+                .Build();
+            return await client.SendAsync(request);
+        }
+
+        public static async Task<HttpResponseMessage> RemoveSensorFromZone(this HttpClient client, RemoveSensorFromZoneCommand command, string token)
+        {
+            var request = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Delete)
+                .AddRequestUri($"api/zones/{command.ZoneId}/sensors")
+                .AddJsonContent(command)
+                .AddBearerToken(token)
+                .Build();
+            return await client.SendAsync(request);
+        }
+
 
         public static async Task<string> GetApiKey(this HttpClient client, string token)
         {

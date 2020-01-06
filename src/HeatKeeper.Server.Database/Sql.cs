@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-
 namespace HeatKeeper.Server.Database
 {
     public interface ISqlProvider
@@ -30,6 +23,12 @@ namespace HeatKeeper.Server.Database
         string InsertSensor { get; }
 
         string GetAllSensors { get; }
+
+        string AddSensorToZone { get; }
+
+        string RemoveSensorFromZone { get; }
+
+        string GetSensorsByZone { get; }
 
         string GetAllExternalSensors { get; }
 

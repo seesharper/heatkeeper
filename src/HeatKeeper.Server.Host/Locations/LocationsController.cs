@@ -42,7 +42,7 @@ namespace HeatKeeper.Server.Host.Locations
         public async Task<IActionResult> Post([FromBodyAndRoute] CreateZoneCommand command)
         {
             await commandExecutor.ExecuteAsync(command);
-            return CreatedAtAction(nameof(Post), new { id = command.Name });
+            return CreatedAtAction(nameof(Post), new ResourceId(command.ZoneId));
         }
 
 
