@@ -25,8 +25,13 @@ namespace HeatKeeper.Server.Database
             using (var connection = new SQLiteConnection(configuration.ConnectionString))
             {
                 connection.Open();
-                connection.Execute(sqlProvider.CreateDatabase);
-                connection.Execute(sqlProvider.InsertAdminUser, new { Email = AdminUser.DefaultEmail, Firstname = AdminUser.DefaultFirstName, Lastname = AdminUser.DefaultLastName, HashedPassword = AdminUser.DefaultPasswordHash });
+                var isEmpty = connection.ExecuteScalar<long>(sqlProvider.IsEmptyDatabase) == 1 ? true : false;
+                if (isEmpty)
+                {
+                    connection.Execute(sqlProvider.CreateDatabase);
+                    connection.Execute(sqlProvider.InsertAdminUser, new { Email = AdminUser.DefaultEmail, Firstname = AdminUser.DefaultFirstName, Lastname = AdminUser.DefaultLastName, HashedPassword = AdminUser.DefaultPasswordHash });
+                    connection.Execute(sqlProvider.InsertVersionInfo, new VersionInfo() { Version = 1, AppliedOn = DateTime.UtcNow, Description = "Initial version" });
+                }
             }
         }
     }

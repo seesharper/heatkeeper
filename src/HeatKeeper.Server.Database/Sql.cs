@@ -4,6 +4,10 @@ namespace HeatKeeper.Server.Database
     {
         string CreateDatabase { get; }
 
+        string IsEmptyDatabase { get; }
+
+        string InsertVersionInfo { get; }
+
         string InsertZone { get; }
 
         string GetAllZones { get; }
