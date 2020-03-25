@@ -1,3 +1,4 @@
+using System;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Host.Locations;
@@ -20,7 +21,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             new AuthenticatedUserQuery(AdminUser.DefaultEmail, AdminUser.DefaultPassword);
 
         public static CreateMeasurementCommand[] TemperatureMeasurementRequests =>
-            new[] { new CreateMeasurementCommand("SensorID1", MeasurementType.Temperature, 23.7) };
+            new[] { new CreateMeasurementCommand("SensorID1", MeasurementType.Temperature, 23.7, DateTime.UtcNow) };
 
         public static class Locations
         {
