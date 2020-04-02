@@ -173,6 +173,17 @@ namespace HeatKeeper.Server.WebApi.Tests
             return await client.SendAsync(httpRequest);
         }
 
+        public static async Task<HttpResponseMessage> PatchLocation(this HttpClient client, UpdateLocationCommand command, string token)
+        {
+            var request = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Patch)
+                .AddRequestUri($"api/locations/{command.LocationId}")
+                .AddBearerToken(token)
+                .AddContent(new JsonContent(command))
+                .Build();
+            return await client.SendAsync(request);
+        }
+
         public static async Task<Location[]> GetLocations(this HttpClient client, string token)
         {
             var httpRequest = new HttpRequestBuilder()

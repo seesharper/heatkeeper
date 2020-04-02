@@ -29,6 +29,10 @@ namespace HeatKeeper.Server.Host.Locations
             return CreatedAtAction(nameof(Post), new CreateLocationResponse(command.Id));
         }
 
+        [HttpPatch("{locationId}")]
+        public async Task Patch([FromBodyAndRoute] UpdateLocationCommand updateLocationCommand)
+            => await commandExecutor.ExecuteAsync(updateLocationCommand).ConfigureAwait(false);
+
         [HttpGet]
         public async Task<Location[]> Get([FromQuery]GetAllLocationsQuery query)
             => await queryExecutor.ExecuteAsync(query);
@@ -44,9 +48,6 @@ namespace HeatKeeper.Server.Host.Locations
             await commandExecutor.ExecuteAsync(command);
             return CreatedAtAction(nameof(Post), new ResourceId(command.ZoneId));
         }
-
-
-
 
         [HttpPost("{locationId}/users")]
         public async Task<IActionResult> AddUser([FromBodyAndRoute]AddUserToLocationCommand command)

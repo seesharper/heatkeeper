@@ -1,11 +1,11 @@
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Host.Users;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Zones;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests
@@ -24,8 +24,41 @@ namespace HeatKeeper.Server.WebApi.Tests
             var content = await response.ContentAs<CreateLocationResponse>();
             content.Id.Should().Be(1);
 
+            var createdLocation = (await client.GetLocations(token)).Single();
+            createdLocation.Id.Should().Be(1);
+            createdLocation.Name.Should().Be(TestData.Locations.Home.Name);
+            createdLocation.Description.Should().Be(TestData.Locations.Home.Description);
+
             response.Headers.Should().Contain(header => header.Key == "Location");
         }
+
+        [Fact]
+        public async Task ShouldUpdateLocation()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+
+            var response = await client.CreateLocation(TestData.Locations.Home, token);
+
+            var content = await response.ContentAs<CreateLocationResponse>();
+
+            var updateLocationCommand = new UpdateLocationCommand()
+            {
+                LocationId = content.Id,
+                Name = TestData.Locations.Cabin.Name,
+                Description = TestData.Locations.Cabin.Description
+            };
+
+            await client.PatchLocation(updateLocationCommand, token);
+
+            var updatedLocation = (await client.GetLocations(token)).Single();
+
+            updatedLocation.Name.Should().Be(TestData.Locations.Cabin.Name);
+            updatedLocation.Description.Should().Be(TestData.Locations.Cabin.Description);
+            updatedLocation.Id.Should().Be(content.Id);
+
+        }
+
 
         [Fact]
         public async Task ShouldCreateLocationOnlyForAdminUser()

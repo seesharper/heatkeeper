@@ -18,6 +18,8 @@ namespace HeatKeeper.Server.Database
 
         string InsertLocation { get; }
 
+        string UpdateLocation { get; }
+
         string GetAllLocations { get; }
 
         string GetLocationId { get; }
