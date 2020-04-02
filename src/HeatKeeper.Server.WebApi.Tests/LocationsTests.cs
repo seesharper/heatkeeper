@@ -56,7 +56,6 @@ namespace HeatKeeper.Server.WebApi.Tests
             updatedLocation.Name.Should().Be(TestData.Locations.Cabin.Name);
             updatedLocation.Description.Should().Be(TestData.Locations.Cabin.Description);
             updatedLocation.Id.Should().Be(content.Id);
-
         }
 
 
@@ -170,8 +169,6 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             zoneDetail.IsDefaultOutsideZone.Should().Be(true);
         }
-
-
 
         [Fact]
         public async Task ShouldAddUserToLocation()
