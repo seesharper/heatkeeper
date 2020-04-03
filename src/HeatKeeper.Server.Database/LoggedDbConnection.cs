@@ -24,6 +24,7 @@ namespace HeatKeeper.Server.Database
 
         public IDbTransaction BeginTransaction()
         {
+            logger.Debug("Started transaction");
             return dbConnection.BeginTransaction();
         }
 
@@ -39,6 +40,7 @@ namespace HeatKeeper.Server.Database
 
         public void Close()
         {
+            logger.Debug("Closing connection");
             dbConnection.Close();
         }
 
@@ -49,11 +51,13 @@ namespace HeatKeeper.Server.Database
 
         public void Dispose()
         {
+            logger.Debug("Disposing connection");
             dbConnection.Dispose();
         }
 
         public void Open()
         {
+            logger.Debug("Opening the connection");
             dbConnection.Open();
         }
     }
