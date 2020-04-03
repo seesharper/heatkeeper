@@ -1,19 +1,19 @@
 using System;
 using System.Data;
-using HeatKeeper.Server.Locations;
-using HeatKeeper.Abstractions.Logging;
-using HeatKeeper.Server.Users;
-using LightInject;
-
-using Vibrant.InfluxDB.Client;
-using HeatKeeper.Server.Zones;
 using CQRS.Command.Abstractions;
-using CQRS.Transactions;
 using CQRS.LightInject;
-using HeatKeeper.Abstractions.Transactions;
 using CQRS.Query.Abstractions;
+using CQRS.Transactions;
+using HeatKeeper.Abstractions.Logging;
+using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Authorization;
+using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Locations;
+using HeatKeeper.Server.Users;
+using HeatKeeper.Server.Zones;
+using LightInject;
+using Vibrant.InfluxDB.Client;
 
 namespace HeatKeeper.Server
 {
@@ -24,6 +24,7 @@ namespace HeatKeeper.Server
             serviceRegistry.RegisterCommandHandlers()
                 .RegisterQueryHandlers()
                 .Decorate(typeof(ICommandHandler<>), typeof(TransactionalCommandHandler<>))
+                .Decorate<IDbConnection, LoggedDbConnection>()
                 .Decorate<IDbConnection, ConnectionDecorator>()
                 .RegisterConstructorDependency<Logger>((f, p) => f.GetInstance<LogFactory>()(p.Member.DeclaringType))
                 .RegisterSingleton<IInfluxClient>(f => new InfluxClient(new Uri("http://influxdb:8086")))
