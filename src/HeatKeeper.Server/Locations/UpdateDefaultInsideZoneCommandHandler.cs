@@ -1,10 +1,10 @@
+using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using DbReader;
 using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Database;
-using System.Data;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace HeatKeeper.Server.Locations
 {

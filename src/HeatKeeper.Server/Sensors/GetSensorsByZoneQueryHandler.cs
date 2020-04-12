@@ -28,6 +28,9 @@ namespace HeatKeeper.Server.Sensors
         }
     }
 
+    /// <summary>
+    /// Gets sensors for the given zone in addition to sensors not connected to a zone.
+    /// </summary>
     [RequireAdminRole]
     public class SensorsByZoneQuery : IQuery<Sensor[]>
     {

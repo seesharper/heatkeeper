@@ -1,6 +1,7 @@
 {
   "FormattingOptions": {
-    "EnableEditorConfigSupport": true
+    "EnableEditorConfigSupport": true,
+    "OrganizeImports": true
   },
   "RoslynExtensionsOptions": {
     "EnableAnalyzersSupport": true
