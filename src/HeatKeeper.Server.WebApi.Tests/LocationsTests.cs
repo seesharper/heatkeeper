@@ -106,7 +106,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             await client.CreateZone(locationId, TestData.Zones.LivingRoom);
             await client.CreateZone(locationId, TestData.Zones.Kitchen);
 
-            var zones = await (await client.GetZones(locationId)).ContentAs<Zone[]>();
+            var zones = await client.GetZones(locationId);
             zones.Length.Should().Be(2);
         }
 
@@ -125,10 +125,10 @@ namespace HeatKeeper.Server.WebApi.Tests
             await client.CreateZone(homeLocationId, TestData.Zones.LivingRoom);
             await client.CreateZone(cabinLocationID, TestData.Zones.LivingRoom);
 
-            var zones = await (await client.GetZones(homeLocationId)).ContentAs<Zone[]>();
+            var zones = await client.GetZones(homeLocationId);
             zones.Length.Should().Be(1);
 
-            zones = await (await client.GetZones(cabinLocationID)).ContentAs<Zone[]>();
+            zones = await client.GetZones(cabinLocationID);
             zones.Length.Should().Be(1);
         }
 
@@ -160,7 +160,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             await client.CreateZone(locationId, TestData.Zones.Outside);
             await client.CreateZone(locationId, TestData.Zones.LivingRoom);
 
-            var zones = await (await client.GetZones(locationId)).ContentAs<Zone[]>();
+            var zones = await client.GetZones(locationId);
 
             var outsideZone = zones.Single(z => z.Name == TestData.Zones.Outside.Name);
 

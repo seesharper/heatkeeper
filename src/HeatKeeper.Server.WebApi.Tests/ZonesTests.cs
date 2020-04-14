@@ -1,8 +1,10 @@
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Sensors;
+using HeatKeeper.Server.Zones;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests
@@ -113,8 +115,19 @@ namespace HeatKeeper.Server.WebApi.Tests
             var createZoneRequest = await client.CreateZone(locationId, TestData.Zones.LivingRoom);
             var zoneId = (await createZoneRequest.ContentAs<ResourceId>()).Id;
 
+            var updateZoneCommand = new UpdateZoneCommand()
+            {
+                ZoneId = zoneId,
+                Name = TestData.Zones.Kitchen.Name,
+                Description = TestData.Zones.Kitchen.Description
+            };
 
+            await client.PatchZone(updateZoneCommand, token);
 
+            var updatedZone = (await client.GetZones(locationId)).Single();
+
+            updatedZone.Name.Should().Be(TestData.Zones.Kitchen.Name);
+            updatedZone.Description.Should().Be(TestData.Zones.Kitchen.Description);
         }
 
 

@@ -20,7 +20,7 @@ namespace HeatKeeper.Server.Zones
         }
 
         public async Task HandleAsync(UpdateZoneCommand command, CancellationToken cancellationToken = default(CancellationToken))
-            => await dbConnection.ExecuteAsync(sqlProvider.UpdateLocation, command).ConfigureAwait(false);
+            => await dbConnection.ExecuteAsync(sqlProvider.UpdateZone, command).ConfigureAwait(false);
     }
 
     /// <summary>

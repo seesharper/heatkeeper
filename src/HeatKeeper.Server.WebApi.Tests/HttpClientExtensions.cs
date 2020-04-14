@@ -184,6 +184,17 @@ namespace HeatKeeper.Server.WebApi.Tests
             return await client.SendAsync(request);
         }
 
+        public static async Task<HttpResponseMessage> PatchZone(this HttpClient client, UpdateZoneCommand command, string token)
+        {
+            var request = new HttpRequestBuilder()
+                .WithMethod(HttpMethod.Patch)
+                .AddRequestUri($"api/zones/{command.ZoneId}")
+                .AddBearerToken(token)
+                .AddContent(new JsonContent(command))
+                .Build();
+            return await client.SendAsync(request);
+        }
+
         public static async Task<Location[]> GetLocations(this HttpClient client, string token)
         {
             var httpRequest = new HttpRequestBuilder()
@@ -209,7 +220,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         }
 
 
-        public static async Task<HttpResponseMessage> GetZones(this HttpClient client, long locationId)
+        public static async Task<Zone[]> GetZones(this HttpClient client, long locationId)
         {
             var token = await client.AuthenticateAsAdminUser();
             var httpRequest = new HttpRequestBuilder()
@@ -217,7 +228,8 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .WithMethod(HttpMethod.Get)
                 .AddRequestUri($"api/locations/{locationId}/zones")
                 .Build();
-            return await client.SendAsync(httpRequest);
+            var response = await client.SendAsync(httpRequest);
+            return await response.ContentAs<Zone[]>();
         }
 
         public static async Task<HttpResponseMessage> GetZoneDetails(this HttpClient client, string token, long zoneId)
