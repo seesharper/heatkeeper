@@ -1,8 +1,0 @@
-{
-  "cSpell.words": ["heatkeeper"],
-
-  "csharp.unitTestDebuggingOptions": {
-    "type": "coreclr"
-  },
-  "coverage-gutters.lcovname": "../../build/Artifacts/CodeCoverage/coverage.info"
-}

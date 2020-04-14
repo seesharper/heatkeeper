@@ -1,9 +1,9 @@
+using System.Net;
 using System.Threading.Tasks;
+using FluentAssertions;
 using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Sensors;
 using Xunit;
-using FluentAssertions;
-using System.Net;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
@@ -101,6 +101,21 @@ namespace HeatKeeper.Server.WebApi.Tests
             sensors[0].ZoneId.Should().BeNull();
         }
 
+        [Fact]
+        public async Task ShouldUpdateZone()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+
+            var createLocationResponse = await client.CreateLocation(TestData.Locations.Home, token);
+            var locationId = (await createLocationResponse.ContentAs<CreateLocationResponse>()).Id;
+
+            var createZoneRequest = await client.CreateZone(locationId, TestData.Zones.LivingRoom);
+            var zoneId = (await createZoneRequest.ContentAs<ResourceId>()).Id;
+
+
+
+        }
 
 
     }

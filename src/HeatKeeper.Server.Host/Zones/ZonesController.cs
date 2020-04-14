@@ -21,6 +21,10 @@ namespace HeatKeeper.Server.Host.Zones
             this.commandExecutor = commandExecutor;
         }
 
+        [HttpPatch("{zoneId}")]
+        public async Task Patch([FromBodyAndRoute] UpdateZoneCommand updateZoneCommand)
+           => await commandExecutor.ExecuteAsync(updateZoneCommand).ConfigureAwait(false);
+
 
         [HttpGet("{zoneId}")]
         public async Task<ZoneDetails> GetZoneDetails([FromRoute]ZoneDetailsQuery query)
