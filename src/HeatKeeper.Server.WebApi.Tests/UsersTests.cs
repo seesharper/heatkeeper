@@ -1,15 +1,15 @@
 
-using FluentAssertions;
-using HeatKeeper.Server.Host.Users;
-using HeatKeeper.Server.Users;
-using HeatKeeper.Server.Database;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Xunit;
-using Microsoft.AspNetCore.Mvc;
+using FluentAssertions;
 using HeatKeeper.Server.Authentication;
+using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Host.Users;
+using HeatKeeper.Server.Users;
+using Microsoft.AspNetCore.Mvc;
+using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
@@ -43,10 +43,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var response = await client.RegisterUser(TestData.Users.StandardUser, token);
-            response.StatusCode.Should().Be(HttpStatusCode.Created);
-            response = await client.RegisterUser(TestData.Users.AnotherStandardUser, token);
-            response.StatusCode.Should().Be(HttpStatusCode.Created);
+            await client.PostUser(TestData.Users.StandardUser, token);
+            await client.PostUser(TestData.Users.AnotherStandardUser, token);
 
             var allUsersResponse = await client.GetAllUsers(token);
             var users = await allUsersResponse.ContentAs<User[]>();
@@ -99,12 +97,11 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
-            var registerUserResponseMessage = await client.RegisterUser(TestData.Users.StandardUser, token);
-            var registerUserResponse = await registerUserResponseMessage.ContentAs<RegisterUserResponse>();
+            var userId = await client.PostUser(TestData.Users.StandardUser, token);
 
             var updateCommand = new UpdateUserCommand()
             {
-                UserId = registerUserResponse.Id,
+                UserId = userId,
                 FirstName = TestData.Users.StandardUser.FirstName,
                 LastName = TestData.Users.StandardUser.LastName,
                 Email = TestData.Users.StandardUser.Email,
@@ -142,11 +139,12 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var responseMessage = await client.RegisterUser(TestData.Users.StandardUserWithGivenPassword(password), token);
-
-            responseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            var problemDetails = await responseMessage.ContentAs<ProblemDetails>();
-            problemDetails.Detail.Should().Be(errorMessage);
+            await client.PostUser(TestData.Users.StandardUserWithGivenPassword(password), token, async response =>
+            {
+                response.StatusCode.ShouldBeBadRequest();
+                var problemDetails = await response.ContentAs<ProblemDetails>();
+                problemDetails.Detail.Should().Be(errorMessage);
+            });
         }
 
 
@@ -175,11 +173,14 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var responseMessage = await client.RegisterUser(TestData.Users.StandardUserWithInvalidEmail, token);
+            client.PostUser(TestData.Users.StandardUserWithInvalidEmail, token, async response =>
+            {
+                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                var problemDetails = await response.ContentAs<ProblemDetails>();
+                problemDetails.Detail.Should().Be("The mail address 'InvalidMailAddress' is not correctly formatted.");
+            }).Wait();
 
-            responseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            var problemDetails = await responseMessage.ContentAs<ProblemDetails>();
-            problemDetails.Detail.Should().Be("The mail address 'InvalidMailAddress' is not correctly formatted.");
+
         }
 
         [Fact]
@@ -188,9 +189,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var registerUserResponse = await client.RegisterUser(TestData.Users.StandardUser, token);
-            registerUserResponse.EnsureSuccessStatusCode();
-            var userId = (await registerUserResponse.ContentAs<RegisterUserResponse>()).Id;
+            var userId = await client.PostUser(TestData.Users.StandardUser, token);
 
             var allUsersResponse = await client.GetAllUsers(token);
             var allUsers = await allUsersResponse.ContentAs<User[]>();

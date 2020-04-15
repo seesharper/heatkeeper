@@ -1,7 +1,7 @@
-using CQRS.Command.Abstractions;
-using HeatKeeper.Server.Authorization;
 using System.Threading;
 using System.Threading.Tasks;
+using CQRS.Command.Abstractions;
+using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Locations
 {
@@ -30,15 +30,9 @@ namespace HeatKeeper.Server.Locations
 
     public class LocationCommand
     {
-        public LocationCommand(string name, string description)
-        {
-            Name = name;
-            Description = description;
-        }
+        public string Name { get; set; }
 
-        public string Name { get; }
-
-        public string Description { get; }
+        public string Description { get; set; }
 
         public long Id { get; set; }
     }
@@ -50,9 +44,6 @@ namespace HeatKeeper.Server.Locations
     [RequireAdminRole]
     public class CreateLocationCommand : LocationCommand
     {
-        public CreateLocationCommand(string name, string description) : base(name, description)
-        {
-        }
     }
 
 }

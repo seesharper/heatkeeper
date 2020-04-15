@@ -2,8 +2,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
-using HeatKeeper.Server.Host.Locations;
-using HeatKeeper.Server.Host.Users;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Zones;
 using Xunit;
@@ -18,18 +16,15 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var response = await client.CreateLocation(TestData.Locations.Home, token);
-
-            response.StatusCode.Should().Be(HttpStatusCode.Created);
-            var content = await response.ContentAs<CreateLocationResponse>();
-            content.Id.Should().Be(1);
+            var locationId = await client.PostLocation(TestData.Locations.Home, token);
 
             var createdLocation = (await client.GetLocations(token)).Single();
-            createdLocation.Id.Should().Be(1);
+
+            createdLocation.Id.Should().Be(locationId);
             createdLocation.Name.Should().Be(TestData.Locations.Home.Name);
             createdLocation.Description.Should().Be(TestData.Locations.Home.Description);
 
-            response.Headers.Should().Contain(header => header.Key == "Location");
+            //response.Headers.Should().Contain(header => header.Key == "Location");
         }
 
         [Fact]
@@ -38,13 +33,11 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var response = await client.CreateLocation(TestData.Locations.Home, token);
-
-            var content = await response.ContentAs<CreateLocationResponse>();
+            var locationId = await client.PostLocation(TestData.Locations.Home, token);
 
             var updateLocationCommand = new UpdateLocationCommand()
             {
-                LocationId = content.Id,
+                Id = locationId,
                 Name = TestData.Locations.Cabin.Name,
                 Description = TestData.Locations.Cabin.Description
             };
@@ -55,17 +48,16 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             updatedLocation.Name.Should().Be(TestData.Locations.Cabin.Name);
             updatedLocation.Description.Should().Be(TestData.Locations.Cabin.Description);
-            updatedLocation.Id.Should().Be(content.Id);
+            updatedLocation.Id.Should().Be(locationId);
         }
-
 
         [Fact]
         public async Task ShouldCreateLocationOnlyForAdminUser()
         {
             var client = Factory.CreateClient();
             var token = await client.CreateAndAuthenticateStandardUser();
-            var createLocationResponse = await client.CreateLocation(TestData.Locations.Home, token);
-            createLocationResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+            await client.PostLocation(TestData.Locations.Home, token, problem: details => details.ShouldHaveUnauthorizedStatus());
         }
 
         [Fact]
@@ -74,8 +66,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            await client.CreateLocation(TestData.Locations.Home, token);
-            await client.CreateLocation(TestData.Locations.Cabin, token);
+            await client.PostLocation(TestData.Locations.Home, token);
+            await client.PostLocation(TestData.Locations.Cabin, token);
 
             var locations = await client.GetLocations(token);
 
@@ -83,28 +75,42 @@ namespace HeatKeeper.Server.WebApi.Tests
         }
 
         [Fact]
-        public async Task ShouldHandleDuplicateLocation()
+        public async Task ShouldHandleCreatingDuplicateLocations()
         {
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            await client.CreateLocation(TestData.Locations.Home, token);
-            var response = await client.CreateLocation(TestData.Locations.Home, token);
-
-            response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+            await client.PostLocation(TestData.Locations.Home, token);
+            await client.PostLocation(TestData.Locations.Home, token, problem: details => details.ShouldHaveConflictStatus());
         }
 
+        [Fact]
+        public async Task ShouldHandleDuplicateLocationsOnUpdate()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
 
+            await client.PostLocation(TestData.Locations.Home, token);
+            var cabinLocationId = await client.PostLocation(TestData.Locations.Cabin, token);
+
+            var updateLocationCommand = new UpdateLocationCommand()
+            {
+                Id = cabinLocationId,
+                Name = TestData.Locations.Home.Name,
+                Description = TestData.Locations.Home.Description
+            };
+
+            await client.PatchLocation(updateLocationCommand, token, problem: details => details.ShouldHaveConflictStatus());
+        }
 
         [Fact]
         public async Task ShouldCreateAndGetZones()
         {
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
-            var locationMessageResponse = await client.CreateLocation(TestData.Locations.Home, token);
-            var locationId = (await locationMessageResponse.ContentAs<CreateLocationResponse>()).Id;
-            await client.CreateZone(locationId, TestData.Zones.LivingRoom);
-            await client.CreateZone(locationId, TestData.Zones.Kitchen);
+            var locationId = await client.PostLocation(TestData.Locations.Home, token);
+            await client.PostZone(locationId, TestData.Zones.LivingRoom, token);
+            await client.PostZone(locationId, TestData.Zones.Kitchen, token);
 
             var zones = await client.GetZones(locationId);
             zones.Length.Should().Be(2);
@@ -116,14 +122,11 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
+            var homeLocationId = await client.PostLocation(TestData.Locations.Home, token);
+            var cabinLocationID = await client.PostLocation(TestData.Locations.Cabin, token);
 
-            var locationMessageResponse = await client.CreateLocation(TestData.Locations.Home, token);
-            var homeLocationId = (await locationMessageResponse.ContentAs<CreateLocationResponse>()).Id;
-            locationMessageResponse = await client.CreateLocation(TestData.Locations.Cabin, token);
-            var cabinLocationID = (await locationMessageResponse.ContentAs<CreateLocationResponse>()).Id;
-
-            await client.CreateZone(homeLocationId, TestData.Zones.LivingRoom);
-            await client.CreateZone(cabinLocationID, TestData.Zones.LivingRoom);
+            await client.PostZone(homeLocationId, TestData.Zones.LivingRoom, token);
+            await client.PostZone(cabinLocationID, TestData.Zones.LivingRoom, token);
 
             var zones = await client.GetZones(homeLocationId);
             zones.Length.Should().Be(1);
@@ -138,14 +141,10 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var locationRequestMessage = await client.CreateLocation(TestData.Locations.Home, token);
-            var locationId = (await locationRequestMessage.ContentAs<CreateLocationResponse>()).Id;
+            var locationId = await client.PostLocation(TestData.Locations.Home, token);
 
-            await client.CreateZone(locationId, TestData.Zones.LivingRoom);
-
-            var zoneRequestMessage = await client.CreateZone(locationId, TestData.Zones.LivingRoom);
-
-            zoneRequestMessage.StatusCode.Should().Be(HttpStatusCode.Conflict);
+            await client.PostZone(locationId, TestData.Zones.LivingRoom, token);
+            await client.PostZone(locationId, TestData.Zones.LivingRoom, token, problem: details => details.ShouldHaveConflictStatus());
         }
 
         [Fact]
@@ -154,11 +153,10 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var locationRequestMessage = await client.CreateLocation(TestData.Locations.Home, token);
-            var locationId = (await locationRequestMessage.ContentAs<CreateLocationResponse>()).Id;
+            var locationId = await client.PostLocation(TestData.Locations.Home, token);
 
-            await client.CreateZone(locationId, TestData.Zones.Outside);
-            await client.CreateZone(locationId, TestData.Zones.LivingRoom);
+            await client.PostZone(locationId, TestData.Zones.Outside, token);
+            await client.PostZone(locationId, TestData.Zones.LivingRoom, token);
 
             var zones = await client.GetZones(locationId);
 
@@ -177,13 +175,11 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var token = await client.AuthenticateAsAdminUser();
 
-            var createLocationResponse = await client.CreateLocation(TestData.Locations.Home, token);
-            var location = await createLocationResponse.ContentAs<CreateLocationResponse>();
+            var locationId = await client.PostLocation(TestData.Locations.Home, token);
 
-            var createUserResponse = await client.RegisterUser(TestData.Users.StandardUser, token);
-            var user = await createUserResponse.ContentAs<RegisterUserResponse>();
+            var userId = await client.PostUser(TestData.Users.StandardUser, token);
 
-            var response = await client.AddUserToLocation(location.Id, new AddUserToLocationCommand(user.Id), token);
+            var response = await client.AddUserToLocation(locationId, new AddUserToLocationCommand(userId), token);
             response.StatusCode.Should().Be(HttpStatusCode.Created);
         }
 
@@ -193,11 +189,9 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var createLocationResponseMessage = await client.CreateLocation(TestData.Locations.Home, token);
-            var locationId = (await createLocationResponseMessage.ContentAs<CreateLocationResponse>()).Id;
+            var locationId = await client.PostLocation(TestData.Locations.Home, token);
 
-            var registerUserResponseMessage = await client.RegisterUser(TestData.Users.StandardUser, token);
-            var userId = (await registerUserResponseMessage.ContentAs<RegisterUserResponse>()).Id;
+            var userId = await client.PostUser(TestData.Users.StandardUser, token);
 
             var response = await client.AddUserToLocation(locationId, new AddUserToLocationCommand(userId), token);
             response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -213,16 +207,14 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
-            var createLocationResponse = await client.CreateLocation(TestData.Locations.Home, token);
-            var location = await createLocationResponse.ContentAs<CreateLocationResponse>();
+            var locationId = await client.PostLocation(TestData.Locations.Home, token);
+            var userId = await client.PostUser(TestData.Users.StandardUser, token);
 
-            var createUserResponseMessage = await client.RegisterUser(TestData.Users.StandardUser, token);
-            var user = await createUserResponseMessage.ContentAs<RegisterUserResponse>();
 
-            var addUserLocationResponseMessage = await client.AddUserToLocation(location.Id, new AddUserToLocationCommand(user.Id), token);
+            var addUserLocationResponseMessage = await client.AddUserToLocation(locationId, new AddUserToLocationCommand(userId), token);
             addUserLocationResponseMessage.EnsureSuccessStatusCode();
 
-            var removeUserFromLocationResponseMessage = await client.RemoveUserFromRequest(location.Id, user.Id);
+            var removeUserFromLocationResponseMessage = await client.RemoveUserFromRequest(locationId, userId);
             removeUserFromLocationResponseMessage.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
     }

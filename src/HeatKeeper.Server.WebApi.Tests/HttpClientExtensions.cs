@@ -1,19 +1,17 @@
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Authentication;
-using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Host.Locations;
-using HeatKeeper.Server.Host.Users;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace HeatKeeper.Server.WebApi.Tests
@@ -25,20 +23,6 @@ namespace HeatKeeper.Server.WebApi.Tests
             var result = await client.GetAsync(requestUri);
             result.EnsureSuccessStatusCode();
             return await result.ContentAs<T>();
-        }
-
-        public static async Task<HttpResponseMessage> PostAsync<T>(this HttpClient client, string requestUri, string bearerToken, T content)
-        {
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(requestUri),
-                Content = new JsonContent(content)
-            };
-
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
-
-            return await client.SendAsync(request);
         }
 
         public static async Task<T> ContentAs<T>(this HttpResponseMessage response)
@@ -57,15 +41,9 @@ namespace HeatKeeper.Server.WebApi.Tests
             return content.Token;
         }
 
-        public static async Task<HttpResponseMessage> RegisterUser(this HttpClient client, RegisterUserCommand command, string token)
+        public static async Task<long> PostUser(this HttpClient client, RegisterUserCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
-            var postRequest = new HttpRequestBuilder()
-                .WithMethod(HttpMethod.Post)
-                .AddRequestUri("api/users")
-                .AddBearerToken(token)
-                .AddContent(new JsonContent(command))
-                .Build();
-            return await client.SendAsync(postRequest);
+            return await Post(client, $"api/users", content, token, success, problem);
         }
 
         public static async Task<HttpResponseMessage> DeleteUser(this HttpClient client, DeleteUserCommand command, string token)
@@ -142,8 +120,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             var token = await client.AuthenticateAsAdminUser();
 
             var registerUserRequest = TestData.Users.StandardUser;
-            var registerUserResponse = await client.RegisterUser(registerUserRequest, token);
-            registerUserResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+            await client.PostUser(registerUserRequest, token);
             var authenticateResponse = await client.PostAuthenticateRequest(registerUserRequest.Email, registerUserRequest.Password);
             authenticateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -162,38 +139,14 @@ namespace HeatKeeper.Server.WebApi.Tests
             return await client.SendAsync(authenticateRequest);
         }
 
-        public static async Task<HttpResponseMessage> CreateLocation(this HttpClient client, CreateLocationCommand command, string token)
-        {
-            var httpRequest = new HttpRequestBuilder()
-                .AddBearerToken(token)
-                .AddContent(new JsonContent(command))
-                .WithMethod(HttpMethod.Post)
-                .AddRequestUri("api/locations")
-                .Build();
-            return await client.SendAsync(httpRequest);
-        }
+        public static async Task<long> PostLocation(this HttpClient client, CreateLocationCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, $"api/locations", content, token, success, problem);
 
-        public static async Task<HttpResponseMessage> PatchLocation(this HttpClient client, UpdateLocationCommand command, string token)
-        {
-            var request = new HttpRequestBuilder()
-                .WithMethod(HttpMethod.Patch)
-                .AddRequestUri($"api/locations/{command.LocationId}")
-                .AddBearerToken(token)
-                .AddContent(new JsonContent(command))
-                .Build();
-            return await client.SendAsync(request);
-        }
+        public static async Task PatchLocation(this HttpClient client, UpdateLocationCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Patch(client, $"api/locations/{content.Id}", content, token, success, problem);
 
-        public static async Task<HttpResponseMessage> PatchZone(this HttpClient client, UpdateZoneCommand command, string token)
-        {
-            var request = new HttpRequestBuilder()
-                .WithMethod(HttpMethod.Patch)
-                .AddRequestUri($"api/zones/{command.ZoneId}")
-                .AddBearerToken(token)
-                .AddContent(new JsonContent(command))
-                .Build();
-            return await client.SendAsync(request);
-        }
+        public static async Task PatchZone(this HttpClient client, UpdateZoneCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Patch(client, $"api/zones/{content.ZoneId}", content, token, success, problem);
 
         public static async Task<Location[]> GetLocations(this HttpClient client, string token)
         {
@@ -207,18 +160,58 @@ namespace HeatKeeper.Server.WebApi.Tests
         }
 
 
-        public static async Task<HttpResponseMessage> CreateZone(this HttpClient client, long locationId, CreateZoneCommand request)
+        private static async Task<long> Post<TContent>(HttpClient client, string uri, TContent content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
-            var token = await client.AuthenticateAsAdminUser();
+            success ??= (response) => response.StatusCode.Should().Be(HttpStatusCode.Created);
+            problem ??= (problemDetails) => problemDetails.Should().NotBeNull();
+
             var httpRequest = new HttpRequestBuilder()
                 .AddBearerToken(token)
-                .AddJsonContent(request)
+                .AddJsonContent(content)
                 .WithMethod(HttpMethod.Post)
-                .AddRequestUri($"api/locations/{locationId}/zones")
+                .AddRequestUri(uri)
                 .Build();
-            return await client.SendAsync(httpRequest);
+
+            var response = await client.SendAsync(httpRequest);
+            if (response.IsSuccessStatusCode)
+            {
+                success(response);
+            }
+            else
+            {
+                var problemDetails = await response.ContentAs<ProblemDetails>();
+                problem(problemDetails);
+            }
+
+            return (await response.ContentAs<ResourceId>()).Id;
         }
 
+        private static async Task Patch<TContent>(HttpClient client, string uri, TContent content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        {
+            success ??= (response) => response.StatusCode.Should().Be(HttpStatusCode.OK);
+            problem ??= (problemDetails) => problemDetails.Should().NotBeNull();
+
+            var httpRequest = new HttpRequestBuilder()
+                .AddBearerToken(token)
+                .AddJsonContent(content)
+                .WithMethod(HttpMethod.Patch)
+                .AddRequestUri(uri)
+                .Build();
+
+            var response = await client.SendAsync(httpRequest);
+            if (response.IsSuccessStatusCode)
+            {
+                success(response);
+            }
+            else
+            {
+                var problemDetails = await response.ContentAs<ProblemDetails>();
+                problem(problemDetails);
+            }
+        }
+
+        public static async Task<long> PostZone(this HttpClient client, long locationId, CreateZoneCommand request, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, $"api/locations/{locationId}/zones", request, token, success, problem);
 
         public static async Task<Zone[]> GetZones(this HttpClient client, long locationId)
         {

@@ -29,11 +29,9 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var createLocationResponse = await client.CreateLocation(TestData.Locations.Home, token);
-            var locationId = (await createLocationResponse.ContentAs<CreateLocationResponse>()).Id;
+            var locationId = await client.PostLocation(TestData.Locations.Home, token);
 
-            var createZoneRequest = await client.CreateZone(locationId, TestData.Zones.LivingRoom);
-            var zoneId = (await createZoneRequest.ContentAs<ResourceId>()).Id;
+            var zoneId = await client.PostZone(locationId, TestData.Zones.LivingRoom, token);
 
             await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, token);
 
@@ -49,11 +47,9 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var createLocationResponse = await client.CreateLocation(TestData.Locations.Home, token);
-            var locationId = (await createLocationResponse.ContentAs<CreateLocationResponse>()).Id;
+            var locationId = await client.PostLocation(TestData.Locations.Home, token);
 
-            var createZoneRequest = await client.CreateZone(locationId, TestData.Zones.LivingRoom);
-            var zoneId = (await createZoneRequest.ContentAs<ResourceId>()).Id;
+            var zoneId = await client.PostZone(locationId, TestData.Zones.LivingRoom, token);
 
             await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, token);
 
@@ -75,11 +71,9 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var createLocationResponse = await client.CreateLocation(TestData.Locations.Home, token);
-            var locationId = (await createLocationResponse.ContentAs<CreateLocationResponse>()).Id;
+            var locationId = await client.PostLocation(TestData.Locations.Home, token);
+            var zoneId = await client.PostZone(locationId, TestData.Zones.LivingRoom, token);
 
-            var createZoneRequest = await client.CreateZone(locationId, TestData.Zones.LivingRoom);
-            var zoneId = (await createZoneRequest.ContentAs<ResourceId>()).Id;
 
             await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, token);
 
@@ -109,11 +103,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var createLocationResponse = await client.CreateLocation(TestData.Locations.Home, token);
-            var locationId = (await createLocationResponse.ContentAs<CreateLocationResponse>()).Id;
-
-            var createZoneRequest = await client.CreateZone(locationId, TestData.Zones.LivingRoom);
-            var zoneId = (await createZoneRequest.ContentAs<ResourceId>()).Id;
+            var locationId = await client.PostLocation(TestData.Locations.Home, token);
+            var zoneId = await client.PostZone(locationId, TestData.Zones.LivingRoom, token);
 
             var updateZoneCommand = new UpdateZoneCommand()
             {
