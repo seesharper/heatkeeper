@@ -44,7 +44,6 @@ namespace HeatKeeper.Server
                 .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>))
                 .Decorate<ICommandHandler<DeleteUserCommand>, ValidatedDeleteUserCommandHandler>()
                 .Decorate(typeof(ICommandHandler<>), typeof(MaintainDefaultZonesCommandHandler<>));
-
         }
     }
 }

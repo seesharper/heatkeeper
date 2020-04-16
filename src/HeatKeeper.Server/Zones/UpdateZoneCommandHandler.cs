@@ -27,12 +27,7 @@ namespace HeatKeeper.Server.Zones
     /// Updates the name and the description of the given zone.
     /// </summary>
     [RequireAdminRole]
-    public class UpdateZoneCommand
+    public class UpdateZoneCommand : ZoneCommand
     {
-        public long ZoneId { get; set; }
-
-        public string Name { get; set; }
-
-        public string Description { get; set; }
     }
 }
