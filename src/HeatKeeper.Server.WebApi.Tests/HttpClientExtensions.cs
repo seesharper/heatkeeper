@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Authentication;
-using HeatKeeper.Server.Host.Locations;
+using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Sensors;
@@ -119,7 +119,7 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .WithMethod(HttpMethod.Get)
                 .AddRequestUri(uri)
                 .Build();
-            var response = await client.SendAsync(httpRequest);
+            var response = await SendAndHandleRequest(client, success, problem, httpRequest);
             return await response.ContentAs<TContent>();
         }
 

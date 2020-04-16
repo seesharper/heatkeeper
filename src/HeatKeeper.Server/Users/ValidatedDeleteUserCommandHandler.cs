@@ -1,12 +1,12 @@
+using System.Data;
+using System.Data.Common;
+using System.Threading;
+using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using DbReader;
 using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Validation;
-using System.Data;
-using System.Data.Common;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace HeatKeeper.Server.Users
 {
@@ -21,7 +21,7 @@ namespace HeatKeeper.Server.Users
             this.userContext = userContext;
         }
 
-        public async Task HandleAsync(DeleteUserCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(DeleteUserCommand command, CancellationToken cancellationToken = default)
         {
             if (command.UserId == userContext.Id)
             {

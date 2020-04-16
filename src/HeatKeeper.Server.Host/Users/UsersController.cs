@@ -30,10 +30,10 @@ namespace HeatKeeper.Server.Host.Users
             => await queryExecutor.ExecuteAsync(query);
 
         [HttpPost()]
-        public async Task<ActionResult<RegisterUserResponse>> Post([FromBody]RegisterUserCommand command)
+        public async Task<ActionResult<ResourceId>> Post([FromBody]RegisterUserCommand command)
         {
             await commandExecutor.ExecuteAsync(command);
-            return Created(nameof(Post), new RegisterUserResponse(command.UserId));
+            return Created(nameof(Post), new ResourceId(command.UserId));
         }
 
         [HttpDelete("{userId}")]
@@ -48,7 +48,7 @@ namespace HeatKeeper.Server.Host.Users
             => await commandExecutor.ExecuteAsync(command);
 
         [HttpPatch()]
-        public async Task<ActionResult<RegisterUserResponse>> PatchCurrentUser([FromBodyAndRoute]UpdateCurrentUserCommand command)
+        public async Task<ActionResult<ResourceId>> PatchCurrentUser([FromBodyAndRoute]UpdateCurrentUserCommand command)
         {
             command.UserId = userContext.Id;
             await commandExecutor.ExecuteAsync(command);

@@ -29,7 +29,7 @@ namespace HeatKeeper.Server.Database
             {
                 log.Debug($"Open database connection using connection string: {configuration.ConnectionString}");
                 connection.Open();
-                var isEmpty = connection.ExecuteScalar<long>(sqlProvider.IsEmptyDatabase) == 1 ? true : false;
+                var isEmpty = connection.ExecuteScalar<long>(sqlProvider.IsEmptyDatabase) == 1;
                 if (isEmpty)
                 {
                     connection.Execute(sqlProvider.CreateDatabase);
