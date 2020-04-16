@@ -53,7 +53,7 @@ namespace HeatKeeper.Server.Host.Locations
         public async Task<IActionResult> AddUser([FromBodyAndRoute]AddUserToLocationCommand command)
         {
             await commandExecutor.ExecuteAsync(command);
-            return CreatedAtAction(nameof(AddUser), new AddUserLocationResponse(command.UserLocationId));
+            return Ok();
         }
 
         [HttpGet("{locationId}/users")]

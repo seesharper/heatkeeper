@@ -19,7 +19,7 @@ namespace HeatKeeper.Server.Locations
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task HandleAsync(UpdateLocationCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(UpdateLocationCommand command, CancellationToken cancellationToken = default)
         {
             await dbConnection.ExecuteAsync(sqlProvider.UpdateLocation, command).ConfigureAwait(false);
         }
@@ -29,13 +29,7 @@ namespace HeatKeeper.Server.Locations
     /// Updates the name and the description for the given location.
     /// </summary>
     [RequireAdminRole]
-    public class UpdateLocationCommand
+    public class UpdateLocationCommand : LocationCommand
     {
-        public long LocationId { get; set; }
-
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
     }
 }

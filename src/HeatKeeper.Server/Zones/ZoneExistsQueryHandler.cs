@@ -1,10 +1,10 @@
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Server.Database;
-using DbReader;
 using CQRS.Query.Abstractions;
+using DbReader;
 using HeatKeeper.Server.Authorization;
+using HeatKeeper.Server.Database;
 
 namespace HeatKeeper.Server.Zones
 {
@@ -20,9 +20,7 @@ namespace HeatKeeper.Server.Zones
         }
 
         public async Task<bool> HandleAsync(ZoneExistsQuery query, CancellationToken cancellationToken = default)
-        {
-            return (await dbConnection.ExecuteScalarAsync<long>(sqlProvider.ZoneExists, query)) == 1 ? true : false;
-        }
+            => (await dbConnection.ExecuteScalarAsync<long>(sqlProvider.ZoneExists, query)) == 1;
     }
 
     [RequireUserRole]

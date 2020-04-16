@@ -14,6 +14,8 @@ namespace HeatKeeper.Server.Database
 
         string GetZoneId { get; }
 
+        string UpdateZone { get; }
+
         string GetZoneDetails { get; }
 
         string InsertLocation { get; }

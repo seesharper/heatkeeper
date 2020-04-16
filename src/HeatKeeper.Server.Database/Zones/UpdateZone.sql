@@ -1,6 +1,6 @@
-UPDATE Locations
+UPDATE Zones
 SET
     name = @name,
     description = @description
 WHERE
-    id = @Id
+    id = @ZoneId

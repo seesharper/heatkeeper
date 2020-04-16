@@ -5,6 +5,9 @@
       "label": "build",
       "command": "dotnet",
       "args": ["build", "/property:GenerateFullPaths=true"],
+      "options": {
+        "cwd": "${workspaceFolder}/src"
+      },
       "type": "shell",
       "group": "build",
       "presentation": {
@@ -16,6 +19,9 @@
       "label": "rebuild",
       "command": "dotnet",
       "args": ["build", "--no-incremental", "/property:GenerateFullPaths=true"],
+      "options": {
+        "cwd": "${workspaceFolder}/src"
+      },
       "type": "shell",
       "group": "build",
       "presentation": {
@@ -28,15 +34,12 @@
       "label": "build container",
       "command": "dotnet",
       "type": "process",
+      "group": "build",
       "args": [
         "script",
         "${workspaceFolder}/../build/build.csx",
         "dockerImage"
       ],
-      "group": {
-        "kind": "build",
-        "isDefault": false
-      },
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -50,7 +53,7 @@
       "label": "test",
       "command": "dotnet",
       "type": "process",
-      "args": ["script", "${workspaceFolder}/../build/build.csx", "test"],
+      "args": ["script", "${workspaceFolder}/build/build.csx", "test"],
       "problemMatcher": "$msCompile",
       "group": {
         "kind": "test",
@@ -69,11 +72,7 @@
       "label": "test with coverage",
       "command": "dotnet",
       "type": "process",
-      "args": [
-        "script",
-        "${workspaceFolder}/../build/build.csx",
-        "testcoverage"
-      ],
+      "args": ["script", "${workspaceFolder}/build/build.csx", "testcoverage"],
       "problemMatcher": "$msCompile",
       "group": {
         "kind": "test",

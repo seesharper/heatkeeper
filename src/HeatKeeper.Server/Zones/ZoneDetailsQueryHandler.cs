@@ -1,12 +1,11 @@
 using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
-using HeatKeeper.Server.Database;
-using DbReader;
-using System.Linq;
 using CQRS.Query.Abstractions;
+using DbReader;
 using HeatKeeper.Server.Authorization;
+using HeatKeeper.Server.Database;
 
 namespace HeatKeeper.Server.Zones
 {
@@ -21,7 +20,7 @@ namespace HeatKeeper.Server.Zones
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task<ZoneDetails> HandleAsync(ZoneDetailsQuery query, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<ZoneDetails> HandleAsync(ZoneDetailsQuery query, CancellationToken cancellationToken = default)
         {
             return (await dbConnection.ReadAsync<ZoneDetails>(sqlProvider.GetZoneDetails, query)).Single();
         }
