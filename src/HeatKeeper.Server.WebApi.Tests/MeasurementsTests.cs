@@ -18,7 +18,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             var token = await client.AuthenticateAsAdminUser();
             var apiKey = await client.GetApiKey(token);
 
-            var response = await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, apiKey);
+            var response = await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, apiKey.Token);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             response.EnsureSuccessStatusCode();

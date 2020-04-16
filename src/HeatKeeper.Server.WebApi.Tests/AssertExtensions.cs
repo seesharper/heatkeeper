@@ -14,5 +14,10 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
             httpStatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
+
+        public static void ShouldBeOK(this HttpStatusCode httpStatusCode)
+        {
+            httpStatusCode.Should().Be(HttpStatusCode.OK);
+        }
     }
 }

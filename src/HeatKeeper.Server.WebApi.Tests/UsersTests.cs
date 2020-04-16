@@ -1,14 +1,10 @@
 
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
-using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Database;
-using HeatKeeper.Server.Host.Users;
 using HeatKeeper.Server.Users;
-using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests
@@ -19,22 +15,23 @@ namespace HeatKeeper.Server.WebApi.Tests
         public async Task ShouldAuthenticateAdminUser()
         {
             var client = Factory.CreateClient();
-            var response = await client.AuthenticateUser(TestData.AuthenticateAdminUserRequest);
-            var content = await response.ContentAs<AuthenticatedUserQueryResult>();
+            var authenticatedUser = await client.GetAuthenticatedUser(TestData.AuthenticateAdminUserRequest, success: response => response.StatusCode.ShouldBeOK());
 
-            content.IsAdmin.Should().BeTrue();
-            content.FirstName.Should().Be(AdminUser.DefaultFirstName);
-            content.LastName.Should().Be(AdminUser.DefaultLastName);
-            content.Email.Should().Be(AdminUser.DefaultEmail);
-            content.Token.Should().NotBeEmpty();
+            authenticatedUser.IsAdmin.Should().BeTrue();
+            authenticatedUser.FirstName.Should().Be(AdminUser.DefaultFirstName);
+            authenticatedUser.LastName.Should().Be(AdminUser.DefaultLastName);
+            authenticatedUser.Email.Should().Be(AdminUser.DefaultEmail);
+            authenticatedUser.Token.Should().NotBeEmpty();
         }
 
         [Fact]
         public async Task ShouldNotAuthenticateAdminUserWithInvalidPassword()
         {
             var client = Factory.CreateClient();
-            var response = await client.AuthenticateUser(TestData.InvalidAuthenticateAdminUserRequest);
-            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            var response = await client.GetAuthenticatedUser(
+                TestData.InvalidAuthenticateAdminUserRequest,
+                success: response => response.StatusCode.ShouldBeOK(),
+                problem: details => details.ShouldHaveUnauthorizedStatus());
         }
 
         [Fact]
@@ -43,30 +40,21 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            await client.PostUser(TestData.Users.StandardUser, token);
-            await client.PostUser(TestData.Users.AnotherStandardUser, token);
+            await client.CreateUser(TestData.Users.StandardUser, token);
+            await client.CreateUser(TestData.Users.AnotherStandardUser, token);
 
-            var allUsersResponse = await client.GetAllUsers(token);
-            var users = await allUsersResponse.ContentAs<User[]>();
-
+            var users = await client.GetAllUsers(token);
             users.Where(u => u.Email != AdminUser.DefaultEmail).Count().Should().Be(2);
         }
 
         [Fact]
-        public async Task ShouldCreateApiKey()
+        public async Task ShouldGetApiKey()
         {
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var request = new HttpRequestBuilder()
-                .WithMethod(HttpMethod.Get)
-                .AddRequestUri("api/users/apikey")
-                .AddBearerToken(token)
-                .Build();
+            var apiKey = await client.GetApiKey(token);
 
-            var responseMessage = await client.SendAsync(request);
-            var apiKey = await responseMessage.ContentAs<ApiKey>();
-            responseMessage.EnsureSuccessStatusCode();
             apiKey.Token.Should().NotBeEmpty();
         }
 
@@ -97,7 +85,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
-            var userId = await client.PostUser(TestData.Users.StandardUser, token);
+            var userId = await client.CreateUser(TestData.Users.StandardUser, token);
 
             var updateCommand = new UpdateUserCommand()
             {
@@ -108,8 +96,7 @@ namespace HeatKeeper.Server.WebApi.Tests
                 IsAdmin = true
             };
 
-            var response = await client.PatchUser(updateCommand, token);
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            await client.UpdateUser(updateCommand, token);
         }
 
         [Fact]
@@ -124,8 +111,7 @@ namespace HeatKeeper.Server.WebApi.Tests
                 Email = TestData.Users.StandardUser.Email,
             };
 
-            var response = await client.PatchCurrentUser(updateCommand, token);
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            await client.UpdateCurrentUser(updateCommand, token);
         }
 
         [Theory]
@@ -139,14 +125,12 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            await client.PostUser(TestData.Users.StandardUserWithGivenPassword(password), token, async response =>
+            await client.CreateUser(TestData.Users.StandardUserWithGivenPassword(password), token, problem: details =>
             {
-                response.StatusCode.ShouldBeBadRequest();
-                var problemDetails = await response.ContentAs<ProblemDetails>();
-                problemDetails.Detail.Should().Be(errorMessage);
+                details.ShouldHaveBadRequestStatus();
+                details.Detail.Should().Be(errorMessage);
             });
         }
-
 
         [Theory]
         [InlineData("PASSWORD", "Password should contain at least one lower case letter")]
@@ -160,11 +144,11 @@ namespace HeatKeeper.Server.WebApi.Tests
             var token = await client.AuthenticateAsAdminUser();
             var changePasswordCommand = new ChangePasswordCommand(AdminUser.DefaultPassword, password, password);
 
-            var responseMessage = await client.ChangePassword(changePasswordCommand, token);
-
-            responseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            var problemDetails = await responseMessage.ContentAs<ProblemDetails>();
-            problemDetails.Detail.Should().Be(errorMessage);
+            await client.ChangePassword(changePasswordCommand, token, problem: details =>
+            {
+                details.ShouldHaveBadRequestStatus();
+                details.Detail.Should().Be(errorMessage);
+            });
         }
 
         [Fact]
@@ -173,14 +157,11 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            client.PostUser(TestData.Users.StandardUserWithInvalidEmail, token, async response =>
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-                var problemDetails = await response.ContentAs<ProblemDetails>();
-                problemDetails.Detail.Should().Be("The mail address 'InvalidMailAddress' is not correctly formatted.");
-            }).Wait();
-
-
+            await client.CreateUser(TestData.Users.StandardUserWithInvalidEmail, token, problem: details =>
+           {
+               details.ShouldHaveBadRequestStatus();
+               details.Detail.Should().Be("The mail address 'InvalidMailAddress' is not correctly formatted.");
+           });
         }
 
         [Fact]
@@ -189,19 +170,14 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var userId = await client.PostUser(TestData.Users.StandardUser, token);
+            var userId = await client.CreateUser(TestData.Users.StandardUser, token);
 
-            var allUsersResponse = await client.GetAllUsers(token);
-            var allUsers = await allUsersResponse.ContentAs<User[]>();
-
+            var allUsers = await client.GetAllUsers(token);
             allUsers.Should().Contain(u => u.Email == TestData.Users.StandardUser.Email);
 
-            var deleteUserResponse = await client.DeleteUser(new DeleteUserCommand() { UserId = userId }, token);
-            deleteUserResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            await client.DeleteUser(userId, token);
 
-            allUsersResponse = await client.GetAllUsers(token);
-            allUsers = await allUsersResponse.ContentAs<User[]>();
-
+            allUsers = await client.GetAllUsers(token);
             allUsers.Should().NotContain(u => u.Email == TestData.Users.StandardUser.Email);
         }
 
@@ -211,13 +187,10 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var allUsersResponse = await client.GetAllUsers(token);
-            var allUsers = await allUsersResponse.ContentAs<User[]>();
-
+            var allUsers = await client.GetAllUsers(token);
             var adminUser = allUsers.Single(u => u.Email == AdminUser.DefaultEmail);
 
-            var deleteUserResponse = await client.DeleteUser(new DeleteUserCommand() { UserId = adminUser.Id }, token);
-            deleteUserResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            await client.DeleteUser(adminUser.Id, token, problem: details => details.ShouldHaveBadRequestStatus());
         }
 
         [Fact]
@@ -226,8 +199,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var allUsersResponse = await client.GetAllUsers(token);
-            var allUsers = await allUsersResponse.ContentAs<User[]>();
+            var allUsers = await client.GetAllUsers(token);
 
             var adminUser = allUsers.Single(u => u.Email == AdminUser.DefaultEmail);
 
@@ -240,9 +212,7 @@ namespace HeatKeeper.Server.WebApi.Tests
                 IsAdmin = false
             };
 
-            var response = await client.PatchUser(updateCommand, token);
-            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
+            await client.UpdateUser(updateCommand, token, problem: details => details.ShouldHaveBadRequestStatus());
         }
     }
 }

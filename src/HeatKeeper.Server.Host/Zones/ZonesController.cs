@@ -1,4 +1,3 @@
-using System.Net;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
@@ -25,25 +24,17 @@ namespace HeatKeeper.Server.Host.Zones
         public async Task Patch([FromBodyAndRoute] UpdateZoneCommand updateZoneCommand)
            => await commandExecutor.ExecuteAsync(updateZoneCommand).ConfigureAwait(false);
 
-
         [HttpGet("{zoneId}")]
         public async Task<ZoneDetails> GetZoneDetails([FromRoute]ZoneDetailsQuery query)
-        {
-            return await queryExecutor.ExecuteAsync(query);
-        }
+            => await queryExecutor.ExecuteAsync(query);
 
         [HttpGet("{zoneId}/sensors")]
         public async Task<Sensor[]> GetSensors([FromRoute]SensorsByZoneQuery query)
-        {
-            return await queryExecutor.ExecuteAsync(query);
-        }
+            => await queryExecutor.ExecuteAsync(query);
 
         [HttpPost("{zoneId}/sensors")]
-        public async Task<IActionResult> AddSensorToZone([FromBodyAndRoute] AddSensorToZoneCommand command)
-        {
-            await commandExecutor.ExecuteAsync(command);
-            return new StatusCodeResult((int)HttpStatusCode.Created);
-        }
+        public async Task AddSensorToZone([FromBodyAndRoute] AddSensorToZoneCommand command)
+            => await commandExecutor.ExecuteAsync(command);
 
         [HttpDelete("{zoneId}/sensors")]
         public async Task<IActionResult> RemoveSensorFromZone([FromBodyAndRoute] RemoveSensorFromZoneCommand command)

@@ -1,15 +1,15 @@
-using System.Threading;
-using System.Threading.Tasks;
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using System;
+using System.Threading;
+using System.Threading.Tasks;
 using CQRS.Query.Abstractions;
-using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Authentication;
+using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Users
 {
-    public class AuthenticatedUserQueryHandler : IQueryHandler<AuthenticatedUserQuery, AuthenticatedUserQueryResult>
+    public class AuthenticatedUserQueryHandler : IQueryHandler<AuthenticatedUserQuery, AuthenticatedUser>
     {
         private readonly IPasswordManager passwordManager;
         private readonly ITokenProvider tokenProvider;
@@ -22,7 +22,7 @@ namespace HeatKeeper.Server.Users
             this.queryExecutor = queryExecutor;
         }
 
-        public async Task<AuthenticatedUserQueryResult> HandleAsync(AuthenticatedUserQuery query, CancellationToken cancellationToken = default)
+        public async Task<AuthenticatedUser> HandleAsync(AuthenticatedUserQuery query, CancellationToken cancellationToken = default)
         {
             var user = await queryExecutor.ExecuteAsync(new GetUserQuery(query.Email));
 
@@ -42,12 +42,12 @@ namespace HeatKeeper.Server.Users
 
             var token = tokenProvider.CreateToken(claims, DateTime.UtcNow.AddDays(7));
 
-            return new AuthenticatedUserQueryResult(token, user.Id, user.Email, user.FirstName, user.LastName, user.IsAdmin);
+            return new AuthenticatedUser(token, user.Id, user.Email, user.FirstName, user.LastName, user.IsAdmin);
         }
     }
 
     [RequireAnonymousRole]
-    public class AuthenticatedUserQuery : IQuery<AuthenticatedUserQueryResult>
+    public class AuthenticatedUserQuery : IQuery<AuthenticatedUser>
     {
         public AuthenticatedUserQuery(string email, string password)
         {
@@ -60,9 +60,9 @@ namespace HeatKeeper.Server.Users
 
     }
 
-    public class AuthenticatedUserQueryResult
+    public class AuthenticatedUser
     {
-        public AuthenticatedUserQueryResult(string token, long id, string email, string firstName, string lastName, bool isAdmin)
+        public AuthenticatedUser(string token, long id, string email, string firstName, string lastName, bool isAdmin)
         {
             Token = token;
             Id = id;

@@ -19,7 +19,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public async Task ShouldGetZonesForLocation()
         {
             var client = Factory.CreateClient();
-            await client.GetZones(12);
+            var token = await client.AuthenticateAsAdminUser();
+            await client.GetZones(12, token);
 
         }
 
@@ -29,14 +30,13 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var locationId = await client.PostLocation(TestData.Locations.Home, token);
+            var locationId = await client.CreateLocation(TestData.Locations.Home, token);
 
-            var zoneId = await client.PostZone(locationId, TestData.Zones.LivingRoom, token);
+            var zoneId = await client.CreateZone(locationId, TestData.Zones.LivingRoom, token);
 
             await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, token);
 
-            var getSensorsResponse = await client.GetSensors(token, zoneId);
-            var sensors = await getSensorsResponse.ContentAs<Sensor[]>();
+            var sensors = await client.GetSensors(zoneId, token);
 
             sensors.Length.Should().Be(1);
         }
@@ -47,21 +47,18 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var locationId = await client.PostLocation(TestData.Locations.Home, token);
+            var locationId = await client.CreateLocation(TestData.Locations.Home, token);
 
-            var zoneId = await client.PostZone(locationId, TestData.Zones.LivingRoom, token);
+            var zoneId = await client.CreateZone(locationId, TestData.Zones.LivingRoom, token);
 
             await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, token);
 
-            var getSensorsResponse = await client.GetSensors(token, zoneId);
-            var sensors = await getSensorsResponse.ContentAs<Sensor[]>();
+            var sensors = await client.GetSensors(zoneId, token);
 
-            var addSensorResponse = await client.AddSensorToZone(new AddSensorToZoneCommand() { ZoneId = zoneId, SensorId = sensors[0].Id }, token);
-            addSensorResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+            await client.AddSensorToZone(zoneId, new AddSensorToZoneCommand() { SensorId = sensors[0].Id }, token);
 
-            getSensorsResponse = await client.GetSensors(token, zoneId);
-            sensors = await getSensorsResponse.ContentAs<Sensor[]>();
 
+            sensors = await client.GetSensors(zoneId, token);
             sensors[0].ZoneId.Should().Be(zoneId);
         }
 
@@ -71,29 +68,24 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var locationId = await client.PostLocation(TestData.Locations.Home, token);
-            var zoneId = await client.PostZone(locationId, TestData.Zones.LivingRoom, token);
-
+            var locationId = await client.CreateLocation(TestData.Locations.Home, token);
+            var zoneId = await client.CreateZone(locationId, TestData.Zones.LivingRoom, token);
 
             await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, token);
 
-            var getSensorsResponse = await client.GetSensors(token, zoneId);
-            var sensors = await getSensorsResponse.ContentAs<Sensor[]>();
+            var sensors = await client.GetSensors(zoneId, token);
 
-            var addSensorResponse = await client.AddSensorToZone(new AddSensorToZoneCommand() { ZoneId = zoneId, SensorId = sensors[0].Id }, token);
-            addSensorResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+            await client.AddSensorToZone(zoneId, new AddSensorToZoneCommand() { SensorId = sensors[0].Id }, token);
 
-            getSensorsResponse = await client.GetSensors(token, zoneId);
-            sensors = await getSensorsResponse.ContentAs<Sensor[]>();
+
+            sensors = await client.GetSensors(zoneId, token);
 
             sensors[0].ZoneId.Should().Be(zoneId);
 
             var removeSensorResponse = await client.RemoveSensorFromZone(new RemoveSensorFromZoneCommand() { SensorId = sensors[0].Id, ZoneId = zoneId }, token);
             removeSensorResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-            getSensorsResponse = await client.GetSensors(token, zoneId);
-            sensors = await getSensorsResponse.ContentAs<Sensor[]>();
-
+            sensors = await client.GetSensors(zoneId, token);
             sensors[0].ZoneId.Should().BeNull();
         }
 
@@ -103,8 +95,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
-            var locationId = await client.PostLocation(TestData.Locations.Home, token);
-            var zoneId = await client.PostZone(locationId, TestData.Zones.LivingRoom, token);
+            var locationId = await client.CreateLocation(TestData.Locations.Home, token);
+            var zoneId = await client.CreateZone(locationId, TestData.Zones.LivingRoom, token);
 
             var updateZoneCommand = new UpdateZoneCommand()
             {
@@ -113,14 +105,12 @@ namespace HeatKeeper.Server.WebApi.Tests
                 Description = TestData.Zones.Kitchen.Description
             };
 
-            await client.PatchZone(updateZoneCommand, token);
+            await client.UpdateZone(updateZoneCommand, token);
 
-            var updatedZone = (await client.GetZones(locationId)).Single();
+            var updatedZone = (await client.GetZones(locationId, token)).Single();
 
             updatedZone.Name.Should().Be(TestData.Zones.Kitchen.Name);
             updatedZone.Description.Should().Be(TestData.Zones.Kitchen.Description);
         }
-
-
     }
 }

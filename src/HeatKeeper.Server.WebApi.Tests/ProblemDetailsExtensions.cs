@@ -15,5 +15,10 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
             ((HttpStatusCode)problemDetails.Status).Should().Be(HttpStatusCode.Unauthorized);
         }
+
+        public static void ShouldHaveBadRequestStatus(this ProblemDetails problemDetails)
+        {
+            ((HttpStatusCode)problemDetails.Status).Should().Be(HttpStatusCode.BadRequest);
+        }
     }
 }
