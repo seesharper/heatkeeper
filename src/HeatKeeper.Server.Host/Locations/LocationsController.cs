@@ -63,10 +63,7 @@ namespace HeatKeeper.Server.Host.Locations
 
         [HttpDelete("{locationId}/users/{userId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> RemoveUser([FromRoute]DeleteUserLocationCommand command)
-        {
-            await commandExecutor.ExecuteAsync(command);
-            return NoContent();
-        }
+        public async Task RemoveUser([FromRoute]DeleteUserLocationCommand command)
+            => await commandExecutor.ExecuteAsync(command);
     }
 }

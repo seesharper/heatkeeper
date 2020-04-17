@@ -14,6 +14,12 @@ namespace HeatKeeper.Server.Database
 
         string GetZoneId { get; }
 
+        string ClearZoneFromAllSensors { get; }
+
+        string ClearZoneFromAllLocations { get; }
+
+        string DeleteZone { get; }
+
         string UpdateZone { get; }
 
         string GetZoneDetails { get; }

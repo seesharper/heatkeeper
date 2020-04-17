@@ -43,6 +43,7 @@ namespace HeatKeeper.Server.Host
             services.AddMvc(options =>
             {
                 options.Filters.Add<GlobalExceptionFilter>();
+                options.Filters.Add<DeleteActionFilter>();
                 var bodyModelBinderProvider = options.ModelBinderProviders.Single(p => p.GetType() == typeof(BodyModelBinderProvider));
                 options.ModelBinderProviders.Insert(0, new RouteAndBodyBinderProvider(bodyModelBinderProvider));
             }).AddControllersAsServices().AddNewtonsoftJson();

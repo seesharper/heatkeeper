@@ -37,6 +37,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<long> CreateUser(this HttpClient client, RegisterUserCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/users", content, token, success, problem);
 
+        public static async Task DeleteZone(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Delete(client, $"api/zones/{zoneId}", token, success, problem);
+
         public static async Task Delete(HttpClient client, string uri, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
             success ??= (response) => response.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -167,7 +170,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             }
             else
             {
-                problem.Should().NotBeNull("There was a problem handling the request and this was not not handled in the calling test method");
+                problem.Should().NotBeNull($"There was a problem handling the request and this was not not handled in the calling test method. The status code was ({(int)response.StatusCode}) {response.StatusCode}");
                 var problemDetails = await response.ContentAs<ProblemDetails>();
                 problem(problemDetails);
             }
