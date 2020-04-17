@@ -206,6 +206,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<long> CreateZone(this HttpClient client, long locationId, CreateZoneCommand request, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/locations/{locationId}/zones", request, token, success, problem);
 
+        public static async Task DeleteLocation(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Delete(client, $"api/locations/{locationId}", token, success, problem);
+
         public static async Task<Zone[]> GetZones(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<Zone[]>(client, $"api/locations/{locationId}/zones", token, success, problem);
 

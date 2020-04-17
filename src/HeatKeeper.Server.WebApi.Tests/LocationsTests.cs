@@ -205,5 +205,21 @@ namespace HeatKeeper.Server.WebApi.Tests
             var locationUsers = await client.GetUsersByLocation(locationId, token);
             locationUsers.Length.Should().Be(1);
         }
+
+        [Fact]
+        public async Task ShouldDeleteLocation()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+
+            var locationId = await client.CreateLocation(TestData.Locations.Home, token);
+            await client.CreateZone(locationId, TestData.Zones.Outside, token);
+
+            (await client.GetLocations(token)).Should().NotBeEmpty();
+
+            await client.DeleteLocation(locationId, token);
+
+            (await client.GetLocations(token)).Should().BeEmpty();
+        }
     }
 }
