@@ -30,6 +30,10 @@ namespace HeatKeeper.Server.Database
 
         string GetAllLocations { get; }
 
+        string DeleteLocation { get; }
+
+        string DeleteAllUsersFromLocation { get; }
+
         string GetLocationId { get; }
 
         string InsertMeasurement { get; }

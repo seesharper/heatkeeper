@@ -11,7 +11,7 @@ namespace HeatKeeper.Server.Host
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            if (context.HttpContext.Request.Method == "DELETE")
+            if (context.HttpContext.Request.Method == "DELETE" && context.HttpContext.Response.StatusCode == (int)HttpStatusCode.OK)
             {
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.NoContent;
             }

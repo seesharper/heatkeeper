@@ -29,6 +29,10 @@ namespace HeatKeeper.Server.Host.Locations
             return CreatedAtAction(nameof(Post), new CreateLocationResponse(command.Id));
         }
 
+        [HttpDelete("{locationId}")]
+        public async Task Delete([FromRoute] DeleteLocationCommand command)
+            => await commandExecutor.ExecuteAsync(command);
+
         [HttpPatch("{locationId}")]
         public async Task Patch([FromBodyAndRoute] UpdateLocationCommand updateLocationCommand)
             => await commandExecutor.ExecuteAsync(updateLocationCommand).ConfigureAwait(false);
