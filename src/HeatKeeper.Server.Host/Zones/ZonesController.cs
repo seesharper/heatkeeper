@@ -24,6 +24,10 @@ namespace HeatKeeper.Server.Host.Zones
         public async Task Patch([FromBodyAndRoute] UpdateZoneCommand updateZoneCommand)
            => await commandExecutor.ExecuteAsync(updateZoneCommand);
 
+        [HttpDelete("{zoneId}")]
+        public async Task Delete([FromRoute] DeleteZoneCommand deleteZoneCommand)
+            => await commandExecutor.ExecuteAsync(deleteZoneCommand);
+
         [HttpGet("{zoneId}")]
         public async Task<ZoneDetails> GetZoneDetails([FromRoute]ZoneDetailsQuery query)
             => await queryExecutor.ExecuteAsync(query);
@@ -37,10 +41,7 @@ namespace HeatKeeper.Server.Host.Zones
             => await commandExecutor.ExecuteAsync(command);
 
         [HttpDelete("{zoneId}/sensors")]
-        public async Task<IActionResult> RemoveSensorFromZone([FromBodyAndRoute] RemoveSensorFromZoneCommand command)
-        {
-            await commandExecutor.ExecuteAsync(command);
-            return NoContent();
-        }
+        public async Task RemoveSensorFromZone([FromBodyAndRoute] RemoveSensorFromZoneCommand command)
+            => await commandExecutor.ExecuteAsync(command);
     }
 }

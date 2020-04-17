@@ -2,7 +2,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
-using HeatKeeper.Server.Host.Locations;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Zones;
 using Xunit;
@@ -111,6 +110,23 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             updatedZone.Name.Should().Be(TestData.Zones.Kitchen.Name);
             updatedZone.Description.Should().Be(TestData.Zones.Kitchen.Description);
+        }
+
+        [Fact]
+        public async Task ShouldDeleteZone()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+
+            var locationId = await client.CreateLocation(TestData.Locations.Home, token);
+            var zoneId = await client.CreateZone(locationId, TestData.Zones.LivingRoom, token);
+
+            (await client.GetZones(locationId, token)).Should().NotBeEmpty();
+
+            await client.DeleteZone(zoneId, token);
+
+            (await client.GetZones(locationId, token)).Should().BeEmpty();
+
         }
     }
 }
