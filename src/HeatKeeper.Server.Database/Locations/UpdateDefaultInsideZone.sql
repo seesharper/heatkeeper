@@ -1,4 +1,4 @@
 UPDATE Locations
 SET DefaultInsideZoneId = @ZoneId
-WHERE Id = @LocationId
+WHERE Id = (SELECT LocationId from zones where id = @ZoneId)
 

@@ -1,3 +1,3 @@
 UPDATE Locations
 SET DefaultOutsideZoneId = @ZoneId
-WHERE Id = @LocationId
+WHERE Id = (SELECT LocationId from zones where id = @ZoneId)
