@@ -27,7 +27,7 @@ namespace HeatKeeper.Server.Zones
                 throw new HeatKeeperConflictException($"Zone {command.Name} already exists for location {command.Name}");
             }
 
-            if (command.UseAsDefaultInsideZone && command.UseAsDefaultOutsideZone)
+            if (command.IsDefaultInsideZone && command.IsDefaultOutsideZone)
             {
                 throw new ValidationFailedException("A zone cannot be a default outside zone and a default inside zone at the same time.");
             }

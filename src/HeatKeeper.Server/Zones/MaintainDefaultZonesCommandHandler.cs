@@ -1,7 +1,7 @@
-using CQRS.Command.Abstractions;
-using HeatKeeper.Server.Locations;
 using System.Threading;
 using System.Threading.Tasks;
+using CQRS.Command.Abstractions;
+using HeatKeeper.Server.Locations;
 
 namespace HeatKeeper.Server.Zones
 {
@@ -19,7 +19,7 @@ namespace HeatKeeper.Server.Zones
         public async Task HandleAsync(TCommand command, CancellationToken cancellationToken = default)
         {
             await handler.HandleAsync(command);
-            if (command.UseAsDefaultInsideZone)
+            if (command.IsDefaultInsideZone)
             {
                 await commandExecutor.ExecuteAsync(new UpdateDefaultInsideZoneCommand() { LocationId = command.LocationId, ZoneId = command.ZoneId });
             }
@@ -28,7 +28,7 @@ namespace HeatKeeper.Server.Zones
                 await commandExecutor.ExecuteAsync(new ClearDefaultInsideZoneCommand() { LocationId = command.LocationId, ZoneId = command.ZoneId });
             }
 
-            if (command.UseAsDefaultOutsideZone)
+            if (command.IsDefaultOutsideZone)
             {
                 await commandExecutor.ExecuteAsync(new UpdateDefaultOutsideZoneCommand() { LocationId = command.LocationId, ZoneId = command.ZoneId });
             }

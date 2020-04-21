@@ -6,7 +6,7 @@ namespace HeatKeeper.Server.Zones
         public long LocationId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public bool UseAsDefaultInsideZone { get; set; }
-        public bool UseAsDefaultOutsideZone { get; set; }
+        public bool IsDefaultInsideZone { get; set; }
+        public bool IsDefaultOutsideZone { get; set; }
     }
 }
