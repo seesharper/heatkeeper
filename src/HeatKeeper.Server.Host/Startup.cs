@@ -49,7 +49,7 @@ namespace HeatKeeper.Server.Host
             }).AddControllersAsServices().AddNewtonsoftJson();
 
             services.AddJwtAuthentication(appConfig);
-
+            services.AddSpaStaticFiles(config => config.RootPath = "wwwroot");
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Heatkeeper", Version = "v1" });
@@ -90,6 +90,8 @@ namespace HeatKeeper.Server.Host
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseStaticFiles();
+            app.UseSpaStaticFiles();
+            app.UseSpa(config => config.Options.SourcePath = "wwwroot");
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
