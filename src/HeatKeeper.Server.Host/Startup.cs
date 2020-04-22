@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Host.Swagger;
@@ -62,7 +63,7 @@ namespace HeatKeeper.Server.Host
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseMigrator databaseMigrator)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseMigrator databaseMigrator, ApplicationConfiguration applicationConfiguration)
         {
             databaseMigrator.Migrate();
 
@@ -83,6 +84,10 @@ namespace HeatKeeper.Server.Host
             }
             else
             {
+                if (applicationConfiguration.Secret == DefaultSecret.Value)
+                {
+                    throw new Exception("Cannot run in production with the default secret.");
+                }
                 app.UseDeveloperExceptionPage();
             }
 

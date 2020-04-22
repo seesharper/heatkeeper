@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using HeatKeeper.Abstractions.Logging;
 using HeatKeeper.Server.Authentication;
