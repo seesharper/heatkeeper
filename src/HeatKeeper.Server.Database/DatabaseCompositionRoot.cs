@@ -1,6 +1,7 @@
 using System.Data;
 using System.Data.SQLite;
 using DbReader;
+using HeatKeeper.Server.Database.Migrations;
 using LightInject;
 using ResourceReader;
 

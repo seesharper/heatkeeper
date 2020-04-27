@@ -1,0 +1,1 @@
+SELECT ZoneId FROM Sensors s WHERE s.ExternalId = @ExternalSensorId

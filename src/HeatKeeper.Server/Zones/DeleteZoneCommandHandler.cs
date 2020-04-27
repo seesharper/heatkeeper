@@ -19,7 +19,7 @@ namespace HeatKeeper.Server.Zones
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task HandleAsync(DeleteZoneCommand command, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task HandleAsync(DeleteZoneCommand command, CancellationToken cancellationToken = default)
         {
             await dbConnection.ExecuteAsync(sqlProvider.ClearZoneFromAllSensors, command);
             await dbConnection.ExecuteAsync(sqlProvider.ClearZoneFromAllLocations, command);

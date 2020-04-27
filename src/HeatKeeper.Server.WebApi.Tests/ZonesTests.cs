@@ -37,7 +37,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var sensors = await client.GetSensors(zoneId, token);
 
-            sensors.Length.Should().Be(1);
+            sensors.Length.Should().Be(2);
         }
 
         [Fact]

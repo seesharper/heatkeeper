@@ -93,5 +93,19 @@ namespace HeatKeeper.Server.Database
         string ClearDefaultInsideZone { get; }
 
         string ClearDefaultOutsideZone { get; }
+
+        string GetZoneIdByExternalSensorId { get; }
+
+        string LatestZoneMeasurementExists { get; }
+
+        string InsertLatestZoneMeasurement { get; }
+
+        string UpdateLatestZoneMeasurement { get; }
+
+        string GetVersionInfo { get; }
+
+        string CreateLatestZoneMeasurementsTable { get; }
+
+        string GetAllDashboardLocations { get; }
     }
 }

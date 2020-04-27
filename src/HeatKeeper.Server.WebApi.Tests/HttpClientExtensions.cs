@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Authentication;
+using HeatKeeper.Server.Dashboard;
 using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
@@ -68,6 +69,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<AppVersion> GetAppVersion(this HttpClient client)
             => await Get<AppVersion>(client, "api/version", string.Empty);
 
+        public static async Task<DashboardLocation[]> GetDashboardLocations(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Get<DashboardLocation[]>(client, "api/dashboard/locations", token, success, problem);
 
         public static async Task AddUserToLocation(this HttpClient client, long locationId, AddUserToLocationCommand addUserLocationRequest, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
@@ -224,16 +227,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<ApiKey> GetApiKey(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ApiKey>(client, "api/users/apikey", token, success, problem);
 
-        public static async Task<HttpResponseMessage> CreateMeasurement(this HttpClient client, CreateMeasurementCommand[] requests, string token)
-        {
-            var httpRequest = new HttpRequestBuilder()
-                .AddBearerToken(token)
-                .AddJsonContent(requests)
-                .WithMethod(HttpMethod.Post)
-                .AddRequestUri($"api/measurements")
-                .Build();
-            return await client.SendAsync(httpRequest);
-        }
+        public static async Task CreateMeasurement(this HttpClient client, MeasurementCommand[] requests, string token)
+            => await PostWithNoResponse(client, "api/measurements/", requests, token);
 
         public static async Task UpdateUser(this HttpClient client, UpdateUserCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/users/{command.UserId}", command, token, success, problem);

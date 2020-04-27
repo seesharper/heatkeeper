@@ -99,7 +99,7 @@
       "    }",
       "}"
     ],
-    "description": "public class"
+    "description": "public interface"
   },
   "public async method": {
     "prefix": "pas",

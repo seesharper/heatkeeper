@@ -20,8 +20,21 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static AuthenticatedUserQuery AuthenticateAdminUserRequest =>
             new AuthenticatedUserQuery(AdminUser.DefaultEmail, AdminUser.DefaultPassword);
 
-        public static CreateMeasurementCommand[] TemperatureMeasurementRequests =>
-            new[] { new CreateMeasurementCommand("SensorID1", MeasurementType.Temperature, 23.7, DateTime.UtcNow) };
+        public static MeasurementCommand[] TemperatureMeasurementRequests =>
+            new[]
+                {
+                    Measurements.LivingRoomTemperatureMeasurement,
+                    Measurements.LivingRoomHumidityMeasurement,
+                    Measurements.OutsideTemperatureMeasurement,
+
+                };
+
+        public static class Measurements
+        {
+            public static MeasurementCommand LivingRoomTemperatureMeasurement => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Temperature, 23.7, DateTime.UtcNow);
+            public static MeasurementCommand LivingRoomHumidityMeasurement => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Humidity, 39.3, DateTime.UtcNow);
+            public static MeasurementCommand OutsideTemperatureMeasurement => new MeasurementCommand(Sensors.OutsideSensor, MeasurementType.Temperature, 10.2, DateTime.UtcNow);
+        }
 
         public static class Locations
         {
@@ -59,6 +72,13 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             public static RegisterUserCommand StandardUserWithInvalidEmail =>
                 new RegisterUserCommand() { Email = "InvalidMailAddress", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
+        }
+
+        public static class Sensors
+        {
+            public static string LivingRoomSensor = "SensorID1";
+
+            public static string OutsideSensor = "SensorID2";
         }
     }
 }
