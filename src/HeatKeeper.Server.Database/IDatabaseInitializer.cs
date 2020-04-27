@@ -33,10 +33,8 @@ namespace HeatKeeper.Server.Database
                 log.Debug($"Open database connection using connection string: {configuration.ConnectionString}");
                 connection.Open();
                 var appliedVersions = GetDatabaseVersion(connection);
-                var databaseVersion = appliedVersions.OrderBy(vi => vi.Version).Last().Version;
+                var databaseVersion = appliedVersions.OrderBy(vi => vi.Version).LastOrDefault()?.Version ?? 0;
                 log.Info($"Database is at version {databaseVersion}");
-                var test = typeof(DatabaseMigrator).Assembly.GetTypes()
-                   .Where(t => typeof(IMigration).IsAssignableFrom(t) && t.IsClass);
 
                 var migrations = typeof(DatabaseMigrator).Assembly.GetTypes()
                     .Where(t => typeof(IMigration).IsAssignableFrom(t) && t.IsClass)
