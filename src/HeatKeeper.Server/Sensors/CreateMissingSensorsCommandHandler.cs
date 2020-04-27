@@ -26,7 +26,7 @@ namespace HeatKeeper.Server.Sensors
             var unknownExternalSensorIds = command.ExternalSensorIds.Distinct().Except(allSensors.Select(s => s.ExternalId)).ToArray();
             foreach (var unknownExternalSensorId in unknownExternalSensorIds)
             {
-                await commandExecutor.ExecuteAsync(new CreateSensorCommand(unknownExternalSensorId, "New sensor", "This sensor need to be assigned to a zone"));
+                await commandExecutor.ExecuteAsync(new CreateSensorCommand(unknownExternalSensorId, unknownExternalSensorId, "This sensor need to be assigned to a zone"));
             }
         }
     }

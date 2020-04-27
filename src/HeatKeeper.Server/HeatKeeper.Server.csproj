@@ -8,7 +8,7 @@
   <ItemGroup>
     <PackageReference Include="CQRS.LightInject" Version="1.1.0" />
     <PackageReference Include="CQRS.Transactions" Version="1.0.0" />
-    <PackageReference Include="DbReader" Version="2.3.2" />
+    <PackageReference Include="DbReader" Version="2.3.3" />
     <PackageReference Include="LightInject" Version="6.3.2" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.3" />

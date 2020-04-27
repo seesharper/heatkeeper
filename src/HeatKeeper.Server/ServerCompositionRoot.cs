@@ -10,6 +10,7 @@ using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Locations;
+using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
 using LightInject;
@@ -43,7 +44,8 @@ namespace HeatKeeper.Server
                 .Decorate(typeof(ICommandHandler<>), typeof(AuthorizedCommandHandler<>))
                 .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>))
                 .Decorate<ICommandHandler<DeleteUserCommand>, ValidatedDeleteUserCommandHandler>()
-                .Decorate(typeof(ICommandHandler<>), typeof(MaintainDefaultZonesCommandHandler<>));
+                .Decorate(typeof(ICommandHandler<>), typeof(MaintainDefaultZonesCommandHandler<>))
+                .Decorate<ICommandHandler<MeasurementCommand>, MaintainLatestZoneMeasurementDecorator>();
         }
     }
 }
