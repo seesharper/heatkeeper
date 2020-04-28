@@ -36,21 +36,44 @@ namespace HeatKeeper.Server.Database
                 var databaseVersion = appliedVersions.OrderBy(vi => vi.Version).LastOrDefault()?.Version ?? 0;
                 log.Info($"Database is at version {databaseVersion}");
 
-                var migrations = typeof(DatabaseMigrator).Assembly.GetTypes()
-                    .Where(t => typeof(IMigration).IsAssignableFrom(t) && t.IsClass)
-                    .Select(t => new { MigrationType = t, ((AppliesToVersionAttribute)t.GetCustomAttributes(typeof(AppliesToVersionAttribute), true).Single()).Version })
-                    .Where(m => m.Version > databaseVersion).OrderBy(m => m.Version).ToArray();
+                var migrationsGroupedByVersion = GetMigrationsGroupedByVersion(databaseVersion);
 
-                foreach (var migration in migrations)
+                foreach (var migrations in migrationsGroupedByVersion)
                 {
-                    log.Info($"Applying migration {migration.MigrationType.Name}");
-                    var migrationInstance = (IMigration)Activator.CreateInstance(migration.MigrationType, sqlProvider);
-                    migrationInstance.Migrate(connection);
-                    connection.Execute(sqlProvider.InsertVersionInfo, new VersionInfo() { Version = migration.Version, AppliedOn = DateTime.UtcNow, Description = migration.MigrationType.Name });
-                    log.Info($"Database is now at version {migration.Version}");
+                    var appliedMigrationsDescription = string.Empty;
+                    log.Info($"Found {migrations.Count()} migration(s) to be applied for version {migrations.Key}");
+                    foreach (var migration in migrations.OrderBy(m => m.Order))
+                    {
+                        log.Info($"Applying migration {migration.MigrationType.Name}");
+                        var migrationInstance = (IMigration)Activator.CreateInstance(migration.MigrationType, sqlProvider);
+                        migrationInstance.Migrate(connection);
+                        if (string.IsNullOrWhiteSpace(appliedMigrationsDescription))
+                        {
+                            appliedMigrationsDescription = migration.MigrationType.Name;
+                        }
+                        else
+                        {
+                            appliedMigrationsDescription = $"{appliedMigrationsDescription}, {migration.MigrationType.Name}";
+                        }
+                    }
+                    connection.Execute(sqlProvider.InsertVersionInfo, new VersionInfo() { Version = migrations.Key, AppliedOn = DateTime.UtcNow, Description = appliedMigrationsDescription });
+                    log.Info($"Database is now at version {migrations.Key}");
                 }
+
                 connection.Close();
             }
+        }
+
+        private static IGrouping<int, MigrationInfo>[] GetMigrationsGroupedByVersion(long databaseVersion)
+        {
+            return typeof(DatabaseMigrator).Assembly.GetTypes()
+                .Where(t => typeof(IMigration).IsAssignableFrom(t) && t.IsClass)
+                .Select(t => new MigrationInfo(t,
+                    ((AppliesToVersionAttribute)t.GetCustomAttributes(typeof(AppliesToVersionAttribute), true).Single()).Version,
+                    ((AppliesToVersionAttribute)t.GetCustomAttributes(typeof(AppliesToVersionAttribute), true).Single()).Order)
+                )
+                .GroupBy(m => m.AppliesToVersion)
+                .Where(g => g.Key > databaseVersion).ToArray();
         }
 
         private VersionInfo[] GetDatabaseVersion(IDbConnection connection)
@@ -64,6 +87,22 @@ namespace HeatKeeper.Server.Database
             {
                 return connection.Read<VersionInfo>(sqlProvider.GetVersionInfo).ToArray();
             }
+        }
+
+        public class MigrationInfo
+        {
+            public MigrationInfo(Type migrationType, int appliesToVersion, int order)
+            {
+                MigrationType = migrationType;
+                AppliesToVersion = appliesToVersion;
+                Order = order;
+            }
+
+            public Type MigrationType { get; }
+
+            public int AppliesToVersion { get; }
+
+            public int Order { get; }
         }
     }
 }

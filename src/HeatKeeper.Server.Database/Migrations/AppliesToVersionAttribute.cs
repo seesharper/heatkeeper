@@ -10,5 +10,7 @@ namespace HeatKeeper.Server.Database.Migrations
         }
 
         public int Version { get; }
+
+        public int Order { get; set; }
     }
 }
