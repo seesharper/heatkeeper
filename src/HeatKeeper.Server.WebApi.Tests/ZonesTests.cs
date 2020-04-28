@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Sensors;
@@ -54,38 +53,20 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var sensors = await client.GetSensors(zoneId, token);
 
-            await client.AddSensorToZone(zoneId, new AddSensorToZoneCommand() { SensorId = sensors[0].Id }, token);
+            var livingroomSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
 
-
-            sensors = await client.GetSensors(zoneId, token);
-            sensors[0].ZoneId.Should().Be(zoneId);
-        }
-
-        [Fact]
-        public async Task ShouldRemoveSensorFromZone()
-        {
-            var client = Factory.CreateClient();
-            var token = await client.AuthenticateAsAdminUser();
-
-            var locationId = await client.CreateLocation(TestData.Locations.Home, token);
-            var zoneId = await client.CreateZone(locationId, TestData.Zones.LivingRoom, token);
-
-            await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, token);
-
-            var sensors = await client.GetSensors(zoneId, token);
-
-            await client.AddSensorToZone(zoneId, new AddSensorToZoneCommand() { SensorId = sensors[0].Id }, token);
-
+            await client.UpdateSensor(new UpdateSensorCommand() { SensorId = livingroomSensor.Id, Name = livingroomSensor.Name, Description = livingroomSensor.Description, ZoneId = zoneId }, token);
 
             sensors = await client.GetSensors(zoneId, token);
+            livingroomSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
+            livingroomSensor.ZoneId.Should().Be(zoneId);
 
-            sensors[0].ZoneId.Should().Be(zoneId);
-
-            var removeSensorResponse = await client.RemoveSensorFromZone(new RemoveSensorFromZoneCommand() { SensorId = sensors[0].Id, ZoneId = zoneId }, token);
-            removeSensorResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            await client.UpdateSensor(new UpdateSensorCommand() { SensorId = livingroomSensor.Id, Name = livingroomSensor.Name, Description = livingroomSensor.Description, ZoneId = null }, token);
 
             sensors = await client.GetSensors(zoneId, token);
-            sensors[0].ZoneId.Should().BeNull();
+            livingroomSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
+            livingroomSensor.ZoneId.Should().BeNull();
+
         }
 
         [Fact]

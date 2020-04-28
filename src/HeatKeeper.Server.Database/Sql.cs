@@ -107,5 +107,13 @@ namespace HeatKeeper.Server.Database
         string CreateLatestZoneMeasurementsTable { get; }
 
         string GetAllDashboardLocations { get; }
+
+        string DeleteSensor { get; }
+
+        string UpdateSensor { get; }
+
+        string MeasurementsToSensonsForeignKey { get; }
+
+        string DeleteSensorMeasurements { get; }
     }
 }

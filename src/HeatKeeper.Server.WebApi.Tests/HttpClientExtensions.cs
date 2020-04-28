@@ -195,17 +195,6 @@ namespace HeatKeeper.Server.WebApi.Tests
             await SendAndHandleRequest(client, success, problem, httpRequest);
         }
 
-        public static async Task<HttpResponseMessage> RemoveSensorFromZone(this HttpClient client, RemoveSensorFromZoneCommand command, string token)
-        {
-            var request = new HttpRequestBuilder()
-                .WithMethod(HttpMethod.Delete)
-                .AddRequestUri($"api/zones/{command.ZoneId}/sensors")
-                .AddJsonContent(command)
-                .AddBearerToken(token)
-                .Build();
-            return await client.SendAsync(request);
-        }
-
         public static async Task<long> CreateZone(this HttpClient client, long locationId, CreateZoneCommand request, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/locations/{locationId}/zones", request, token, success, problem);
 
@@ -221,8 +210,11 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<Sensor[]> GetSensors(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<Sensor[]>(client, $"api/zones/{zoneId}/sensors", token, success, problem);
 
-        public static async Task AddSensorToZone(this HttpClient client, long zoneId, AddSensorToZoneCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await PostWithNoResponse(client, $"api/zones/{zoneId}/sensors", content, token, success, problem);
+        public static async Task UpdateSensor(this HttpClient client, UpdateSensorCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Patch(client, $"api/sensors/{command.SensorId}", command, token, success, problem);
+
+        public static async Task DeleteSensor(this HttpClient client, long sensorId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Delete(client, $"api/sensors/{sensorId}", token, success, problem);
 
         public static async Task<ApiKey> GetApiKey(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ApiKey>(client, "api/users/apikey", token, success, problem);
