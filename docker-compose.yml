@@ -4,7 +4,7 @@ services:
     image: bernhardrichter/heatkeeper:0.0.3
     container_name: heatkeeper
     volumes:
-      - ./db/sqlite/data:/heatkeeper/db
+      - ./db/sqlite/data:/db
     environment:
       - "HEATKEEPER_SECRET=${HEATKEEPER_SECRET}"
     ports:
