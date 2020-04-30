@@ -21,4 +21,8 @@
     <ProjectReference Include="..\HeatKeeper.Server.Database\HeatKeeper.Server.Database.csproj" />
     <ProjectReference Include="..\HeatKeeper.Abstractions\HeatKeeper.Abstractions.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="appsettings.json" CopyToPublishDirectory="Always" />
+    <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
 </Project>
