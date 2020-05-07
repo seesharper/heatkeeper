@@ -34,7 +34,7 @@ AsyncStep deploy = async () =>
     await dockerImage();
     if (BuildEnvironment.IsSecure && BuildEnvironment.IsTagCommit)
     {
-        await Docker.PushAsync("bernhardrichter/heatkeeper", BuildContext.LatestTag, BuildContext.RepositoryFolder);
+        await Docker.PushAsync("bernhardrichter/heatkeeper", BuildContext.LatestTag, BuildContext.BuildFolder);
     }
 
     await Artifacts.Deploy();
