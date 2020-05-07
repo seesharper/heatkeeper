@@ -4,7 +4,12 @@
 BuildContext.CodeCoverageThreshold = 30;
 
 [StepDescription("Runs the tests with test coverage")]
-Step testcoverage = () => DotNet.TestWithCodeCoverage();
+Step testcoverage = () =>
+{
+    Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" up -d");
+    DotNet.TestWithCodeCoverage();
+    Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" down");
+};
 
 [StepDescription("Runs all the tests for all target frameworks")]
 Step test = () =>
