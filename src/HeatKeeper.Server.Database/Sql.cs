@@ -115,5 +115,13 @@ namespace HeatKeeper.Server.Database
         string MeasurementsToSensonsForeignKey { get; }
 
         string DeleteSensorMeasurements { get; }
+
+        string GetMeasurementsToExport { get; }
+
+        string DeleteExportedMeasurements { get; }
+
+        string UpdateExportedMeasurement { get; }
+
+        string MeasurementsValueFieldAsDouble { get; }
     }
 }

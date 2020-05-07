@@ -7,7 +7,12 @@ BuildContext.CodeCoverageThreshold = 30;
 Step testcoverage = () => DotNet.TestWithCodeCoverage();
 
 [StepDescription("Runs all the tests for all target frameworks")]
-Step test = () => DotNet.Test();
+Step test = () =>
+{
+    Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" up -d");
+    DotNet.Test();
+    Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" down");
+};
 
 [StepDescription("Creates the NuGet packages")]
 AsyncStep dockerImage = async () =>

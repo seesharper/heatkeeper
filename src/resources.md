@@ -1,3 +1,5 @@
+https://thomaslevesque.com/2015/06/28/how-to-retrieve-dates-as-utc-in-sqlite/
+
 https://restfulapi.net/http-methods/#post
 
 https://snippet-generator.app/

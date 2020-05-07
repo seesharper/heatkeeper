@@ -4,6 +4,7 @@ using CQRS.Command.Abstractions;
 using CQRS.LightInject;
 using CQRS.Query.Abstractions;
 using CQRS.Transactions;
+using DbReader;
 using HeatKeeper.Abstractions.Logging;
 using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Authentication;
@@ -28,7 +29,7 @@ namespace HeatKeeper.Server
                 .Decorate<IDbConnection, LoggedDbConnection>()
                 .Decorate<IDbConnection, ConnectionDecorator>()
                 .RegisterConstructorDependency<Logger>((f, p) => f.GetInstance<LogFactory>()(p.Member.DeclaringType))
-                .RegisterSingleton<IInfluxClient>(f => new InfluxClient(new Uri("http://influxdb:8086")))
+                .RegisterSingleton<IInfluxClient>(f => new InfluxClient(new Uri("http://localhost:8086")))
                 .RegisterSingleton<IPasswordManager, PasswordManager>()
                 .RegisterSingleton<IPasswordPolicy, PasswordPolicy>()
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
@@ -45,7 +46,10 @@ namespace HeatKeeper.Server
                 .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>))
                 .Decorate<ICommandHandler<DeleteUserCommand>, ValidatedDeleteUserCommandHandler>()
                 .Decorate(typeof(ICommandHandler<>), typeof(MaintainDefaultZonesCommandHandler<>))
-                .Decorate<ICommandHandler<MeasurementCommand>, MaintainLatestZoneMeasurementDecorator>();
+                .Decorate<ICommandHandler<MeasurementCommand>, MaintainLatestZoneMeasurementDecorator>()
+                .Decorate<ICommandHandler<MeasurementCommand[]>, ExportMeasurementsDecorator>();
+
+
         }
     }
 }
