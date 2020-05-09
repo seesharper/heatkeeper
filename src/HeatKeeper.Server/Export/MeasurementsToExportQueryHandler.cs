@@ -24,12 +24,7 @@ namespace HeatKeeper.Server.Export
         }
 
         public async Task<MeasurementToExport[]> HandleAsync(MeasurementsToExportQuery query, CancellationToken cancellationToken = default)
-        {
-            var reader = dbConnection.ExecuteReader(sqlProvider.GetMeasurementsToExport, query);
-            //reader.GetFieldType()
-
-            return (await dbConnection.ReadAsync<MeasurementToExport>(sqlProvider.GetMeasurementsToExport, query)).ToArray();
-        }
+            => (await dbConnection.ReadAsync<MeasurementToExport>(sqlProvider.GetMeasurementsToExport, query)).ToArray();
     }
 
     [RequireReporterRole]
