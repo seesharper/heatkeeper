@@ -1,4 +1,6 @@
 
+using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -56,6 +58,15 @@ namespace HeatKeeper.Server.WebApi.Tests
             var apiKey = await client.GetApiKey(token);
 
             apiKey.Token.Should().NotBeEmpty();
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = (JwtSecurityToken)handler.ReadToken(apiKey.Token);
+
+            var exp = jwtToken.Claims.First(claim => claim.Type == "exp").Value;
+
+            var expirationDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(exp));
+
+            expirationDate.Year.Should().Be(DateTime.UtcNow.Year + 10);
         }
 
         [Fact]

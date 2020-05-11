@@ -23,7 +23,7 @@ namespace HeatKeeper.Abstractions.Logging
         public static void Trace(this Logger logger, string message) => logger(LogLevel.Trace, message);
         public static void Debug(this Logger logger, string message) => logger(LogLevel.Debug, message);
         public static void Info(this Logger logger, string message) => logger(LogLevel.Info, message);
-        public static void Warning(this Logger logger, string message) => logger(LogLevel.Warning, message);
+        public static void Warning(this Logger logger, string message, Exception exception = null) => logger(LogLevel.Warning, message, exception);
         public static void Error(this Logger logger, string message, Exception exception = null) => logger(LogLevel.Error, message, exception);
         public static void Critical(this Logger logger, string message, Exception exception = null) => logger(LogLevel.Critical, message, exception);
     }

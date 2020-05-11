@@ -20,6 +20,35 @@ namespace HeatKeeper.Server.WebApi.Tests
         }
 
         [Fact]
+        public async Task ShouldUpdateExportedMeasurements()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+            var apiKey = await client.GetApiKey(token);
+
+            var locationId = await client.CreateLocation(TestData.Locations.Home, token);
+            var livingRoomZoneId = await client.CreateZone(locationId, TestData.Zones.LivingRoom, token);
+            var outsideZoneId = await client.CreateZone(locationId, TestData.Zones.Outside, token);
+
+            await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, apiKey.Token);
+
+            var sensors = await client.GetSensors(livingRoomZoneId, token);
+
+            var livingroomSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
+            var outsideSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.OutsideSensor);
+
+            await client.UpdateSensor(new UpdateSensorCommand() { SensorId = livingroomSensor.Id, Name = livingroomSensor.Name, Description = livingroomSensor.Description, ZoneId = livingRoomZoneId }, token);
+            await client.UpdateSensor(new UpdateSensorCommand() { SensorId = outsideSensor.Id, Name = outsideSensor.Name, Description = outsideSensor.Description, ZoneId = outsideZoneId }, token);
+
+            await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, apiKey.Token);
+
+            var latestMeasurements = await client.GetLatestMeasurements(10, token);
+
+            latestMeasurements.Should().OnlyContain(m => m.Exported != null);
+        }
+
+
+        [Fact]
         public async Task ShouldMakeLatestMeasurementAvailableThroughDashboard()
         {
             var client = Factory.CreateClient();

@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace HeatKeeper.Server.Authorization
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = true)]
     public class RequireRoleAttribute : Attribute
     {
         private readonly string[] satisfiedByRoles;

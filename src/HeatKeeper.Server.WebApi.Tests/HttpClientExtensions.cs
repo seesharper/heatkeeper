@@ -222,6 +222,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task CreateMeasurement(this HttpClient client, MeasurementCommand[] requests, string token)
             => await PostWithNoResponse(client, "api/measurements/", requests, token);
 
+        public static async Task<Measurement[]> GetLatestMeasurements(this HttpClient client, long limit, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<Measurement[]>(client, $"api/measurements/latest?limit={limit}", token, success, problem);
+
         public static async Task UpdateUser(this HttpClient client, UpdateUserCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/users/{command.UserId}", command, token, success, problem);
 

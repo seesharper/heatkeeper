@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
+using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Sensors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +12,12 @@ namespace HeatKeeper.Server.Measurements
     public class MeasurementsController : ControllerBase
     {
         private readonly ICommandExecutor commandExecutor;
+        private readonly IQueryExecutor queryExecutor;
 
-        public MeasurementsController(ICommandExecutor commandExecutor)
+        public MeasurementsController(ICommandExecutor commandExecutor, IQueryExecutor queryExecutor)
         {
             this.commandExecutor = commandExecutor;
+            this.queryExecutor = queryExecutor;
         }
 
         [HttpPost]
@@ -24,5 +27,9 @@ namespace HeatKeeper.Server.Measurements
             await commandExecutor.ExecuteAsync(createMeasurementCommands);
             return Ok();
         }
+
+        [HttpGet("latest")]
+        public async Task<Measurement[]> GetLatestMeasurements([FromQuery] LatestTenMeasurementsQuery query)
+            => await queryExecutor.ExecuteAsync(query);
     }
 }

@@ -33,7 +33,7 @@ namespace HeatKeeper.Server.Authentication
                 new Claim(ClaimTypes.Role, "reporter")
             };
 
-            var token = tokenProvider.CreateToken(claims, DateTime.MaxValue);
+            var token = tokenProvider.CreateToken(claims, DateTime.UtcNow.AddYears(10));
 
             return new ApiKey(token);
         }
