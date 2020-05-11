@@ -66,7 +66,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var expirationDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(exp));
 
-            expirationDate.Year.Should().Be(DateTime.MaxValue.Year);
+            expirationDate.Year.Should().Be(DateTime.UtcNow.Year + 10);
         }
 
         [Fact]
