@@ -74,5 +74,12 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             livingroomSensor.Should().BeNull();
         }
+
+
+        [Fact]
+        public void ShouldUpdateMeasurementAsExported()
+        {
+
+        }
     }
 }
