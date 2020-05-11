@@ -36,7 +36,7 @@ namespace HeatKeeper.Server.Measurements
             }
             catch (Exception exception)
             {
-                logger.Error("Failed to export measurements", exception);
+                logger.Warning("Failed to export measurements", exception);
             }
         }
     }
