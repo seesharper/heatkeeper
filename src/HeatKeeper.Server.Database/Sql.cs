@@ -123,5 +123,7 @@ namespace HeatKeeper.Server.Database
         string UpdateExportedMeasurement { get; }
 
         string MeasurementsValueFieldAsDouble { get; }
+
+        string LatestMeasurements { get; }
     }
 }

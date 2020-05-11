@@ -30,7 +30,7 @@ namespace HeatKeeper.Server.Export
     }
 
     [RequireReporterRole]
-    public struct UpdateExportedMeasurementsCommand
+    public class UpdateExportedMeasurementsCommand
     {
         public long MeasurementId { get; set; }
 
