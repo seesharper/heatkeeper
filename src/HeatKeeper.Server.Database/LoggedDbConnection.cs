@@ -1,17 +1,17 @@
+using System;
 using System.Data;
-using HeatKeeper.Abstractions.Logging;
 
 namespace HeatKeeper.Server.Database
 {
     public class LoggedDbConnection : IDbConnection
     {
         private readonly IDbConnection dbConnection;
-        private readonly Logger logger;
+        private readonly Action<string> logAction;
 
-        public LoggedDbConnection(IDbConnection dbConnection, Logger logger)
+        public LoggedDbConnection(IDbConnection dbConnection, Action<string> logAction)
         {
             this.dbConnection = dbConnection;
-            this.logger = logger;
+            this.logAction = logAction;
         }
 
         public string ConnectionString { get => dbConnection.ConnectionString; set => dbConnection.ConnectionString = value; }
@@ -24,40 +24,43 @@ namespace HeatKeeper.Server.Database
 
         public IDbTransaction BeginTransaction()
         {
-            logger.Debug("Started transaction");
-            return dbConnection.BeginTransaction();
+            logAction("Started transaction");
+            return new LoggedDbTransaction(dbConnection.BeginTransaction(), logAction);
         }
 
         public IDbTransaction BeginTransaction(IsolationLevel il)
         {
+            logAction($"Started transaction with isolationlevel {il}");
             return dbConnection.BeginTransaction(il);
         }
 
         public void ChangeDatabase(string databaseName)
         {
+            logAction($"Changing database to {databaseName}");
             dbConnection.ChangeDatabase(databaseName);
         }
 
         public void Close()
         {
-            logger.Debug("Closing connection");
+            logAction("Closing connection");
             dbConnection.Close();
         }
 
         public IDbCommand CreateCommand()
         {
+            logAction("Creating command");
             return dbConnection.CreateCommand();
         }
 
         public void Dispose()
         {
-            logger.Debug("Disposing connection");
+            logAction("Disposing connection");
             dbConnection.Dispose();
         }
 
         public void Open()
         {
-            logger.Debug("Opening the connection");
+            logAction("Opening the connection");
             dbConnection.Open();
         }
     }
