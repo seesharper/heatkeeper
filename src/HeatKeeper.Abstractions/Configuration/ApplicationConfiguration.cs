@@ -6,6 +6,5 @@ namespace HeatKeeper.Server
 
         public string Secret { get; set; }
 
-        public string InfluxDBUrl { get; set; }
     }
 }

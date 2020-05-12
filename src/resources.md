@@ -1,3 +1,5 @@
+https://www.qamilestone.com/post/end-to-end-steps-to-set-up-influxdb-grafana-using-docker-compose
+
 https://thomaslevesque.com/2015/06/28/how-to-retrieve-dates-as-utc-in-sqlite/
 
 https://restfulapi.net/http-methods/#post
