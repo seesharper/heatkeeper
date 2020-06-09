@@ -4,6 +4,7 @@ namespace HeatKeeper.Server.Measurements
     {
         Temperature = 1,
         Humidity = 2,
-        BatteryLevel = 3
+        BatteryLevel = 3,
+        AirPressure = 4
     }
 }
