@@ -5,10 +5,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CQRS.Command.Abstractions" Version="1.0.0" />
-    <PackageReference Include="DbReader" Version="2.3.3" />
+    <PackageReference Include="DbReader" Version="2.3.5" />
     <PackageReference Include="ResourceReader" Version="0.0.2" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.112.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.4" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.9" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="**/*.sql" />
