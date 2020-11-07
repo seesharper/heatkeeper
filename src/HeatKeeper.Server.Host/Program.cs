@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using LightInject.Microsoft.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -15,7 +16,7 @@ namespace HeatKeeper.Server.Host
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             GenericHost.CreateDefaultBuilder(args)
-                .UseLightInject(services => services.RegisterFrom<HostCompositionRoot>())
+                .UseLightInject(registry => registry.RegisterFrom<HostCompositionRoot>())
                 .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
                 .ConfigureAppConfiguration(config => config.AddEnvironmentVariables(prefix: "HEATKEEPER_"));
     }
