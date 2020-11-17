@@ -26,14 +26,25 @@ namespace HeatKeeper.Server.WebApi.Tests
                     Measurements.LivingRoomTemperatureMeasurement,
                     Measurements.LivingRoomHumidityMeasurement,
                     Measurements.OutsideTemperatureMeasurement,
-
                 };
+
+        public static MeasurementCommand[] TemperatureMeasurementRequestsWithRetentionPolicy =>
+            new[]
+                {
+                    Measurements.LivingRoomTemperatureWithHourRetentionPolicy,
+                    Measurements.LivingRoomTemperatureWithDayRetentionPolicy,
+                    Measurements.LivingRoomTemperatureWithWeekRetentionPolicy,
+                };
+
 
         public static class Measurements
         {
-            public static MeasurementCommand LivingRoomTemperatureMeasurement => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Temperature, 23.7, DateTime.UtcNow);
-            public static MeasurementCommand LivingRoomHumidityMeasurement => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Humidity, 39.3, DateTime.UtcNow);
-            public static MeasurementCommand OutsideTemperatureMeasurement => new MeasurementCommand(Sensors.OutsideSensor, MeasurementType.Temperature, 10.2, DateTime.UtcNow);
+            public static MeasurementCommand LivingRoomTemperatureMeasurement => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Temperature, RetentionPolicy.None, 23.7, DateTime.UtcNow);
+            public static MeasurementCommand LivingRoomHumidityMeasurement => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Humidity, RetentionPolicy.None, 39.3, DateTime.UtcNow);
+            public static MeasurementCommand OutsideTemperatureMeasurement => new MeasurementCommand(Sensors.OutsideSensor, MeasurementType.Temperature, RetentionPolicy.None, 10.2, DateTime.UtcNow);
+            public static MeasurementCommand LivingRoomTemperatureWithHourRetentionPolicy => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Temperature, RetentionPolicy.Hour, 23.7, DateTime.UtcNow);
+            public static MeasurementCommand LivingRoomTemperatureWithDayRetentionPolicy => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Temperature, RetentionPolicy.Day, 23.7, DateTime.UtcNow);
+            public static MeasurementCommand LivingRoomTemperatureWithWeekRetentionPolicy => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Temperature, RetentionPolicy.Week, 23.7, DateTime.UtcNow);
         }
 
         public static class Locations

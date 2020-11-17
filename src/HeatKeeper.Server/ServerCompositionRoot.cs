@@ -6,11 +6,13 @@ using CQRS.LightInject;
 using CQRS.Query.Abstractions;
 using CQRS.Transactions;
 using DbReader;
+using HeatKeeper.Abstractions;
 using HeatKeeper.Abstractions.Logging;
 using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Export;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Users;
@@ -22,6 +24,16 @@ namespace HeatKeeper.Server
 {
     public class ServerCompositionRoot : ICompositionRoot
     {
+        static ServerCompositionRoot()
+        {
+            DbReaderOptions.WhenReading<long?>().Use((rd, i) => rd.GetInt32(i));
+            DbReaderOptions.WhenReading<long>().Use((rd, i) => rd.GetInt32(i));
+            DbReaderOptions.WhenReading<string>().Use((rd, i) => (string)rd.GetValue(i));
+            DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) != 0);
+            DbReaderOptions.WhenReading<RetentionPolicy>().Use((dr, i) => (RetentionPolicy)dr.GetInt64(i));
+            DbReaderOptions.WhenReading<MeasurementType>().Use((dr, i) => (MeasurementType)dr.GetInt64(i));
+        }
+
         public void Compose(IServiceRegistry serviceRegistry)
         {
             serviceRegistry.RegisterCommandHandlers()
@@ -38,6 +50,7 @@ namespace HeatKeeper.Server
                 .Decorate<IDbConnection, ConnectionDecorator>()
                 .RegisterConstructorDependency<Logger>((f, p) => f.GetInstance<LogFactory>()(p.Member.DeclaringType))
                 .RegisterSingleton<IInfluxClient>(f => CreateInfluxClient())
+                .RegisterSingleton<IBootStrapper, InfluxDbBootStrapper>()
                 .RegisterSingleton<IPasswordManager, PasswordManager>()
                 .RegisterSingleton<IPasswordPolicy, PasswordPolicy>()
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
@@ -56,6 +69,7 @@ namespace HeatKeeper.Server
                 .Decorate(typeof(ICommandHandler<>), typeof(MaintainDefaultZonesCommandHandler<>))
                 .Decorate<ICommandHandler<MeasurementCommand>, MaintainLatestZoneMeasurementDecorator>()
                 .Decorate<ICommandHandler<MeasurementCommand[]>, ExportMeasurementsDecorator>();
+
         }
 
         private static IInfluxClient CreateInfluxClient()

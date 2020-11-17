@@ -1,6 +1,7 @@
 SELECT
     m.Id,
     m.MeasurementType,
+    m.RetentionPolicy,
     m.Value,
     m.Created,
     z.Name as Zone,

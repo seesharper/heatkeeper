@@ -73,7 +73,7 @@ namespace HeatKeeper.Server.Database
                     ((AppliesToVersionAttribute)t.GetCustomAttributes(typeof(AppliesToVersionAttribute), true).Single()).Order)
                 )
                 .GroupBy(m => m.AppliesToVersion)
-                .Where(g => g.Key > databaseVersion).ToArray();
+                .Where(g => g.Key > databaseVersion).OrderBy(g => g.Key).ToArray();
         }
 
         private VersionInfo[] GetDatabaseVersion(IDbConnection connection)

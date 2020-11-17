@@ -3,15 +3,15 @@ using DbReader;
 
 namespace HeatKeeper.Server.Database.Migrations
 {
-    [AppliesToVersion(3)]
-    public class MeasurementsValueFieldAsDouble : IMigration
+    [AppliesToVersion(4)]
+    public class AddRetentionPolicyColumn : IMigration
     {
         private readonly ISqlProvider sqlProvider;
 
-        public MeasurementsValueFieldAsDouble(ISqlProvider sqlProvider)
+        public AddRetentionPolicyColumn(ISqlProvider sqlProvider)
             => this.sqlProvider = sqlProvider;
 
         public void Migrate(IDbConnection dbConnection)
-            => dbConnection.Execute(sqlProvider.MeasurementsValueFieldAsDouble);
+            => dbConnection.Execute(sqlProvider.AddRetentionPolicyColumn);
     }
 }
