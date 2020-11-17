@@ -125,5 +125,7 @@ namespace HeatKeeper.Server.Database
         string MeasurementsValueFieldAsDouble { get; }
 
         string LatestMeasurements { get; }
+
+        string AddRetentionPolicyColumn { get; }
     }
 }

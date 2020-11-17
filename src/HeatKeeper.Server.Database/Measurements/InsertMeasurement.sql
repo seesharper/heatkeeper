@@ -1,7 +1,8 @@
-INSERT INTO Measurements (SensorId, MeasurementType, Value, Created)
+INSERT INTO Measurements (SensorId, MeasurementType, RetentionPolicy, Value, Created)
 SELECT
     Id,
     @MeasurementType,
+    @RetentionPolicy,
     @Value,
     @Created
 FROM

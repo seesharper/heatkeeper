@@ -32,7 +32,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var zoneId = await client.CreateZone(locationId, TestData.Zones.LivingRoom, token);
 
-            await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, token);
+            await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, token);
 
             var sensors = await client.GetSensors(zoneId, token);
 
@@ -49,7 +49,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var zoneId = await client.CreateZone(locationId, TestData.Zones.LivingRoom, token);
 
-            await client.CreateMeasurement(TestData.TemperatureMeasurementRequests, token);
+            await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, token);
 
             var sensors = await client.GetSensors(zoneId, token);
 

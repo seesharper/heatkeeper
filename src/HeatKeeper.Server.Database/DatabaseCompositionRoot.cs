@@ -11,10 +11,7 @@ namespace HeatKeeper.Server.Database
     {
         static DatabaseCompositionRoot()
         {
-            DbReaderOptions.WhenReading<long?>().Use((rd, i) => rd.GetInt32(i));
-            DbReaderOptions.WhenReading<long>().Use((rd, i) => rd.GetInt32(i));
-            DbReaderOptions.WhenReading<string>().Use((rd, i) => (string)rd.GetValue(i));
-            DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) != 0);
+
         }
 
 

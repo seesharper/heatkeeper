@@ -9,9 +9,7 @@ namespace HeatKeeper.Server.Database.Migrations
         private readonly ISqlProvider sqlProvider;
 
         public CreateLatestZoneMeasurementsTable(ISqlProvider sqlProvider)
-        {
-            this.sqlProvider = sqlProvider;
-        }
+            => this.sqlProvider = sqlProvider;
 
         public void Migrate(IDbConnection dbConnection)
         {

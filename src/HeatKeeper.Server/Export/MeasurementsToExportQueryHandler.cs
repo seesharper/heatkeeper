@@ -34,12 +34,24 @@ namespace HeatKeeper.Server.Export
 
     public class MeasurementToExport
     {
+        private MeasurementType measurementType;
+
         public long Id { get; set; }
 
-        public long MeasurementType { get; set; }
+        public MeasurementType MeasurementType
+        {
+            get => measurementType;
+            set
+            {
+                measurementType = value;
+                MeasurementTypeName = Enum.GetName(typeof(MeasurementType), MeasurementType);
+            }
+        }
+
+        public RetentionPolicy RetentionPolicy { get; set; }
 
         [InfluxTag("MeasurementType")]
-        public string MeasurementTypeName { get => Enum.GetName(typeof(MeasurementType), MeasurementType); }
+        public string MeasurementTypeName { get; set; }
 
         [InfluxField("Value")]
         public double Value { get; set; }
@@ -52,7 +64,6 @@ namespace HeatKeeper.Server.Export
 
         [InfluxTag("Location")]
         public string Location { get; set; }
-
     }
 
 

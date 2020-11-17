@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Users;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests

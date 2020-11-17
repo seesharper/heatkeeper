@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using HeatKeeper.Abstractions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Database;
@@ -63,8 +64,13 @@ namespace HeatKeeper.Server.Host
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseMigrator databaseMigrator, ApplicationConfiguration applicationConfiguration)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseMigrator databaseMigrator, IEnumerable<IBootStrapper> bootstrappers, ApplicationConfiguration applicationConfiguration)
         {
+            foreach (var bootStrapper in bootstrappers)
+            {
+                bootStrapper.Execute().GetAwaiter().GetResult();
+            }
+
             databaseMigrator.Migrate();
 
             app.UseSwagger();
