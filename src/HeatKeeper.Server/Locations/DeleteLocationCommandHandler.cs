@@ -43,8 +43,5 @@ namespace HeatKeeper.Server.Locations
     }
 
     [RequireAdminRole]
-    public class DeleteLocationCommand
-    {
-        public long LocationId { get; set; }
-    }
+    public record DeleteLocationCommand(long LocationId);
 }

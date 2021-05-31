@@ -1,9 +1,9 @@
+using System.Threading;
+using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using DbReader;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Authorization;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace HeatKeeper.Server.Users
 {
@@ -28,17 +28,5 @@ namespace HeatKeeper.Server.Users
     }
 
     [RequireUserRole]
-    public class ChangePasswordCommand
-    {
-        public ChangePasswordCommand(string oldPassword, string newPassword, string confirmedPassword)
-        {
-            OldPassword = oldPassword;
-            NewPassword = newPassword;
-            ConfirmedPassword = confirmedPassword;
-        }
-
-        public string NewPassword { get; }
-        public string ConfirmedPassword { get; }
-        public string OldPassword { get; }
-    }
+    public record ChangePasswordCommand(string OldPassword, string NewPassword, string ConfirmedPassword);
 }

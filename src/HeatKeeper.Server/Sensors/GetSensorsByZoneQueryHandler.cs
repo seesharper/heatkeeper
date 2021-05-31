@@ -28,21 +28,7 @@ namespace HeatKeeper.Server.Sensors
     /// Gets sensors for the given zone in addition to sensors not connected to a zone.
     /// </summary>
     [RequireAdminRole]
-    public class SensorsByZoneQuery : IQuery<Sensor[]>
-    {
-        public long ZoneId { get; set; }
-    }
+    public record SensorsByZoneQuery(long ZoneId) : IQuery<Sensor[]>;
 
-    public class Sensor
-    {
-        public long Id { get; set; }
-
-        public string ExternalId { get; set; }
-
-        public long? ZoneId { get; set; }
-
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-    }
+    public record Sensor(long Id, string ExternalId, long? ZoneId, string Name, string Description);
 }

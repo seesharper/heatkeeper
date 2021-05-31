@@ -8,12 +8,12 @@
   <ItemGroup>
     <PackageReference Include="CQRS.LightInject" Version="1.3.1" />
     <PackageReference Include="CQRS.Transactions" Version="1.0.0" />
-    <PackageReference Include="DbReader" Version="2.3.7" />
+    <PackageReference Include="DbReader" Version="2.4.0" />
     <PackageReference Include="LightInject" Version="6.4.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.11.1" />
     <PackageReference Include="Vibrant.InfluxDB.Client" Version="4.0.4" />
   </ItemGroup>
   <ItemGroup>

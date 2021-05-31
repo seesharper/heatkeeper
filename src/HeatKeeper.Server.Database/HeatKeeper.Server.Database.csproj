@@ -5,9 +5,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CQRS.Command.Abstractions" Version="1.0.0" />
-    <PackageReference Include="DbReader" Version="2.3.7" />
-    <PackageReference Include="ResourceReader" Version="0.0.2" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.6" />
+    <PackageReference Include="DbReader" Version="2.4.0" />
+    <PackageReference Include="ResourceReader" Version="1.0.0" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.114.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>

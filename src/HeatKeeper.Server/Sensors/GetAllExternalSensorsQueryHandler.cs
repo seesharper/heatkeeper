@@ -1,11 +1,11 @@
 using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Server.Database;
-using DbReader;
-using System.Linq;
 using CQRS.Query.Abstractions;
+using DbReader;
 using HeatKeeper.Server.Authorization;
+using HeatKeeper.Server.Database;
 
 namespace HeatKeeper.Server.Sensors
 {
@@ -28,14 +28,7 @@ namespace HeatKeeper.Server.Sensors
     }
 
     [RequireReporterRole]
-    public class GetAllExternalSensorsQuery : IQuery<ExternalSensorQueryResult[]>
-    {
-    }
-
-    public class ExternalSensorQueryResult
-    {
-        public string ExternalId { get; set; }
-    }
-
-
+    public record GetAllExternalSensorsQuery() : IQuery<ExternalSensorQueryResult[]>;
+    
+    public record ExternalSensorQueryResult(string ExternalId);
 }
