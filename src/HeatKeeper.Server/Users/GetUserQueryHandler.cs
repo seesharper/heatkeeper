@@ -1,11 +1,12 @@
+using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using HeatKeeper.Server.Database;
-using DbReader;
-using System.Linq;
 using CQRS.Query.Abstractions;
+using DbReader;
 using HeatKeeper.Server.Authorization;
+using HeatKeeper.Server.Database;
 
 namespace HeatKeeper.Server.Users
 {
@@ -21,36 +22,11 @@ namespace HeatKeeper.Server.Users
         }
 
         public async Task<GetUserQueryResult> HandleAsync(GetUserQuery query, CancellationToken cancellationToken = default)
-        {
-            return (await dbConnection.ReadAsync<GetUserQueryResult>(sqlProvider.GetUser, query)).SingleOrDefault();
-        }
+            => (await dbConnection.ReadAsync<GetUserQueryResult>(sqlProvider.GetUser, query)).SingleOrDefault();
     }
 
     [RequireAnonymousRole]
-    public class GetUserQuery : IQuery<GetUserQueryResult>
-    {
-        public GetUserQuery(string email)
-        {
-            Email = email;
-        }
+    public record GetUserQuery(string Email) : IQuery<GetUserQueryResult>;
 
-        public string Email { get; }
-    }
-
-    public class GetUserQueryResult
-    {
-        public long Id { get; set; }
-
-        public string Email { get; set; }
-
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
-
-        public bool IsAdmin { get; set; }
-
-        public string HashedPassword { get; set; }
-    }
-
-
+    public record GetUserQueryResult(long Id, string Email, string FirstName, string LastName, bool IsAdmin, string HashedPassword);
 }

@@ -38,12 +38,12 @@ namespace HeatKeeper.Server.Host.Locations
             => await commandExecutor.ExecuteAsync(updateLocationCommand).ConfigureAwait(false);
 
         [HttpGet]
-        public async Task<Location[]> Get([FromQuery]GetAllLocationsQuery query)
+        public async Task<GetAllLocations.Result[]> Get([FromQuery] GetAllLocations.Query query)
             => await queryExecutor.ExecuteAsync(query);
 
 
         [HttpGet("{locationId}/zones")]
-        public async Task<Zone[]> Zones([FromRoute]ZonesByLocationQuery query)
+        public async Task<ZonesByLocation.Result[]> Zones([FromRoute] ZonesByLocation.Query query)
             => await queryExecutor.ExecuteAsync(query);
 
         [HttpPost("{locationId}/zones")]
@@ -54,20 +54,20 @@ namespace HeatKeeper.Server.Host.Locations
         }
 
         [HttpPost("{locationId}/users")]
-        public async Task<IActionResult> AddUser([FromBodyAndRoute]AddUserToLocationCommand command)
+        public async Task<IActionResult> AddUser([FromBodyAndRoute] AddUserToLocationCommand command)
         {
             await commandExecutor.ExecuteAsync(command);
             return Ok();
         }
 
         [HttpGet("{locationId}/users")]
-        public async Task<User[]> GetUsers([FromRoute]UsersByLocationQuery query) =>
+        public async Task<User[]> GetUsers([FromRoute] UsersByLocationQuery query) =>
             await queryExecutor.ExecuteAsync(query);
 
 
         [HttpDelete("{locationId}/users/{userId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task RemoveUser([FromRoute]DeleteUserLocationCommand command)
+        public async Task RemoveUser([FromRoute] DeleteUserLocationCommand command)
             => await commandExecutor.ExecuteAsync(command);
     }
 }

@@ -113,8 +113,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task UpdateZone(this HttpClient client, UpdateZoneCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/zones/{content.ZoneId}", content, token, success, problem);
 
-        public static async Task<Location[]> GetLocations(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<Location[]>(client, "api/locations", token, success, problem);
+        public static async Task<GetAllLocations.Result[]> GetLocations(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<GetAllLocations.Result[]>(client, "api/locations", token, success, problem);
 
         private static async Task<TContent> Get<TContent>(HttpClient client, string uri, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
@@ -201,8 +201,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task DeleteLocation(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/locations/{locationId}", token, success, problem);
 
-        public static async Task<Zone[]> GetZones(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<Zone[]>(client, $"api/locations/{locationId}/zones", token, success, problem);
+        public static async Task<ZonesByLocation.Result[]> GetZones(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<ZonesByLocation.Result[]>(client, $"api/locations/{locationId}/zones", token, success, problem);
 
         public static async Task<ZoneDetails> GetZoneDetails(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ZoneDetails>(client, $"api/zones/{zoneId}", token, success, problem);

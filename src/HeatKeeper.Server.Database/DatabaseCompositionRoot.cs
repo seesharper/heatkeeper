@@ -20,7 +20,11 @@ namespace HeatKeeper.Server.Database
             serviceRegistry
                 .RegisterScoped(CreateConnection)
                 .RegisterSingleton<IDatabaseMigrator, DatabaseMigrator>()
-                .RegisterSingleton(f => new ResourceBuilder().Build<ISqlProvider>());
+                .RegisterSingleton(f => new ResourceBuilder().Build<ISqlProvider>())
+                .RegisterConstructorDependency<Sql>((factory, parameter) =>
+                {
+                    return "test";
+                });
         }
 
 

@@ -19,19 +19,7 @@ namespace HeatKeeper.Server.Version
     }
 
     [RequireAnonymousRole]
-    public class VersionQuery : IQuery<AppVersion>
-    {
-    }
+    public record VersionQuery() : IQuery<AppVersion>;
 
-    public class AppVersion
-    {
-        public AppVersion(string value)
-        {
-            Value = value;
-        }
-
-        public string Value { get; }
-    }
-
-
+    public record AppVersion(string Value);
 }

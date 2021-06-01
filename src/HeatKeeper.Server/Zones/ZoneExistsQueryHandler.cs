@@ -24,20 +24,5 @@ namespace HeatKeeper.Server.Zones
     }
 
     [RequireUserRole]
-    public class ZoneExistsQuery : IQuery<bool>
-    {
-        public ZoneExistsQuery(long zoneId, long locationId, string name)
-        {
-            ZoneId = zoneId;
-            LocationId = locationId;
-            Name = name;
-        }
-
-        public long ZoneId { get; }
-        public long LocationId { get; }
-        public string Name { get; }
-    }
-
-
-
+    public record ZoneExistsQuery(long ZoneId, long LocationId, string Name) : IQuery<bool>;
 }
