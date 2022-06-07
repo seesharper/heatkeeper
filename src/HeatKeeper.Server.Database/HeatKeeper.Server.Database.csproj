@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CQRS.Command.Abstractions" Version="1.0.0" />
     <PackageReference Include="DbReader" Version="2.3.7" />
     <PackageReference Include="ResourceReader" Version="0.0.2" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.6" />
+    <!-- <PackageReference Include="System.Data.SQLite.Core" Version="1.0.116" /> -->
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
@@ -16,4 +16,30 @@
   <ItemGroup>
     <ProjectReference Include="..\HeatKeeper.Abstractions\HeatKeeper.Abstractions.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Data.SQLite">      
+      <HintPath>SQLite116\System.Data.SQLite.dll</HintPath>      
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <TestItem Include="test1" />
+    <TestItem Include="test2" />
+    <TestItem Include="test3" />    
+  </ItemGroup>
+
+  <Target Name="TestMessage" AfterTargets="Build" >
+
+    <!-- Use $(Property Name) to reference a property -->
+    <Message Text="$(CPU)" Importance="high"/>
+
+    <!-- Use @(Item Name) to output a semi-colon
+         separated list of items on one line      -->
+    <Message Text="@(TestItem)" Importance="high"/>
+
+    <!-- Use %(Item Name.Metadata Property Name) to 
+         call the Message task once for each item.   -->
+    <!-- This will output each item on a separate line -->
+    <Message Text="%(TestItem.Identity)" Importance="high"/>
+
+  </Target>
 </Project>
