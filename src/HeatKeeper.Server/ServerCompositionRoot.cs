@@ -26,12 +26,12 @@ namespace HeatKeeper.Server
     {
         static ServerCompositionRoot()
         {
-            DbReaderOptions.WhenReading<long?>().Use((rd, i) => rd.GetInt32(i));
+            // DbReaderOptions.WhenReading<long?>().Use((rd, i) => rd.GetInt32(i));
             DbReaderOptions.WhenReading<long>().Use((rd, i) => rd.GetInt32(i));
             DbReaderOptions.WhenReading<string>().Use((rd, i) => (string)rd.GetValue(i));
             DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) != 0);
-            DbReaderOptions.WhenReading<RetentionPolicy>().Use((dr, i) => (RetentionPolicy)dr.GetInt64(i));
-            DbReaderOptions.WhenReading<MeasurementType>().Use((dr, i) => (MeasurementType)dr.GetInt64(i));
+            // DbReaderOptions.WhenReading<RetentionPolicy>().Use((dr, i) => (RetentionPolicy)dr.GetInt64(i));
+            // DbReaderOptions.WhenReading<MeasurementType>().Use((dr, i) => (MeasurementType)dr.GetInt64(i));
         }
 
         public void Compose(IServiceRegistry serviceRegistry)
