@@ -13,7 +13,7 @@ namespace HeatKeeper.Server.Authentication
 
         public bool VerifyPassword(string password, string hashedPassword)
         {
-            return passwordHasher.VerifyHashedPassword(this, hashedPassword, password) == PasswordVerificationResult.Success;
+            return passwordHasher.VerifyHashedPassword(this, hashedPassword, password) != PasswordVerificationResult.Failed;
         }
     }
 }
