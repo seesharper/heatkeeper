@@ -1,16 +1,12 @@
 using System;
 using System.Linq;
-using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
-using CQRS.Command.Abstractions;
 using CQRS.LightInject;
-using CQRS.Query.Abstractions;
 using FluentAssertions;
 using HeatKeeper.Server.Export;
+using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Sensors;
-using LightInject;
-using Vibrant.InfluxDB.Client;
+using InfluxDB.Client;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests
@@ -117,9 +113,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
             var client = Factory.CreateClient(c =>
                 {
-                    c.RegisterCommandInterceptor<ExportMeasurementsCommand, IInfluxClient>(async (command, handler, client, token) =>
+                    c.RegisterCommandInterceptor<ExportMeasurementsCommand, IInfluxDBClient>(async (command, handler, client, token) =>
                     {
-
                         // Set the zone to something we can query after the handler has been invoked.
                         var zone = Guid.NewGuid().ToString("N");
                         foreach (var measurementToExport in command.MeasurementsToExport)
@@ -132,15 +127,21 @@ namespace HeatKeeper.Server.WebApi.Tests
                         var exportedMeasurementsCount = command.MeasurementsToExport.Count();
                         if (exportedMeasurementsCount > 0)
                         {
-                            var measurements = await client.ReadAsync<MeasurementToExport>(InfluxDbConstants.DatabaseName, $"SELECT * FROM Day.HeatKeeperMeasurements WHERE Zone = '{zone}'");
-                            measurements.Results.Single().Succeeded.Should().BeTrue();
-                            measurements.Results.Single().Series.Single().Rows.Count.Should().Be(exportedMeasurementsCount);
-                            measurements = await client.ReadAsync<MeasurementToExport>(InfluxDbConstants.DatabaseName, $"SELECT * FROM Week.HeatKeeperMeasurements WHERE Zone = '{zone}'");
-                            measurements.Results.Single().Succeeded.Should().BeTrue();
-                            measurements.Results.Single().Series.Single().Rows.Count.Should().Be(exportedMeasurementsCount);
-                            measurements = await client.ReadAsync<MeasurementToExport>(InfluxDbConstants.DatabaseName, $"SELECT * FROM Month.HeatKeeperMeasurements WHERE Zone = '{zone}'");
-                            measurements.Results.Single().Succeeded.Should().BeTrue();
-                            measurements.Results.Single().Series.Single().Rows.Count.Should().Be(exportedMeasurementsCount);
+                            var query = $$"""
+                            from(bucket:"{0}")
+                                |> range(start: 0)
+                                |> filter(fn: (r) => r["zone"] == "{{zone}}")    
+                            """;
+
+                            var queryApi = client.GetQueryApi();
+                            var result = await queryApi.QueryAsync(string.Format(query, nameof(RetentionPolicy.Hour)), "my-init-org");
+                            result.First().Records.Count().Should().Be(exportedMeasurementsCount);
+
+                            result = await queryApi.QueryAsync(string.Format(query, nameof(RetentionPolicy.Day)), "my-init-org");
+                            result.First().Records.Count().Should().Be(exportedMeasurementsCount);
+
+                            result = await queryApi.QueryAsync(string.Format(query, nameof(RetentionPolicy.Week)), "my-init-org");
+                            result.First().Records.Count().Should().Be(exportedMeasurementsCount);
                         }
                     });
                 });

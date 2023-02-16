@@ -1,8 +1,5 @@
 using System;
-using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Database;
-using HeatKeeper.Server.Host.Locations;
-using HeatKeeper.Server.Host.Users;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Users;
@@ -36,6 +33,13 @@ namespace HeatKeeper.Server.WebApi.Tests
                     Measurements.LivingRoomTemperatureWithWeekRetentionPolicy,
                 };
 
+        public static MeasurementCommand[] CumulativeMeasurementsRequests =>
+            new[]
+            {
+                Measurements.CumulativePowerImportMeasurement1,
+                Measurements.CumulativePowerImportMeasurement2
+            };
+
 
         public static class Measurements
         {
@@ -45,6 +49,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             public static MeasurementCommand LivingRoomTemperatureWithHourRetentionPolicy => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Temperature, RetentionPolicy.Hour, 23.7, DateTime.UtcNow);
             public static MeasurementCommand LivingRoomTemperatureWithDayRetentionPolicy => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Temperature, RetentionPolicy.Day, 23.7, DateTime.UtcNow);
             public static MeasurementCommand LivingRoomTemperatureWithWeekRetentionPolicy => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Temperature, RetentionPolicy.Week, 23.7, DateTime.UtcNow);
+            public static MeasurementCommand CumulativePowerImportMeasurement1 = new MeasurementCommand(Sensors.PowerMeter, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 150000, DateTime.UtcNow.AddHours(-1));
+            public static MeasurementCommand CumulativePowerImportMeasurement2 = new MeasurementCommand(Sensors.PowerMeter, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 150000, DateTime.UtcNow);
         }
 
         public static class Locations
@@ -66,6 +72,9 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             public static CreateZoneCommand Kitchen =>
                 new CreateZoneCommand() { Name = "Kitchen", Description = "This is the description of the Kitchen zone" };
+
+            public static CreateZoneCommand PowerMeter =>
+                new CreateZoneCommand() { Name = "PowerMeter", Description = "This is the description of the PowerMeter zone" };
         }
 
         public static class Users
@@ -84,12 +93,16 @@ namespace HeatKeeper.Server.WebApi.Tests
             public static RegisterUserCommand StandardUserWithInvalidEmail =>
                 new RegisterUserCommand() { Email = "InvalidMailAddress", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
         }
-
         public static class Sensors
         {
             public static string LivingRoomSensor = "SensorID1";
 
             public static string OutsideSensor = "SensorID2";
+
+            public static string PowerMeter = "PM1234";
         }
+
     }
+
+
 }

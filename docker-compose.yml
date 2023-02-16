@@ -19,12 +19,12 @@ services:
     volumes:
       - grafana-volume:/var/lib/grafana
   influxdb:
-    image: influxdb:1.8.5
+    image: influxdb:2.6.1
     container_name: influxdb
     ports:
       - "8086:8086"
     volumes:
-      - influxdb-volume:/var/lib/influxdb
+      - influxdb-volume:/var/lib/influxdb2
   watchtower:
     image: v2tec/watchtower
     volumes:
