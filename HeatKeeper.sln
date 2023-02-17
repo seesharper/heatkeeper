@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatKeeper.Server", "HeatKeeper.Server\HeatKeeper.Server.csproj", "{8225FA54-D8B3-4249-9EE3-599933A2702D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatKeeper.Server", "src/HeatKeeper.Server/HeatKeeper.Server.csproj", "{8225FA54-D8B3-4249-9EE3-599933A2702D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatKeeper.Server.WebApi.Tests", "HeatKeeper.Server.WebApi.Tests\HeatKeeper.Server.WebApi.Tests.csproj", "{D8107DD2-352C-43A4-B2CB-F56A1F91A737}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatKeeper.Server.WebApi.Tests", "src/HeatKeeper.Server.WebApi.Tests/HeatKeeper.Server.WebApi.Tests.csproj", "{D8107DD2-352C-43A4-B2CB-F56A1F91A737}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatKeeper.Server.Host", "HeatKeeper.Server.Host\HeatKeeper.Server.Host.csproj", "{0229E4B2-C17E-4813-8DCC-AE062596BC83}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatKeeper.Server.Host", "src/HeatKeeper.Server.Host/HeatKeeper.Server.Host.csproj", "{0229E4B2-C17E-4813-8DCC-AE062596BC83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatKeeper.Server.Database", "HeatKeeper.Server.Database\HeatKeeper.Server.Database.csproj", "{3D0F4011-CA4B-4B51-A05D-5D0298B82D69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatKeeper.Server.Database", "src/HeatKeeper.Server.Database/HeatKeeper.Server.Database.csproj", "{3D0F4011-CA4B-4B51-A05D-5D0298B82D69}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatKeeper.Abstractions", "HeatKeeper.Abstractions\HeatKeeper.Abstractions.csproj", "{B4B69607-A345-4E44-9401-9B32F4167513}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatKeeper.Abstractions", "src/HeatKeeper.Abstractions/HeatKeeper.Abstractions.csproj", "{B4B69607-A345-4E44-9401-9B32F4167513}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

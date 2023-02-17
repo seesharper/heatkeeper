@@ -31,6 +31,22 @@
       "type": "coreclr",
       "request": "attach",
       "processId": "${command:pickProcess}"
+    },
+    {
+      "name": ".NET Script Debug",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "~/GitHub/dotnet-script/src/Dotnet.Script/bin/Debug/net6.0/dotnet-script",
+      "args": [
+        "${file}",
+        "--isolated-load-context",
+        "--no-cache"
+      ],
+      "windows": {
+        "program": "${env:USERPROFILE}/.dotnet/tools/dotnet-script.exe",
+      },
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": true,
     }
   ]
 }
