@@ -4,11 +4,11 @@ services:
     image: influxdb:2.6.1
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=root
-      - DOCKER_INFLUXDB_INIT_PASSWORD=secret-password
-      - DOCKER_INFLUXDB_INIT_ORG=my-init-org
-      - DOCKER_INFLUXDB_INIT_BUCKET=my-init-bucket
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=secret-token
+      - DOCKER_INFLUXDB_INIT_USERNAME=heatkeeper
+      - DOCKER_INFLUXDB_INIT_PASSWORD=heatkeeper-password
+      - DOCKER_INFLUXDB_INIT_ORG=heatkeeper
+      - DOCKER_INFLUXDB_INIT_BUCKET=default-bucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=heatkeeper-admin-token
     container_name: influxdb
     ports:
       - "8086:8086"
