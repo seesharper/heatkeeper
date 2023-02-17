@@ -2,7 +2,6 @@
 #load "nuget:dotnet-steps, 0.0.2"
 
 BuildContext.CodeCoverageThreshold = 30;
-await Command.ExecuteAsync("docker", $"login --username bernhardrichter --password dckr_pat_2y8LfC54EJZPGRHf-WH3H0yh_DQ");
 
 [StepDescription("Runs the tests with test coverage")]
 Step testcoverage = () =>

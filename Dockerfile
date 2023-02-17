@@ -19,7 +19,7 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-stage
 
 COPY src /src
 
-WORKDIR /src
+WORKDIR /src/HeatKeeper.Server.Host
 
 RUN dotnet publish -c release -o /heatkeeper/app
 
