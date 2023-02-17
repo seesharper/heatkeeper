@@ -21,3 +21,5 @@ jobs:
           GITHUB_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           IS_SECURE_BUILDENVIRONMENT: ${{ secrets.IS_SECURE_BUILDENVIRONMENT }}
           NUGET_APIKEY: ${{ secrets.NUGET_APIKEY }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
