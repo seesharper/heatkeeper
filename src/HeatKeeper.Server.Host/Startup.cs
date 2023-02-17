@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
+using CQRS.Command.Abstractions;
 using HeatKeeper.Abstractions;
 using HeatKeeper.Server.Authentication;
-using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Electricity;
+using HeatKeeper.Server.Host.BackgroundTasks;
 using HeatKeeper.Server.Host.Swagger;
-using HeatKeeper.Server.Users;
-using LightInject;
+using Janitor;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -37,6 +37,21 @@ namespace HeatKeeper.Server.Host
         public void ConfigureServices(IServiceCollection services)
         {
             var appConfig = services.AddApplicationConfiguration(Configuration);
+
+            services.AddJanitor((sp, config) =>
+            {
+                config.Schedule(builder =>
+                {
+                    builder
+                        .WithName("ExportElectricalMarketPrices")
+                        .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
+                            => await commandExecutor.ExecuteAsync(new ExportAllMarketPricesCommand()))
+                        .WithSchedule(new CronSchedule("0 15,18,21 * * *"));
+                });
+
+            });
+            services.AddHostedService<JanitorHostedService>();
+            services.AddHttpClient();
 
             services.AddCorsPolicy();
 

@@ -11,15 +11,16 @@ public class UserContext : IUserContext
     {
         this.httpContextAccessor = httpContextAccessor;
     }
-    public long Id => long.Parse(httpContextAccessor.HttpContext.User.FindFirst(c => c.Type == ClaimTypes.Sid).Value);
+    public long Id
+        => httpContextAccessor.HttpContext is not null ? long.Parse(httpContextAccessor.HttpContext.User.FindFirst(c => c.Type == ClaimTypes.Sid).Value) : BackgroundUser.Id;
 
-    public string FirstName => httpContextAccessor.HttpContext.User.FindFirst(c => c.Type == ClaimTypes.GivenName).Value;
+    public string FirstName => httpContextAccessor.HttpContext is not null ? httpContextAccessor.HttpContext.User.FindFirst(c => c.Type == ClaimTypes.GivenName).Value : BackgroundUser.FirstName;
 
-    public string LastName => httpContextAccessor.HttpContext.User.FindFirst(c => c.Type == ClaimTypes.Surname).Value;
+    public string LastName => httpContextAccessor.HttpContext is not null ? httpContextAccessor.HttpContext.User.FindFirst(c => c.Type == ClaimTypes.Surname).Value : BackgroundUser.LastName;
 
-    public string Email => (httpContextAccessor.HttpContext.User?.FindFirst(c => c.Type == ClaimTypes.Email)?.Value) ?? "anonymous@tempuri.org";
+    public string Email => httpContextAccessor.HttpContext is not null ? (httpContextAccessor.HttpContext.User?.FindFirst(c => c.Type == ClaimTypes.Email)?.Value) ?? "anonymous@tempuri.org" : BackgroundUser.Email;
 
     public bool IsAdmin => Role == "admin";
 
-    public string Role => (httpContextAccessor.HttpContext.User?.FindFirst(c => c.Type == ClaimTypes.Role)?.Value) ?? "anonymous";
+    public string Role => httpContextAccessor.HttpContext is not null ? (httpContextAccessor.HttpContext.User?.FindFirst(c => c.Type == ClaimTypes.Role)?.Value) ?? "anonymous" : BackgroundUser.Role;
 }

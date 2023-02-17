@@ -1,7 +1,5 @@
 using System;
-using System.Data;
 using System.Net.Http;
-using CQRS.LightInject;
 using HeatKeeper.Server.Host;
 using HeatKeeper.Server.WebApi.Tests.Transactions;
 using LightInject;

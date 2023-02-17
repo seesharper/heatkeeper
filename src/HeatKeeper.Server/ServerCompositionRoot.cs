@@ -11,13 +11,16 @@ using HeatKeeper.Abstractions.Logging;
 using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Authorization;
+using HeatKeeper.Server.Configuration;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Export;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
+using InfluxDB.Client;
 using LightInject;
+using Microsoft.Extensions.Configuration;
 using Vibrant.InfluxDB.Client;
 
 namespace HeatKeeper.Server
@@ -56,6 +59,8 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
+                .RegisterScoped<IInfluxDBClient>(f => CreateInfluxDbClient(f.GetInstance<IConfiguration>()))
+                //.Decorate<ICommandHandler<ExportMeasurementsCommand>, CumulativeMeasurementsExporter>()
                 .Decorate<ICommandHandler<UpdateUserCommand>, ValidatedUpdateUserCommandHandler>()
                 .Decorate<ICommandHandler<RegisterUserCommand>, RegisterUserValidator>()
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidatedLocationCommandHandler<>))
@@ -72,13 +77,14 @@ namespace HeatKeeper.Server
 
         }
 
+        private InfluxDBClient CreateInfluxDbClient(IConfiguration configuration)
+            => new InfluxDBClient(configuration.GetInfluxDbUrl(), configuration.GetInfluxDbApiKey());
+
         private static IInfluxClient CreateInfluxClient()
         {
             string url = IsRunningInContainer() ? "http://influxdb:8086" : "http://localhost:8086";
             return new InfluxClient(new Uri(url));
         }
-
-
 
         public static bool IsRunningInContainer()
         {

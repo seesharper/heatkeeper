@@ -44,8 +44,13 @@ namespace HeatKeeper.Server.Measurements
         VoltageBetweenPhase2AndPhase3 = 11,
 
         /// <summary>
-        /// Cumulativeactive import active energy (Wh)
+        /// Cumulative active import active energy (Wh)
         /// </summary>
-        CumulativePowerImport = 12
+        CumulativePowerImport = 12,
+
+        /// <summary>
+        /// The price per kWh; 
+        /// </summary>
+        ElectricalPricePerkWh = 13,
     }
 }

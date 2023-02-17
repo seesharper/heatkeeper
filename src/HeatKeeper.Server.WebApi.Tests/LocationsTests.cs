@@ -11,6 +11,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         [Fact]
         public async Task ShouldCreateLocation()
         {
+            var test = Host.AppEnvironment.IsRunningFromTests;
+
+
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 

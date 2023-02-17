@@ -43,6 +43,13 @@ namespace HeatKeeper.Server.Authorization
         }
     }
 
+    public class RequireBackgroundRole : RequireRoleAttribute
+    {
+        public RequireBackgroundRole() : base(new string[] { Roles.AdminRole, Roles.UserRole, Roles.BackgroundUserRole })
+        {
+        }
+    }
+
     public class RequireAnonymousRoleAttribute : RequireRoleAttribute
     {
         public RequireAnonymousRoleAttribute() : base(Array.Empty<string>())

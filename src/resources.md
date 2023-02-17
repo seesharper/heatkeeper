@@ -41,3 +41,68 @@ https://stackoverflow.com/questions/9220432/http-401-unauthorized-or-403-forbidd
 https://www.strathweb.com/2018/07/centralized-exception-handling-and-request-validation-in-asp-net-core/
 
 https://jeroenhildering.com/2016/11/24/mapping-exceptions-to-http-responses-with-net-core/
+
+
+https://docs.influxdata.com/influxdb/cloud/query-data/common-queries/compare-values/
+
+
+
+
+
+```
+test2 = from(bucket: "None")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "ElectricalPricePerkWh")
+  |> filter(fn: (r) => r["_field"] == "PriceInNOK")
+  |> mean()
+  |> findColumn(
+      fn: (key) => key._field == "PriceInNOK",
+      column: "_value"
+  )
+  
+
+from(bucket: "None")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "CumulativePowerImport")
+  |> filter(fn: (r) => r["_field"] == "value")
+  |> difference()
+  |> map(fn: (r) => ({    
+    _time: r._time,
+    _value: r._value * test2[0],
+    field_name: r.field_name
+  }))
+  |> yield(name: "first")  
+```
+
+
+https://www.homeautomationguy.io/docker-tips/configuring-the-mosquitto-mqtt-docker-container-for-use-with-home-assistant/
+
+
+https://www.instructables.com/Tasmotized-NodeMCU-8CH-Sonoff-Relay/
+
+https://lastminuteengineers.com/esp8266-pinout-reference/
+
+```
+from(bucket: "None")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "CumulativePowerImport")
+  |> filter(fn: (r) => r["_field"] == "value")
+  |> difference()
+  |> map(fn: (r) => ({    
+    _time: r._time,
+    _value: r._value * 1.0,
+    field_name: r.field_name
+  }))
+  |> yield(name: "first")
+
+
+  from(bucket: "None")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "ElectricalPricePerkWh")
+  |> filter(fn: (r) => r["_field"] == "PriceInNOK")
+  |> mean()
+  |> yield(name: "averagePrice")
+ ```
+
+ 
+ https://rafaelldi.blog/posts/open-telemetry-in-dotnet/
