@@ -16,6 +16,7 @@ using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Export;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
+using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
 using InfluxDB.Client;
@@ -73,7 +74,9 @@ namespace HeatKeeper.Server
                 .Decorate<ICommandHandler<DeleteUserCommand>, ValidatedDeleteUserCommandHandler>()
                 .Decorate(typeof(ICommandHandler<>), typeof(MaintainDefaultZonesCommandHandler<>))
                 .Decorate<ICommandHandler<MeasurementCommand>, MaintainLatestZoneMeasurementDecorator>()
-                .Decorate<ICommandHandler<MeasurementCommand[]>, ExportMeasurementsDecorator>();
+                .Decorate<ICommandHandler<MeasurementCommand[]>, ExportMeasurementsDecorator>()
+                .Decorate<ICommandHandler<DeleteScheduleCommand>, BeforeDeleteSchedule>();
+
 
         }
 

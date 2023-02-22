@@ -46,6 +46,25 @@ public class ProgramsTests : TestBase
 
         schedules.Length.Should().Be(1);
         schedules.Single().Id.Should().Be(scheduleId);
+        schedules.Single().Name.Should().Be("DayTime");
+        schedules.Single().CronExpression.Should().Be("0 15,18,21 * * *");
+
+        await client.UpdateSchedule(new UpdateScheduleCommand(scheduleId, "NightTime", "0 23 * * *"), token);
+
+        schedules = await client.GetSchedules(programId, token);
+
+        schedules.Length.Should().Be(1);
+        schedules.Single().Id.Should().Be(scheduleId);
+        schedules.Single().Name.Should().Be("NightTime");
+        schedules.Single().CronExpression.Should().Be("0 23 * * *");
+
+        var zoneId = await client.CreateZone(locationId, TestData.Zones.Kitchen, token);
+        await client.CreateSetPoint(scheduleId, new CreateSetPointCommand(scheduleId, zoneId, 20, 2), token);
+
+        await client.DeleteSchedule(scheduleId, token);
+
+        schedules = await client.GetSchedules(programId, token);
+        schedules.Should().BeEmpty();
     }
 
     [Fact]
@@ -64,13 +83,30 @@ public class ProgramsTests : TestBase
 
         long scheduleId = await client.CreateSchedule(programId, createScheduleCommand, token);
 
-        var createSetPointCommand = new CreateSetPointCommand(scheduleId, 20, 2);
+        long zoneId = await client.CreateZone(locationId, TestData.Zones.Kitchen, token);
+
+        var createSetPointCommand = new CreateSetPointCommand(scheduleId, zoneId, 20, 2);
 
         var setPointId = await client.CreateSetPoint(scheduleId, createSetPointCommand, token);
 
         var setPoints = await client.GetSetPoints(scheduleId, token);
 
         setPoints.Length.Should().Be(1);
-        setPoints.Single().Id.Should().Be(scheduleId);
+        setPoints.Single().Id.Should().Be(setPointId);
+        setPoints.Single().Value.Should().Be(20);
+        setPoints.Single().Hysteresis.Should().Be(2);
+
+        await client.UpdateSetPoint(new UpdateSetPointCommand(setPointId, 30, 3), token);
+
+        setPoints = await client.GetSetPoints(scheduleId, token);
+        setPoints.Single().Id.Should().Be(setPointId);
+        setPoints.Single().Value.Should().Be(30);
+        setPoints.Single().Hysteresis.Should().Be(3);
+
+        await client.DeleteSetPoint(setPointId, token);
+
+        setPoints = await client.GetSetPoints(scheduleId, token);
+
+        setPoints.Should().BeEmpty();
     }
 }

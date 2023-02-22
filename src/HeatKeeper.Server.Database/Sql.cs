@@ -142,6 +142,14 @@ namespace HeatKeeper.Server.Database
 
         string InsertSetPoint { get; }
 
+        string UpdateSetPoint { get; }
+
+        string UpdateSchedule { get; }
+
+        string DeleteSchedule { get; }
+
+        string DeleteSetPoint { get; }
+        
         string GetLastInsertedRowId { get; }
 
         string GetProgramsByLocation { get; }

@@ -9,7 +9,7 @@ using HeatKeeper.Server.Database;
 namespace HeatKeeper.Server.Programs;
 
 [RequireUserRole]
-public record CreateSetPointCommand(long ScheduleId, double Value, double Hysteresis)
+public record CreateSetPointCommand(long ScheduleId, long ZoneId, double Value, double Hysteresis)
 {
     public long SetPointId { get; set; }
 }
