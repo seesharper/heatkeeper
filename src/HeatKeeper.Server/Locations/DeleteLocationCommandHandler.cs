@@ -38,6 +38,8 @@ namespace HeatKeeper.Server.Locations
                 await commandExecutor.ExecuteAsync(new DeleteZoneCommand() { ZoneId = zone.Id });
             }
 
+            //NOTE: We need to delete all programs 
+
             await dbConnection.ExecuteAsync(sqlProvider.DeleteLocation, command);
         }
     }

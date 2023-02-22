@@ -106,3 +106,6 @@ from(bucket: "None")
 
  
  https://rafaelldi.blog/posts/open-telemetry-in-dotnet/
+
+
+ https://resources.pcb.cadence.com/blog/2021-how-does-temperature-hysteresis-work

@@ -127,5 +127,27 @@ namespace HeatKeeper.Server.Database
         string LatestMeasurements { get; }
 
         string AddRetentionPolicyColumn { get; }
+
+        string CreateProgramsTable { get; }
+
+        string CreateSchedulesTable { get; }
+
+        string CreateSetPointsTable { get; }
+
+        string CreateForeignKeyFromProgramsToSchedules { get; }
+
+        string InsertProgram { get; }
+
+        string InsertSchedule { get; }
+
+        string InsertSetPoint { get; }
+
+        string GetLastInsertedRowId { get; }
+
+        string GetProgramsByLocation { get; }
+
+        string GetSchedulesByProgram { get; }
+
+        string GetSetPointsBySchedule { get; }
     }
 }
