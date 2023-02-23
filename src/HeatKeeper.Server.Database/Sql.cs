@@ -146,10 +146,16 @@ namespace HeatKeeper.Server.Database
 
         string UpdateSchedule { get; }
 
+        string UpdateProgram { get; }
+
         string DeleteSchedule { get; }
 
         string DeleteSetPoint { get; }
-        
+
+        string DeleteProgram { get; }
+
+        string SetActiveScheduleIdToNull { get; }
+
         string GetLastInsertedRowId { get; }
 
         string GetProgramsByLocation { get; }

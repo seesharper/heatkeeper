@@ -24,6 +24,20 @@ public class ProgramsTests : TestBase
         Program[] programs = await client.GetPrograms(locationId, token);
 
         programs.Length.Should().Be(1);
+        programs.Single().Name.Should().Be("Normal");
+        programs.Single().ActiveScheduleId.Should().BeNull();
+
+        var scheduleId = await client.CreateSchedule(programId, new CreateScheduleCommand(programId, "DayTime", "0 15,18,21 * * *"), token);
+
+        await client.UpdateProgram(new UpdateProgramCommand(programId, "Away", scheduleId), token);
+
+        programs = await client.GetPrograms(locationId, token);
+        programs.Single().Name.Should().Be(expected: "Away");
+        programs.Single().ActiveScheduleId.Should().Be(scheduleId);
+
+        await client.DeleteProgram(programId, token);
+        programs = await client.GetPrograms(locationId, token);
+        programs.Should().BeEmpty();
     }
 
     [Fact]

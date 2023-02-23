@@ -30,5 +30,11 @@ public class ProgramsController : ControllerBase
     public async Task<Schedule[]> Programs([FromRoute] SchedulesByProgramQuery query)
             => await _queryExecutor.ExecuteAsync(query);
 
-   
+    [HttpPatch(template: "{programId}")]
+    public async Task Patch([FromBodyAndRoute] UpdateProgramCommand command)
+        => await _commandExecutor.ExecuteAsync(command);
+
+    [HttpDelete("{programId}")]
+    public async Task Delete([FromRoute] DeleteProgramCommand command)
+            => await _commandExecutor.ExecuteAsync(command);
 }

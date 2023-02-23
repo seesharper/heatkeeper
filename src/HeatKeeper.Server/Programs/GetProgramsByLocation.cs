@@ -28,4 +28,4 @@ public class GetProgramsByLocation : IQueryHandler<ProgramsByLocationQuery, Prog
         => (await _dbConnection.ReadAsync<Program>(_sqlProvider.GetProgramsByLocation, query)).ToArray();
 }
 
-public record Program(long Id, string Name, long ActiveScheduleId);
+public record Program(long Id, string Name, long? ActiveScheduleId);

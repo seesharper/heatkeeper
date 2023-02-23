@@ -242,6 +242,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task UpdateSchedule(this HttpClient client, UpdateScheduleCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Patch(client, $"api/schedules/{command.ScheduleId}", command, token, success, problem);
 
+        public static async Task UpdateProgram(this HttpClient client, UpdateProgramCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Patch(client, $"api/programs/{command.ProgramId}", command, token, success, problem);
+
         public static async Task DeleteSensor(this HttpClient client, long sensorId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/sensors/{sensorId}", token, success, problem);
 
@@ -250,6 +253,9 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task DeleteSchedule(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/schedules/{scheduleId}", token, success, problem);
+
+        public static async Task DeleteProgram(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Delete(client, $"api/programs/{programId}", token, success, problem);
 
         public static async Task<ApiKey> GetApiKey(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ApiKey>(client, "api/users/apikey", token, success, problem);

@@ -75,9 +75,8 @@ namespace HeatKeeper.Server
                 .Decorate(typeof(ICommandHandler<>), typeof(MaintainDefaultZonesCommandHandler<>))
                 .Decorate<ICommandHandler<MeasurementCommand>, MaintainLatestZoneMeasurementDecorator>()
                 .Decorate<ICommandHandler<MeasurementCommand[]>, ExportMeasurementsDecorator>()
-                .Decorate<ICommandHandler<DeleteScheduleCommand>, BeforeDeleteSchedule>();
-
-
+                .Decorate<ICommandHandler<DeleteScheduleCommand>, BeforeDeleteSchedule>()
+                .Decorate<ICommandHandler<DeleteProgramCommand>, BeforeDeleteProgram>();
         }
 
         private InfluxDBClient CreateInfluxDbClient(IConfiguration configuration)

@@ -26,6 +26,8 @@ public class BeforeDeleteSchedule : ICommandHandler<DeleteScheduleCommand>
             await _commandExecutor.ExecuteAsync(new DeleteSetPointCommand(setPoint.Id), cancellationToken);
         }
 
+        await _commandExecutor.ExecuteAsync(new SetActiveScheduleIdToNullCommand(command.ScheduleId), cancellationToken);
+
         await _handler.HandleAsync(command, cancellationToken);
     }
 }
