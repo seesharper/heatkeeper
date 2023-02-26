@@ -38,3 +38,4 @@ public class ProgramsController : ControllerBase
     public async Task Delete([FromRoute] DeleteProgramCommand command)
             => await _commandExecutor.ExecuteAsync(command);
 }
+

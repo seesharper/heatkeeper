@@ -3,5 +3,8 @@
   "editor.quickSuggestions": {
     "other": true,
     "strings": true
-  }
+  },
+  "cSpell.words": [
+    "Cronos"
+  ]
 }

@@ -8,8 +8,15 @@ using HeatKeeper.Server.Database;
 
 namespace HeatKeeper.Server.Programs;
 
+public interface IScheduleCommand
+{
+    string Name { get; }
+
+    string CronExpression { get; }
+}
+
 [RequireUserRole]
-public record CreateScheduleCommand(long ProgramId, string Name, string CronExpression)
+public record CreateScheduleCommand(long ProgramId, string Name, string CronExpression) : IScheduleCommand
 {
     public long ScheduleId { get; set; }
 }

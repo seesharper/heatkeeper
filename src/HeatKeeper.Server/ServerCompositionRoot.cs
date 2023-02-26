@@ -30,12 +30,9 @@ namespace HeatKeeper.Server
     {
         static ServerCompositionRoot()
         {
-            // DbReaderOptions.WhenReading<long?>().Use((rd, i) => rd.GetInt32(i));
             DbReaderOptions.WhenReading<long>().Use((rd, i) => rd.GetInt32(i));
             DbReaderOptions.WhenReading<string>().Use((rd, i) => (string)rd.GetValue(i));
             DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) != 0);
-            // DbReaderOptions.WhenReading<RetentionPolicy>().Use((dr, i) => (RetentionPolicy)dr.GetInt64(i));
-            // DbReaderOptions.WhenReading<MeasurementType>().Use((dr, i) => (MeasurementType)dr.GetInt64(i));
         }
 
         public void Compose(IServiceRegistry serviceRegistry)
@@ -54,7 +51,8 @@ namespace HeatKeeper.Server
                 .Decorate<IDbConnection, ConnectionDecorator>()
                 .RegisterConstructorDependency<Logger>((f, p) => f.GetInstance<LogFactory>()(p.Member.DeclaringType))
                 .RegisterSingleton<IInfluxClient>(f => CreateInfluxClient())
-                .RegisterSingleton<IBootStrapper, InfluxDbBootStrapper>()
+                .RegisterSingleton<IBootStrapper, InfluxDbBootStrapper>("InfluxDbBootStrapper")
+                .RegisterSingleton<IBootStrapper>(sf => new JanitorBootStrapper(sf), "JanitorBootStrapper")
                 .RegisterSingleton<IPasswordManager, PasswordManager>()
                 .RegisterSingleton<IPasswordPolicy, PasswordPolicy>()
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
@@ -76,7 +74,9 @@ namespace HeatKeeper.Server
                 .Decorate<ICommandHandler<MeasurementCommand>, MaintainLatestZoneMeasurementDecorator>()
                 .Decorate<ICommandHandler<MeasurementCommand[]>, ExportMeasurementsDecorator>()
                 .Decorate<ICommandHandler<DeleteScheduleCommand>, BeforeDeleteSchedule>()
-                .Decorate<ICommandHandler<DeleteProgramCommand>, BeforeDeleteProgram>();
+                .Decorate<ICommandHandler<DeleteProgramCommand>, BeforeDeleteProgram>()
+                .Decorate(typeof(ICommandHandler<>), typeof(ValidateSchedule<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(AfterScheduleHasBeenInsertedOrUpdated<>));
         }
 
         private InfluxDBClient CreateInfluxDbClient(IConfiguration configuration)

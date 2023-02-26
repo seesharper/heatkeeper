@@ -23,16 +23,5 @@ public class UpdateProgramCommandHandler : ICommandHandler<UpdateProgramCommand>
     }
 
     public async Task HandleAsync(UpdateProgramCommand command, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            await _dbConnection.ExecuteAsync(_sqlProvider.UpdateProgram, command);
-        }
-        catch (System.Exception)
-        {
-
-            throw;
-        }
-
-    }
+        => await _dbConnection.ExecuteAsync(_sqlProvider.UpdateProgram, command);
 }

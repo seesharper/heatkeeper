@@ -9,7 +9,7 @@ using HeatKeeper.Server.Database;
 namespace HeatKeeper.Server.Programs;
 
 [RequireUserRole]
-public record UpdateScheduleCommand(long ScheduleId, string Name, string CronExpression);
+public record UpdateScheduleCommand(long ScheduleId, string Name, string CronExpression) : IScheduleCommand;
 
 public class UpdateScheduleCommandHandler : ICommandHandler<UpdateScheduleCommand>
 {

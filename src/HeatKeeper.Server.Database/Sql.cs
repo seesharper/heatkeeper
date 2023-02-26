@@ -156,11 +156,15 @@ namespace HeatKeeper.Server.Database
 
         string SetActiveScheduleIdToNull { get; }
 
+        string SetActiveSchedule { get; }
+
         string GetLastInsertedRowId { get; }
 
         string GetProgramsByLocation { get; }
 
         string GetSchedulesByProgram { get; }
+
+        string GetAllSchedules { get; }
 
         string GetSetPointsBySchedule { get; }
     }

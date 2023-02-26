@@ -2,7 +2,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
+using HeatKeeper.Abstractions;
 using HeatKeeper.Server.Programs;
+using Janitor;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests;
@@ -122,5 +125,59 @@ public class ProgramsTests : TestBase
         setPoints = await client.GetSetPoints(scheduleId, token);
 
         setPoints.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task ShouldAddSchedulesToJanitorWithBootStrapper()
+    {
+        HttpClient client = Factory.CreateClient();
+        string token = await client.AuthenticateAsAdminUser();
+
+        long locationId = await client.CreateLocation(TestData.Locations.Home, token);
+
+        var insertProgramCommand = new CreateProgramCommand("Normal", locationId);
+
+        long programId = await client.CreateProgram(insertProgramCommand, token);
+
+        var dayTimeScheduleCommand = new CreateScheduleCommand(programId, "DayTime", "0 15,18,21 * * *");
+
+        long dayTimeScheduleId = await client.CreateSchedule(programId, dayTimeScheduleCommand, token);
+
+        var nightTimeScheduleCommand = new CreateScheduleCommand(programId, "NightTime", "0 15,18,21 * * *");
+
+        long nightTimeScheduleId = await client.CreateSchedule(programId, nightTimeScheduleCommand, token);
+
+        var bootStrapper = Factory.Services.GetServices<IBootStrapper>().Single(s => s.GetType() == typeof(JanitorBootStrapper));
+
+        await bootStrapper.Execute();
+
+        var janitor = Factory.Services.GetService<IJanitor>();
+
+        janitor.Count().Should().Be(3);
+    }
+
+    [Fact]
+    public async Task ShouldAddAndUpdateJanitorWhenScheduleIsInsertedAndUpdated()
+    {
+        HttpClient client = Factory.CreateClient();
+        string token = await client.AuthenticateAsAdminUser();
+
+        long locationId = await client.CreateLocation(TestData.Locations.Home, token);
+
+        var insertProgramCommand = new CreateProgramCommand("Normal", locationId);
+
+        long programId = await client.CreateProgram(insertProgramCommand, token);
+
+        var dayTimeScheduleCommand = new CreateScheduleCommand(programId, "DayTime", "0 15,18,21 * * *");
+
+        long dayTimeScheduleId = await client.CreateSchedule(programId, dayTimeScheduleCommand, token);
+
+        var nightTimeScheduleCommand = new CreateScheduleCommand(programId, "NightTime", "0 15,18,21 * * *");
+
+        long nightTimeScheduleId = await client.CreateSchedule(programId, nightTimeScheduleCommand, token);
+
+        var janitor = Factory.Services.GetService<IJanitor>();
+
+        janitor.Count().Should().Be(3);
     }
 }
