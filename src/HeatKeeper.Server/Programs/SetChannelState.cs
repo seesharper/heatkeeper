@@ -1,0 +1,1 @@
+namespace HeatKeeper.Server.Programs;

@@ -1,7 +1,8 @@
 SELECT
     Id,
     Name,
-    Description
+    Description,
+    MqttTopic
 FROM
     Zones z
 WHERE LocationId = @LocationId

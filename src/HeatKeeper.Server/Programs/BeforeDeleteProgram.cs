@@ -26,6 +26,8 @@ public class BeforeDeleteProgram : ICommandHandler<DeleteProgramCommand>
             await _commandExecutor.ExecuteAsync(new DeleteScheduleCommand(schedule.Id), cancellationToken);
         }
 
+        await _commandExecutor.ExecuteAsync(new ClearActiveProgramCommand(command.ProgramId), cancellationToken);
+
         await _handler.HandleAsync(command, cancellationToken);
     }
 }

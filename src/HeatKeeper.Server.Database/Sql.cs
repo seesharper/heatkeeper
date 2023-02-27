@@ -136,6 +136,10 @@ namespace HeatKeeper.Server.Database
 
         string CreateForeignKeyFromProgramsToSchedules { get; }
 
+        string CreateForeignKeyFromLocationsToPrograms { get; }
+
+        string AddMqttTopicToZonesTable { get; }
+
         string InsertProgram { get; }
 
         string InsertSchedule { get; }
@@ -167,5 +171,9 @@ namespace HeatKeeper.Server.Database
         string GetAllSchedules { get; }
 
         string GetSetPointsBySchedule { get; }
+
+        string ActivateProgram { get; }
+
+        string ClearActiveProgram { get; }
     }
 }

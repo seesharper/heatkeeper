@@ -13,6 +13,7 @@
     <PackageReference Include="DbReader" Version="2.5.6" />
     <PackageReference Include="InfluxDB.Client" Version="4.9.0" />
     <PackageReference Include="LightInject" Version="6.6.3" />
+    <PackageReference Include="MQTTnet" Version="4.1.4.563" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />

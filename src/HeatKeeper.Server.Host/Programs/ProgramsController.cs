@@ -26,6 +26,13 @@ public class ProgramsController : ControllerBase
         return CreatedAtAction(nameof(CreateSchedule), new ResourceId(command.ScheduleId));
     }
 
+    [HttpPost("{programId}/activate")]
+    public async Task<IActionResult> Activate([FromRoute] ActivateProgramCommand command)
+    {
+        await _commandExecutor.ExecuteAsync(command);
+        return CreatedAtAction(nameof(Activate), null);
+    }
+
     [HttpGet("{programId}/schedules")]
     public async Task<Schedule[]> Programs([FromRoute] SchedulesByProgramQuery query)
             => await _queryExecutor.ExecuteAsync(query);
