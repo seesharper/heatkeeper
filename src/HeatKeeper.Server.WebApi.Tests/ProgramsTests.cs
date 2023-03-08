@@ -155,7 +155,7 @@ public class ProgramsTests : TestBase
 
         var janitor = Factory.Services.GetService<IJanitor>();
 
-        janitor.Count().Should().Be(3);
+        janitor.Count().Should().Be(4);
     }
 
     [Fact]
@@ -180,6 +180,6 @@ public class ProgramsTests : TestBase
 
         var janitor = Factory.Services.GetService<IJanitor>();
 
-        janitor.Count().Should().Be(3);
+        janitor.Count().Should().Be(4);
     }
 }
