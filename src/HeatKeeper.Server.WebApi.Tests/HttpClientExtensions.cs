@@ -170,7 +170,7 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .AddRequestUri(uri)
                 .Build();
 
-            var response = await SendAndHandleRequest(client, success, problem, httpRequest);        
+            var response = await SendAndHandleRequest(client, success, problem, httpRequest);
         }
 
 
@@ -228,8 +228,11 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<long> CreateSetPoint(this HttpClient client, long scheduleId, CreateSetPointCommand request, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/schedules/{scheduleId}/setPoints", request, token, success, problem);
 
-        public static async Task Activate(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        public static async Task ActivateProgram(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await PostWithNoContent(client, $"api/programs/{programId}/activate", token, success, problem);
+
+        public static async Task ActivateSchedule(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await PostWithNoContent(client, $"api/schedules/{scheduleId}/activate", token, success, problem);
 
         public static async Task DeleteLocation(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/locations/{locationId}", token, success, problem);

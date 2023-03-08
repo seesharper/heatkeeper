@@ -37,4 +37,11 @@ public class SchedulesController : ControllerBase
     [HttpDelete("{scheduleId}")]
     public async Task Delete([FromRoute] DeleteScheduleCommand command)
             => await _commandExecutor.ExecuteAsync(command);
+
+    [HttpPost("{scheduleId}/activate")]
+    public async Task<IActionResult> Activate([FromRoute] SetActiveScheduleCommand command)
+    {
+        await _commandExecutor.ExecuteAsync(command);
+        return CreatedAtAction(nameof(Activate), null);
+    }            
 }

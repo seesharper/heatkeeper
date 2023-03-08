@@ -24,7 +24,7 @@ public class ProgramsTests : TestBase
 
         long programId = await client.CreateProgram(insertProgramCommand, token);
 
-        await client.Activate(programId, token);
+        await client.ActivateProgram(programId, token);
 
         Program[] programs = await client.GetPrograms(locationId, token);
 

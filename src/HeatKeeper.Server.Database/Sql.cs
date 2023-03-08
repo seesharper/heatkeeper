@@ -175,5 +175,11 @@ namespace HeatKeeper.Server.Database
         string ActivateProgram { get; }
 
         string ClearActiveProgram { get; }
+
+        string GetTargetSetPoints { get; }
+
+        string GetMeasuredTemperatureValuePerZone { get; }
+
+        string GetZoneMqttInfo { get; }
     }
 }

@@ -16,12 +16,16 @@ using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Export;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
+using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
 using InfluxDB.Client;
 using LightInject;
 using Microsoft.Extensions.Configuration;
+using MQTTnet;
+using MQTTnet.Client;
+using MQTTnet.Extensions.ManagedClient;
 using Vibrant.InfluxDB.Client;
 
 namespace HeatKeeper.Server
@@ -37,7 +41,7 @@ namespace HeatKeeper.Server
 
         public void Compose(IServiceRegistry serviceRegistry)
         {
-            serviceRegistry.RegisterCommandHandlers()
+            _ = serviceRegistry.RegisterCommandHandlers()
                 .RegisterQueryHandlers()
                 .Decorate(typeof(ICommandHandler<>), typeof(TransactionalCommandHandler<>), sr =>
                 {
@@ -58,6 +62,7 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
+                .RegisterSingleton(sf => CreateMqttClientWrapper(sf.GetInstance<IConfiguration>()))
                 .RegisterScoped<IInfluxDBClient>(f => CreateInfluxDbClient(f.GetInstance<IConfiguration>()))
                 //.Decorate<ICommandHandler<ExportMeasurementsCommand>, CumulativeMeasurementsExporter>()
                 .Decorate<ICommandHandler<UpdateUserCommand>, ValidatedUpdateUserCommandHandler>()
@@ -87,6 +92,27 @@ namespace HeatKeeper.Server
             string url = IsRunningInContainer() ? "http://influxdb:8086" : "http://localhost:8086";
             return new InfluxClient(new Uri(url));
         }
+
+        private static IMqttClientWrapper CreateMqttClientWrapper(IConfiguration configuration)
+        {
+            string mqttBrokerAddress = configuration.GetMqttBrokerAddress();
+            string mqttBrokerUser = configuration.GetMqttBrokerUser();
+            string mqttBrokerPassword = configuration.GetMqttBrokerPassword();
+
+            var options = new ManagedMqttClientOptionsBuilder()
+                .WithAutoReconnectDelay(TimeSpan.FromSeconds(5))
+                .WithClientOptions(new MqttClientOptionsBuilder()
+                    .WithClientId("HeatKeeper")
+                    .WithCredentials(mqttBrokerUser, mqttBrokerPassword)
+                    .WithTcpServer(mqttBrokerAddress, 1883)
+                    .Build())
+                .Build();
+
+            IManagedMqttClient managedClient = new MqttFactory().CreateManagedMqttClient();
+            managedClient.StartAsync(options).Wait();
+            return new MqttClientWrapper(managedClient);
+        }
+
 
         public static bool IsRunningInContainer()
         {

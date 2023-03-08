@@ -26,7 +26,7 @@ public class AddScheduleToJanitorCommandHandler : ICommandHandler<AddScheduleToJ
                 .WithSchedule(new CronSchedule(command.CronExpression))
                 .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken ct) =>
                 {
-                    await commandExecutor.ExecuteAsync(new SetActiveScheduleCommand(command.ProgramId, command.ScheduleId), ct);
+                    await commandExecutor.ExecuteAsync(new SetActiveScheduleCommand(command.ScheduleId), ct);
                 });
         });
 

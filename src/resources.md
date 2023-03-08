@@ -109,3 +109,6 @@ from(bucket: "None")
 
 
  https://resources.pcb.cadence.com/blog/2021-how-does-temperature-hysteresis-work
+
+
+ https://github.com/vvatelot/mosquitto-docker-compose

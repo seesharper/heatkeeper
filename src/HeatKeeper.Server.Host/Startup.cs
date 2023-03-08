@@ -13,6 +13,7 @@ using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Electricity;
 using HeatKeeper.Server.Host.BackgroundTasks;
 using HeatKeeper.Server.Host.Swagger;
+using HeatKeeper.Server.Programs;
 using Janitor;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -39,17 +40,19 @@ namespace HeatKeeper.Server.Host
         {
             var appConfig = services.AddApplicationConfiguration(Configuration);
 
-            services.AddJanitor((sp, config) =>
-            {
-                config.Schedule(builder =>
-                {
-                    builder
-                        .WithName("ExportElectricalMarketPrices")
-                        .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
-                            => await commandExecutor.ExecuteAsync(new ExportAllMarketPricesCommand()))
-                        .WithSchedule(new CronSchedule("0 15,18,21 * * *"));
-                });
-            });
+            services.AddJanitor((sp, config) => config                
+                .Schedule(builder => builder
+                    .WithName("ExportElectricalMarketPrices")
+                    .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
+                        => await commandExecutor.ExecuteAsync(new ExportAllMarketPricesCommand(), cancellationToken))
+                    .WithSchedule(new CronSchedule("0 15,18,21 * * *")))
+                .Schedule(builder => builder
+                    .WithName("SetChannelStates")
+                    .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
+                        => await commandExecutor.ExecuteAsync(new SetChannelStatesCommand(), cancellationToken))
+                    .WithSchedule(new CronSchedule("*/10 * * * *")))
+            );
+
             services.AddHostedService<JanitorHostedService>();
             services.AddHttpClient();
 

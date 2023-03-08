@@ -9,7 +9,7 @@ using HeatKeeper.Server.Database;
 namespace HeatKeeper.Server.Programs;
 
 [RequireBackgroundRole]
-public record SetActiveScheduleCommand(long ProgramId, long ScheduleId);
+public record SetActiveScheduleCommand(long ScheduleId);
 
 public class SetActiveScheduleCommandHandler : ICommandHandler<SetActiveScheduleCommand>
 {

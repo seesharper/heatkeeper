@@ -2,4 +2,4 @@ UPDATE Programs
 SET 
     ActiveScheduleId = @ScheduleId
 WHERE 
-    ProgramId = @ProgramId    
+    Id = (SELECT ProgramId FROM Schedules WHERE Id = @ScheduleId)
