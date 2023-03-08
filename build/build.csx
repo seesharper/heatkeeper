@@ -16,7 +16,15 @@ Step test = () =>
 {
     Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" up -d");
     DotNet.Test();
-    Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" down");
+    try
+    {
+        Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" down");
+    }
+    catch (System.Exception)
+    {
+
+    }
+
 };
 
 [StepDescription("Creates the NuGet packages")]
