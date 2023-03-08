@@ -16,6 +16,14 @@ public static class ConfigurationExtensions
     public static string GetInfluxDbOrganization(this IConfiguration configuration)
         => configuration.GetRequiredValue("INFLUXDB_ORGANIZATION");
 
+    public static string GetMqttBrokerAddress(this IConfiguration configuration)
+        => configuration.GetRequiredValue("MQTT_BROKER_ADDRESS");
+
+    public static string GetMqttBrokerPassword(this IConfiguration configuration)
+        => configuration.GetRequiredValue("MQTT_BROKER_PASSWORD");
+    public static string GetMqttBrokerUser(this IConfiguration configuration)
+    => configuration.GetRequiredValue("MQTT_BROKER_USER");
+
     internal static string GetRequiredValue(this IConfiguration configuration, string key)
     {
         if (configuration.GetValue<string>(key) is null)

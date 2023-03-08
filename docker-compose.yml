@@ -7,6 +7,11 @@ services:
       - sqlite-volume:/db
     environment:
       - "HEATKEEPER_SECRET=${HEATKEEPER_SECRET}"
+      - "HEATKEEPER_INFLUXDB_API_KEY=${HEATKEEPER_INFLUXDB_API_KEY}"
+      - "HEATKEEPER_INFLUXDB_ORGANIZATION=${HEATKEEPER_INFLUXDB_ORGANIZATION}"
+      - "HEATKEEPER_MQTT_BROKER_ADDRESS=${HEATKEEPER_MQTT_BROKER_ADDRESS}"
+      - "HEATKEEPER_MQTT_BROKER_USER=${HEATKEEPER_MQTT_BROKER_USER}"
+      - "HEATKEEPER_MQTT_BROKER_PASSWORD=${HEATKEEPER_MQTT_BROKER_PASSWORD}"
     ports:
       - "5000:80"
   grafana:
@@ -37,7 +42,17 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 30 --debug
+  mosquitto:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./mosquitto/config/:/mosquitto/config/
+      - ./mosquitto/log/:/mosquitto/log/
+      - mosquitto-volume:/mosquitto/data/
+    ports:
+      - 1883:1883
+      - 9001:9001
 volumes:
   grafana-volume:
   influxdb-volume:
   sqlite-volume:
+  mosquitto-volume:

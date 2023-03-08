@@ -65,13 +65,13 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static class Zones
         {
             public static CreateZoneCommand LivingRoom =>
-                new CreateZoneCommand() { Name = "LivingRoom", Description = "This is the description of the LivingRoom zone", IsDefaultInsideZone = true };
+                new CreateZoneCommand() { Name = "LivingRoom", Description = "This is the description of the LivingRoom zone", IsDefaultInsideZone = true, MqttTopic = "LivingRoomTopic" };
 
             public static CreateZoneCommand Outside =>
                 new CreateZoneCommand() { Name = "Outside", Description = "This is the description of the outside zone", IsDefaultOutsideZone = true };
 
             public static CreateZoneCommand Kitchen =>
-                new CreateZoneCommand() { Name = "Kitchen", Description = "This is the description of the Kitchen zone" };
+                new CreateZoneCommand() { Name = "Kitchen", Description = "This is the description of the Kitchen zone", MqttTopic = "KitchenTopic" };
 
             public static CreateZoneCommand PowerMeter =>
                 new CreateZoneCommand() { Name = "PowerMeter", Description = "This is the description of the PowerMeter zone" };

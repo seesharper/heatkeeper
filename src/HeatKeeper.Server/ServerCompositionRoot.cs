@@ -16,11 +16,16 @@ using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Export;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
+using HeatKeeper.Server.Mqtt;
+using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
 using InfluxDB.Client;
 using LightInject;
 using Microsoft.Extensions.Configuration;
+using MQTTnet;
+using MQTTnet.Client;
+using MQTTnet.Extensions.ManagedClient;
 using Vibrant.InfluxDB.Client;
 
 namespace HeatKeeper.Server
@@ -29,17 +34,14 @@ namespace HeatKeeper.Server
     {
         static ServerCompositionRoot()
         {
-            // DbReaderOptions.WhenReading<long?>().Use((rd, i) => rd.GetInt32(i));
             DbReaderOptions.WhenReading<long>().Use((rd, i) => rd.GetInt32(i));
             DbReaderOptions.WhenReading<string>().Use((rd, i) => (string)rd.GetValue(i));
             DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) != 0);
-            // DbReaderOptions.WhenReading<RetentionPolicy>().Use((dr, i) => (RetentionPolicy)dr.GetInt64(i));
-            // DbReaderOptions.WhenReading<MeasurementType>().Use((dr, i) => (MeasurementType)dr.GetInt64(i));
         }
 
         public void Compose(IServiceRegistry serviceRegistry)
         {
-            serviceRegistry.RegisterCommandHandlers()
+            _ = serviceRegistry.RegisterCommandHandlers()
                 .RegisterQueryHandlers()
                 .Decorate(typeof(ICommandHandler<>), typeof(TransactionalCommandHandler<>), sr =>
                 {
@@ -53,12 +55,14 @@ namespace HeatKeeper.Server
                 .Decorate<IDbConnection, ConnectionDecorator>()
                 .RegisterConstructorDependency<Logger>((f, p) => f.GetInstance<LogFactory>()(p.Member.DeclaringType))
                 .RegisterSingleton<IInfluxClient>(f => CreateInfluxClient())
-                .RegisterSingleton<IBootStrapper, InfluxDbBootStrapper>()
+                .RegisterSingleton<IBootStrapper, InfluxDbBootStrapper>("InfluxDbBootStrapper")
+                .RegisterSingleton<IBootStrapper>(sf => new JanitorBootStrapper(sf), "JanitorBootStrapper")
                 .RegisterSingleton<IPasswordManager, PasswordManager>()
                 .RegisterSingleton<IPasswordPolicy, PasswordPolicy>()
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
+                .RegisterSingleton(sf => CreateMqttClientWrapper(sf.GetInstance<IConfiguration>()))
                 .RegisterScoped<IInfluxDBClient>(f => CreateInfluxDbClient(f.GetInstance<IConfiguration>()))
                 //.Decorate<ICommandHandler<ExportMeasurementsCommand>, CumulativeMeasurementsExporter>()
                 .Decorate<ICommandHandler<UpdateUserCommand>, ValidatedUpdateUserCommandHandler>()
@@ -73,8 +77,11 @@ namespace HeatKeeper.Server
                 .Decorate<ICommandHandler<DeleteUserCommand>, ValidatedDeleteUserCommandHandler>()
                 .Decorate(typeof(ICommandHandler<>), typeof(MaintainDefaultZonesCommandHandler<>))
                 .Decorate<ICommandHandler<MeasurementCommand>, MaintainLatestZoneMeasurementDecorator>()
-                .Decorate<ICommandHandler<MeasurementCommand[]>, ExportMeasurementsDecorator>();
-
+                .Decorate<ICommandHandler<MeasurementCommand[]>, ExportMeasurementsDecorator>()
+                .Decorate<ICommandHandler<DeleteScheduleCommand>, BeforeDeleteSchedule>()
+                .Decorate<ICommandHandler<DeleteProgramCommand>, BeforeDeleteProgram>()
+                .Decorate(typeof(ICommandHandler<>), typeof(ValidateSchedule<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(AfterScheduleHasBeenInsertedOrUpdated<>));
         }
 
         private InfluxDBClient CreateInfluxDbClient(IConfiguration configuration)
@@ -85,6 +92,27 @@ namespace HeatKeeper.Server
             string url = IsRunningInContainer() ? "http://influxdb:8086" : "http://localhost:8086";
             return new InfluxClient(new Uri(url));
         }
+
+        private static IMqttClientWrapper CreateMqttClientWrapper(IConfiguration configuration)
+        {
+            string mqttBrokerAddress = configuration.GetMqttBrokerAddress();
+            string mqttBrokerUser = configuration.GetMqttBrokerUser();
+            string mqttBrokerPassword = configuration.GetMqttBrokerPassword();
+
+            var options = new ManagedMqttClientOptionsBuilder()
+                .WithAutoReconnectDelay(TimeSpan.FromSeconds(5))
+                .WithClientOptions(new MqttClientOptionsBuilder()
+                    .WithClientId("HeatKeeper")
+                    .WithCredentials(mqttBrokerUser, mqttBrokerPassword)
+                    .WithTcpServer(mqttBrokerAddress, 1883)
+                    .Build())
+                .Build();
+
+            IManagedMqttClient managedClient = new MqttFactory().CreateManagedMqttClient();
+            managedClient.StartAsync(options).Wait();
+            return new MqttClientWrapper(managedClient);
+        }
+
 
         public static bool IsRunningInContainer()
         {

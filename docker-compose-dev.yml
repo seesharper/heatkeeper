@@ -1,4 +1,3 @@
-version: '3'
 services:
   influxdb:
     image: influxdb:2.6.1
@@ -24,3 +23,15 @@ services:
       - "3000:3000"
     volumes:
       - ./db/grafana/data:/var/lib/grafana
+  mosquitto:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./mosquitto/config/:/mosquitto/config/
+      - ./mosquitto/log/:/mosquitto/log/
+      - mosquitto_data:/mosquitto/data/
+    ports:
+      - 1883:1883
+      - 9001:9001
+
+volumes:
+  mosquitto_data: ~

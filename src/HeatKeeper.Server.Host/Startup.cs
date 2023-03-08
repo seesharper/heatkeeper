@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -12,6 +13,7 @@ using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Electricity;
 using HeatKeeper.Server.Host.BackgroundTasks;
 using HeatKeeper.Server.Host.Swagger;
+using HeatKeeper.Server.Programs;
 using Janitor;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -38,18 +40,19 @@ namespace HeatKeeper.Server.Host
         {
             var appConfig = services.AddApplicationConfiguration(Configuration);
 
-            services.AddJanitor((sp, config) =>
-            {
-                config.Schedule(builder =>
-                {
-                    builder
-                        .WithName("ExportElectricalMarketPrices")
-                        .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
-                            => await commandExecutor.ExecuteAsync(new ExportAllMarketPricesCommand()))
-                        .WithSchedule(new CronSchedule("0 15,18,21 * * *"));
-                });
+            services.AddJanitor((sp, config) => config                
+                .Schedule(builder => builder
+                    .WithName("ExportElectricalMarketPrices")
+                    .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
+                        => await commandExecutor.ExecuteAsync(new ExportAllMarketPricesCommand(), cancellationToken))
+                    .WithSchedule(new CronSchedule("0 15,18,21 * * *")))
+                .Schedule(builder => builder
+                    .WithName("SetChannelStates")
+                    .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
+                        => await commandExecutor.ExecuteAsync(new SetChannelStatesCommand(), cancellationToken))
+                    .WithSchedule(new CronSchedule("*/10 * * * *")))
+            );
 
-            });
             services.AddHostedService<JanitorHostedService>();
             services.AddHttpClient();
 
@@ -81,12 +84,14 @@ namespace HeatKeeper.Server.Host
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseMigrator databaseMigrator, IEnumerable<IBootStrapper> bootstrappers, ApplicationConfiguration applicationConfiguration)
         {
+            databaseMigrator.Migrate();
+
             foreach (var bootStrapper in bootstrappers)
             {
                 bootStrapper.Execute().GetAwaiter().GetResult();
             }
 
-            databaseMigrator.Migrate();
+
 
             app.UseSwagger();
 

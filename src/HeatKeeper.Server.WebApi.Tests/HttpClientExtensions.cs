@@ -8,6 +8,7 @@ using HeatKeeper.Server.Dashboard;
 using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
+using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Version;
@@ -107,11 +108,20 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<long> CreateLocation(this HttpClient client, CreateLocationCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/locations", content, token, success, problem);
 
+        public static async Task<long> CreateProgram(this HttpClient client, CreateProgramCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, $"api/locations/{content.LocationId}/programs", content, token, success, problem);
+
+        public static async Task<long> CreateProgram(this HttpClient client, CreateLocationCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, $"api/programs", content, token, success, problem);
+
         public static async Task UpdateLocation(this HttpClient client, UpdateLocationCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/locations/{content.Id}", content, token, success, problem);
 
         public static async Task UpdateZone(this HttpClient client, UpdateZoneCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/zones/{content.ZoneId}", content, token, success, problem);
+
+        public static async Task UpdateSetPoint(this HttpClient client, UpdateSetPointCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Patch(client, $"api/setPoints/{content.SetPointId}", content, token, success, problem);
 
         public static async Task<Location[]> GetLocations(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<Location[]>(client, "api/locations", token, success, problem);
@@ -149,6 +159,20 @@ namespace HeatKeeper.Server.WebApi.Tests
             var response = await SendAndHandleRequest(client, success, problem, httpRequest);
             return await response.ContentAs<TResponse>();
         }
+
+        private static async Task PostWithNoContent(HttpClient client, string uri, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        {
+            success ??= (response) => response.StatusCode.Should().Be(HttpStatusCode.Created);
+
+            var httpRequest = new HttpRequestBuilder()
+                .AddBearerToken(token)
+                .WithMethod(HttpMethod.Post)
+                .AddRequestUri(uri)
+                .Build();
+
+            var response = await SendAndHandleRequest(client, success, problem, httpRequest);
+        }
+
 
         private static async Task PostWithNoResponse<TContent>(HttpClient client, string uri, TContent content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
@@ -198,11 +222,33 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<long> CreateZone(this HttpClient client, long locationId, CreateZoneCommand request, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/locations/{locationId}/zones", request, token, success, problem);
 
+        public static async Task<long> CreateSchedule(this HttpClient client, long programId, CreateScheduleCommand request, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, $"api/programs/{programId}/schedules", request, token, success, problem);
+
+        public static async Task<long> CreateSetPoint(this HttpClient client, long scheduleId, CreateSetPointCommand request, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, $"api/schedules/{scheduleId}/setPoints", request, token, success, problem);
+
+        public static async Task ActivateProgram(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await PostWithNoContent(client, $"api/programs/{programId}/activate", token, success, problem);
+
+        public static async Task ActivateSchedule(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await PostWithNoContent(client, $"api/schedules/{scheduleId}/activate", token, success, problem);
+
         public static async Task DeleteLocation(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/locations/{locationId}", token, success, problem);
 
         public static async Task<Zone[]> GetZones(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<Zone[]>(client, $"api/locations/{locationId}/zones", token, success, problem);
+
+        public static async Task<Programs.Program[]> GetPrograms(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<Programs.Program[]>(client, $"api/locations/{locationId}/programs", token, success, problem);
+
+        public static async Task<Schedule[]> GetSchedules(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<Schedule[]>(client, $"api/programs/{programId}/schedules", token, success, problem);
+
+        public static async Task<SetPoint[]> GetSetPoints(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<SetPoint[]>(client, $"api/schedules/{scheduleId}/setPoints", token, success, problem);
+
 
         public static async Task<ZoneDetails> GetZoneDetails(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ZoneDetails>(client, $"api/zones/{zoneId}", token, success, problem);
@@ -213,8 +259,23 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task UpdateSensor(this HttpClient client, UpdateSensorCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Patch(client, $"api/sensors/{command.SensorId}", command, token, success, problem);
 
+        public static async Task UpdateSchedule(this HttpClient client, UpdateScheduleCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Patch(client, $"api/schedules/{command.ScheduleId}", command, token, success, problem);
+
+        public static async Task UpdateProgram(this HttpClient client, UpdateProgramCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Patch(client, $"api/programs/{command.ProgramId}", command, token, success, problem);
+
         public static async Task DeleteSensor(this HttpClient client, long sensorId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/sensors/{sensorId}", token, success, problem);
+
+        public static async Task DeleteSetPoint(this HttpClient client, long setPointId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Delete(client, $"api/setPoints/{setPointId}", token, success, problem);
+
+        public static async Task DeleteSchedule(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Delete(client, $"api/schedules/{scheduleId}", token, success, problem);
+
+        public static async Task DeleteProgram(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Delete(client, $"api/programs/{programId}", token, success, problem);
 
         public static async Task<ApiKey> GetApiKey(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ApiKey>(client, "api/users/apikey", token, success, problem);

@@ -127,5 +127,59 @@ namespace HeatKeeper.Server.Database
         string LatestMeasurements { get; }
 
         string AddRetentionPolicyColumn { get; }
+
+        string CreateProgramsTable { get; }
+
+        string CreateSchedulesTable { get; }
+
+        string CreateSetPointsTable { get; }
+
+        string CreateForeignKeyFromProgramsToSchedules { get; }
+
+        string CreateForeignKeyFromLocationsToPrograms { get; }
+
+        string AddMqttTopicToZonesTable { get; }
+
+        string InsertProgram { get; }
+
+        string InsertSchedule { get; }
+
+        string InsertSetPoint { get; }
+
+        string UpdateSetPoint { get; }
+
+        string UpdateSchedule { get; }
+
+        string UpdateProgram { get; }
+
+        string DeleteSchedule { get; }
+
+        string DeleteSetPoint { get; }
+
+        string DeleteProgram { get; }
+
+        string SetActiveScheduleIdToNull { get; }
+
+        string SetActiveSchedule { get; }
+
+        string GetLastInsertedRowId { get; }
+
+        string GetProgramsByLocation { get; }
+
+        string GetSchedulesByProgram { get; }
+
+        string GetAllSchedules { get; }
+
+        string GetSetPointsBySchedule { get; }
+
+        string ActivateProgram { get; }
+
+        string ClearActiveProgram { get; }
+
+        string GetTargetSetPoints { get; }
+
+        string GetMeasuredTemperatureValuePerZone { get; }
+
+        string GetZoneMqttInfo { get; }
     }
 }

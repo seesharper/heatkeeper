@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Locations;
+using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
 using Microsoft.AspNetCore.Http;
@@ -38,12 +39,12 @@ namespace HeatKeeper.Server.Host.Locations
             => await commandExecutor.ExecuteAsync(updateLocationCommand).ConfigureAwait(false);
 
         [HttpGet]
-        public async Task<Location[]> Get([FromQuery]GetAllLocationsQuery query)
+        public async Task<Location[]> Get([FromQuery] GetAllLocationsQuery query)
             => await queryExecutor.ExecuteAsync(query);
 
 
         [HttpGet("{locationId}/zones")]
-        public async Task<Zone[]> Zones([FromRoute]ZonesByLocationQuery query)
+        public async Task<Zone[]> Zones([FromRoute] ZonesByLocationQuery query)
             => await queryExecutor.ExecuteAsync(query);
 
         [HttpPost("{locationId}/zones")]
@@ -54,20 +55,32 @@ namespace HeatKeeper.Server.Host.Locations
         }
 
         [HttpPost("{locationId}/users")]
-        public async Task<IActionResult> AddUser([FromBodyAndRoute]AddUserToLocationCommand command)
+        public async Task<IActionResult> AddUser([FromBodyAndRoute] AddUserToLocationCommand command)
         {
             await commandExecutor.ExecuteAsync(command);
             return Ok();
         }
 
+        [HttpPost("{locationId}/programs")]
+        public async Task<IActionResult> AddProgram([FromBodyAndRoute] CreateProgramCommand command)
+        {
+            await commandExecutor.ExecuteAsync(command);
+            return CreatedAtAction(nameof(AddProgram), new ResourceId(command.ProgramId));
+        }
+
+        [HttpGet("{locationId}/programs")]
+        public async Task<Server.Programs.Program[]> Programs([FromRoute] ProgramsByLocationQuery query)
+            => await queryExecutor.ExecuteAsync(query);
+
+
         [HttpGet("{locationId}/users")]
-        public async Task<User[]> GetUsers([FromRoute]UsersByLocationQuery query) =>
+        public async Task<User[]> GetUsers([FromRoute] UsersByLocationQuery query) =>
             await queryExecutor.ExecuteAsync(query);
 
 
         [HttpDelete("{locationId}/users/{userId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task RemoveUser([FromRoute]DeleteUserLocationCommand command)
+        public async Task RemoveUser([FromRoute] DeleteUserLocationCommand command)
             => await commandExecutor.ExecuteAsync(command);
     }
 }

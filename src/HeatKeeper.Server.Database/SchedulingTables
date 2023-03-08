@@ -1,0 +1,37 @@
+
+
+-- EXAMPLE -> Normal / Borte / Ferie
+
+
+
+CREATE TABLE Programs
+(    
+    Id INTEGER,
+    LocationId INTEGER,
+    ActiveScheduleId INTEGER,    
+    Name TEXT
+)
+
+-- EXAMPLE Dagtid hverdager / Kveldstid Hverdager
+
+CREATE TABLE Schedules 
+(
+    Id INTEGER,
+    ProgramId INTEGER,
+    Name TEXT,
+    CronExpression TEXT
+)
+
+-- EXMPLAE 
+CREATE TABLE SetPoints
+(
+    ScheduleId INTEGER
+    ZoneId INTEGER,
+    Hysteresis DOUBLE
+    Value DOUBLE
+)
+
+-- How to get the target temperatures.
+-- 1. Find the active programs 
+-- 2. For each programs, find the active schedule
+-- 3. 

@@ -2,7 +2,7 @@ using System;
 using Cronos;
 using Janitor;
 
-namespace HeatKeeper.Server.Host.BackgroundTasks;
+namespace HeatKeeper.Server.Programs;
 
 public class CronSchedule : ISchedule
 {

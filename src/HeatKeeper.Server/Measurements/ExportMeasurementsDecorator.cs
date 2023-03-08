@@ -32,7 +32,7 @@ namespace HeatKeeper.Server.Measurements
             {
                 await commandExecutor.ExecuteAsync(new ExportMeasurementsCommand() { MeasurementsToExport = measurementsToExport });
                 await commandExecutor.ExecuteAsync(measurementsToExport.Select(m => new UpdateExportedMeasurementsCommand() { MeasurementId = m.Id, Exported = DateTime.UtcNow }).ToArray());
-                await commandExecutor.ExecuteAsync(new DeleteExportedMeasurementsCommand() { RetentionDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(7)) });
+                await commandExecutor.ExecuteAsync(new DeleteExportedMeasurementsCommand() { RetentionDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1)) });
             }
             catch (Exception exception)
             {
