@@ -26,6 +26,7 @@ build/Chocolatey/tools/LICENSE.TXT
 build/.vscode
 build/Artifacts
 db
+mosquitto
 dotnet-script-tool/
 # Visual Studio 2015 cache/options directory
 .vs/
