@@ -112,3 +112,10 @@ from(bucket: "None")
 
 
  https://github.com/vvatelot/mosquitto-docker-compose
+
+
+
+ https://linuxize.com/post/how-to-setup-passwordless-ssh-login/
+
+
+ https://linuxize.com/post/how-to-set-and-list-environment-variables-in-linux/  

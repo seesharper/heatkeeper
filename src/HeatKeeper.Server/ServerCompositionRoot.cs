@@ -26,7 +26,6 @@ using Microsoft.Extensions.Configuration;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
-using Vibrant.InfluxDB.Client;
 
 namespace HeatKeeper.Server
 {
@@ -54,7 +53,6 @@ namespace HeatKeeper.Server
                 })
                 .Decorate<IDbConnection, ConnectionDecorator>()
                 .RegisterConstructorDependency<Logger>((f, p) => f.GetInstance<LogFactory>()(p.Member.DeclaringType))
-                .RegisterSingleton<IInfluxClient>(f => CreateInfluxClient())
                 .RegisterSingleton<IBootStrapper, InfluxDbBootStrapper>("InfluxDbBootStrapper")
                 .RegisterSingleton<IBootStrapper>(sf => new JanitorBootStrapper(sf), "JanitorBootStrapper")
                 .RegisterSingleton<IPasswordManager, PasswordManager>()
@@ -86,13 +84,7 @@ namespace HeatKeeper.Server
 
         private InfluxDBClient CreateInfluxDbClient(IConfiguration configuration)
             => new InfluxDBClient(configuration.GetInfluxDbUrl(), configuration.GetInfluxDbApiKey());
-
-        private static IInfluxClient CreateInfluxClient()
-        {
-            string url = IsRunningInContainer() ? "http://influxdb:8086" : "http://localhost:8086";
-            return new InfluxClient(new Uri(url));
-        }
-
+       
         private static IMqttClientWrapper CreateMqttClientWrapper(IConfiguration configuration)
         {
             string mqttBrokerAddress = configuration.GetMqttBrokerAddress();
