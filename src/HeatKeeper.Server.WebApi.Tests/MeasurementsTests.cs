@@ -134,14 +134,14 @@ namespace HeatKeeper.Server.WebApi.Tests
                             """;
 
                             var queryApi = client.GetQueryApi();
-                            var result = await queryApi.QueryAsync(string.Format(query, nameof(RetentionPolicy.Hour)), "my-init-org");
-                            result.First().Records.Count().Should().Be(exportedMeasurementsCount);
+                            var result = await queryApi.QueryAsync(string.Format(query, nameof(RetentionPolicy.Hour)), "heatkeeper");
+                            result.First().Records.Count().Should().Be(2);
 
-                            result = await queryApi.QueryAsync(string.Format(query, nameof(RetentionPolicy.Day)), "my-init-org");
-                            result.First().Records.Count().Should().Be(exportedMeasurementsCount);
+                            result = await queryApi.QueryAsync(string.Format(query, nameof(RetentionPolicy.Day)), "heatkeeper");
+                            result.First().Records.Count().Should().Be(2);
 
-                            result = await queryApi.QueryAsync(string.Format(query, nameof(RetentionPolicy.Week)), "my-init-org");
-                            result.First().Records.Count().Should().Be(exportedMeasurementsCount);
+                            result = await queryApi.QueryAsync(string.Format(query, nameof(RetentionPolicy.Week)), "heatkeeper");
+                            result.First().Records.Count().Should().Be(2);
                         }
                     });
                 });

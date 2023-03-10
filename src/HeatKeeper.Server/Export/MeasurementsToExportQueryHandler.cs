@@ -8,7 +8,6 @@ using DbReader;
 using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Measurements;
-using Vibrant.InfluxDB.Client;
 
 namespace HeatKeeper.Server.Export
 {
@@ -49,20 +48,15 @@ namespace HeatKeeper.Server.Export
         }
 
         public RetentionPolicy RetentionPolicy { get; set; }
-
-        [InfluxTag("MeasurementType")]
+    
         public string MeasurementTypeName { get; set; }
-
-        [InfluxField("Value")]
+        
         public double Value { get; set; }
-
-        [InfluxTimestamp]
+        
         public DateTime Created { get; set; }
-
-        [InfluxTag("Zone")]
+        
         public string Zone { get; set; }
-
-        [InfluxTag("Location")]
+        
         public string Location { get; set; }
     }
 
