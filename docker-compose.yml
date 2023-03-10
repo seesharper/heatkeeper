@@ -1,7 +1,7 @@
 version: "3"
 services:
   heatkeeper:
-    image: bernhardrichter/heatkeeper:0.0.6
+    image: bernhardrichter/heatkeeper:0.5.0
     container_name: heatkeeper
     volumes:
       - sqlite-volume:/db
@@ -12,6 +12,7 @@ services:
       - "HEATKEEPER_MQTT_BROKER_ADDRESS=${HEATKEEPER_MQTT_BROKER_ADDRESS}"
       - "HEATKEEPER_MQTT_BROKER_USER=${HEATKEEPER_MQTT_BROKER_USER}"
       - "HEATKEEPER_MQTT_BROKER_PASSWORD=${HEATKEEPER_MQTT_BROKER_PASSWORD}"
+      - "HEATKEEPER_CHANNELSTATE_CRONEXPRESSION=${HEATKEEPER_CHANNELSTATE_CRONEXPRESSION}"
     ports:
       - "5000:80"
   grafana:

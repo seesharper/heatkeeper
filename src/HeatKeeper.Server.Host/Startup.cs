@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using HeatKeeper.Abstractions;
 using HeatKeeper.Server.Authentication;
+using HeatKeeper.Server.Configuration;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Electricity;
 using HeatKeeper.Server.Host.BackgroundTasks;
@@ -24,7 +25,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-
 namespace HeatKeeper.Server.Host
 {
     public class Startup
@@ -40,7 +40,7 @@ namespace HeatKeeper.Server.Host
         {
             var appConfig = services.AddApplicationConfiguration(Configuration);
 
-            services.AddJanitor((sp, config) => config                
+            services.AddJanitor((sp, config) => config
                 .Schedule(builder => builder
                     .WithName("ExportElectricalMarketPrices")
                     .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
@@ -50,7 +50,7 @@ namespace HeatKeeper.Server.Host
                     .WithName("SetChannelStates")
                     .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
                         => await commandExecutor.ExecuteAsync(new SetChannelStatesCommand(), cancellationToken))
-                    .WithSchedule(new CronSchedule("*/10 * * * *")))
+                    .WithSchedule(new CronSchedule(Configuration.GetChannelStateCronExpression())))
             );
 
             services.AddHostedService<JanitorHostedService>();

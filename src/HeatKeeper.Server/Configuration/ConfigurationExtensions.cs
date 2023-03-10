@@ -22,7 +22,10 @@ public static class ConfigurationExtensions
     public static string GetMqttBrokerPassword(this IConfiguration configuration)
         => configuration.GetRequiredValue("MQTT_BROKER_PASSWORD");
     public static string GetMqttBrokerUser(this IConfiguration configuration)
-    => configuration.GetRequiredValue("MQTT_BROKER_USER");
+        => configuration.GetRequiredValue("MQTT_BROKER_USER");
+
+    public static string GetChannelStateCronExpression(this IConfiguration configuration)
+        => configuration.GetRequiredValue("CHANNELSTATE_CRONEXPRESSION");
 
     internal static string GetRequiredValue(this IConfiguration configuration, string key)
     {
