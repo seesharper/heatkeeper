@@ -16,18 +16,10 @@ Step test = () =>
 {
     Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" up -d");
     DotNet.Test();
-    try
-    {
-        Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" down");
-    }
-    catch (System.Exception)
-    {
-
-    }
-
+    Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" down");
 };
 
-[StepDescription("Creates the NuGet packages")]
+[StepDescription("Creates the Docker image")]
 AsyncStep dockerImage = async () =>
 {
     await Docker.BuildAsync("bernhardrichter/heatkeeper", BuildContext.LatestTag, BuildContext.RepositoryFolder);
@@ -39,9 +31,10 @@ AsyncStep deploy = async () =>
 {
     test();
     testcoverage();
-    await dockerImage();
+
     if (BuildEnvironment.IsSecure && BuildEnvironment.IsTagCommit)
     {
+        await dockerImage();
         await Docker.PushAsync("bernhardrichter/heatkeeper", BuildContext.LatestTag, BuildContext.BuildFolder);
     }
 
