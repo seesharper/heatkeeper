@@ -1,8 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Query.Abstractions;
-using HeatKeeper.Server.Users;
 using HeatKeeper.Abstractions.Logging;
+using HeatKeeper.Server.Users;
 
 namespace HeatKeeper.Server.Authorization
 {
@@ -24,7 +24,7 @@ namespace HeatKeeper.Server.Authorization
         {
             if (RoleAttribute.IsSatisfiedBy(userContext.Role))
             {
-                logger.Info($"Successfully authorized access to '{query.GetType()}' for user '{userContext.Email}({userContext.Role})'");
+                logger.Debug($"Successfully authorized access to '{query.GetType()}' for user '{userContext.Email}({userContext.Role})'");
                 return await queryHandler.HandleAsync(query, cancellationToken).ConfigureAwait(false);
             }
             else

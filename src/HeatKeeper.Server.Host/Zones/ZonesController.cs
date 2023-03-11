@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Zones;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,10 @@ namespace HeatKeeper.Server.Host.Zones
 
         [HttpGet("{zoneId}/sensors")]
         public async Task<Sensor[]> GetSensors([FromRoute] SensorsByZoneQuery query)
+            => await _queryExecutor.ExecuteAsync(query);
+
+        [HttpGet("{zoneId}/heatingstatus")]
+        public async Task<HeatingStatusResult> GetHeatingStatus([FromRoute] GetHeatingStatusQuery query)
             => await _queryExecutor.ExecuteAsync(query);
 
         [HttpPost("{zoneId}/sensors")]
