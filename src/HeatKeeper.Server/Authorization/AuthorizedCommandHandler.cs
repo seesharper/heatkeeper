@@ -23,7 +23,7 @@ namespace HeatKeeper.Server.Authorization
         {
             if (RoleAttribute.IsSatisfiedBy(userContext.Role))
             {
-                logger.Info($"Successfully authorized access to '{command.GetType()}' for user '{userContext.Email}({userContext.Role})'");
+                logger.Debug($"Successfully authorized access to '{command.GetType()}' for user '{userContext.Email}({userContext.Role})'");
                 await commandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
             }
             else
