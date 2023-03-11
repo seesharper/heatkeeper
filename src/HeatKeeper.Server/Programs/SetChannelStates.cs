@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Abstractions.Logging;
 using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Programs;
@@ -15,11 +16,13 @@ public class SetChannelStates : ICommandHandler<SetChannelStatesCommand>
 {
     private readonly IQueryExecutor _queryExecutor;
     private readonly ICommandExecutor _commandExecutor;
+    private readonly Logger _logger;
 
-    public SetChannelStates(IQueryExecutor queryExecutor, ICommandExecutor commandExecutor)
+    public SetChannelStates(IQueryExecutor queryExecutor, ICommandExecutor commandExecutor, Logger logger)
     {
         _queryExecutor = queryExecutor;
         _commandExecutor = commandExecutor;
+        _logger = logger;
     }
 
     public async Task HandleAsync(SetChannelStatesCommand command, CancellationToken cancellationToken = default)
@@ -38,10 +41,12 @@ public class SetChannelStates : ICommandHandler<SetChannelStatesCommand>
             {
                 if (measuredZoneTemperature.Value >= targetSetPoint.Value + targetSetPoint.Hysteresis)
                 {
+                    _logger.Info($"The measured value was {measuredZoneTemperature.Value} and the target setpoint is {targetSetPoint.Value}. We are turning the channel off.");
                     await _commandExecutor.ExecuteAsync(new SetZoneHeatingStatusCommand(targetSetPoint.ZoneId, HeatingStatus.Off), cancellationToken);
                 }
                 if (measuredZoneTemperature.Value <= targetSetPoint.Value - targetSetPoint.Hysteresis)
                 {
+                    _logger.Info($"The measured value was {measuredZoneTemperature.Value} and the target setpoint is {targetSetPoint.Value}. We are turning the channel on.");
                     await _commandExecutor.ExecuteAsync(new SetZoneHeatingStatusCommand(targetSetPoint.ZoneId, HeatingStatus.On), cancellationToken);
                 }
             }
