@@ -11,19 +11,17 @@ namespace HeatKeeper.Server.Zones
 {
     public class ZoneDetailsQueryHandler : IQueryHandler<ZoneDetailsQuery, ZoneDetails>
     {
-        private readonly IDbConnection dbConnection;
-        private readonly ISqlProvider sqlProvider;
+        private readonly IDbConnection _dbConnection;
+        private readonly ISqlProvider _sqlProvider;
 
         public ZoneDetailsQueryHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
         {
-            this.dbConnection = dbConnection;
-            this.sqlProvider = sqlProvider;
+            _dbConnection = dbConnection;
+            _sqlProvider = sqlProvider;
         }
 
         public async Task<ZoneDetails> HandleAsync(ZoneDetailsQuery query, CancellationToken cancellationToken = default)
-        {
-            return (await dbConnection.ReadAsync<ZoneDetails>(sqlProvider.GetZoneDetails, query)).Single();
-        }
+            => (await _dbConnection.ReadAsync<ZoneDetails>(_sqlProvider.GetZoneDetails, query)).Single();
     }
 
     [RequireAdminRole]
@@ -39,6 +37,8 @@ namespace HeatKeeper.Server.Zones
         public string Name { get; set; }
 
         public string Description { get; set; }
+
+        public string MqttTopic { get; set; }
 
         public bool IsDefaultOutsideZone { get; set; }
 

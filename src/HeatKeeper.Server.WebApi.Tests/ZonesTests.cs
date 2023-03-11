@@ -82,15 +82,17 @@ namespace HeatKeeper.Server.WebApi.Tests
             {
                 ZoneId = zoneId,
                 Name = TestData.Zones.Kitchen.Name,
+                MqttTopic = "SomeTopic",
                 Description = TestData.Zones.Kitchen.Description
             };
 
             await client.UpdateZone(updateZoneCommand, token);
 
-            var updatedZone = (await client.GetZones(locationId, token)).Single();
+            var updatedZone = await client.GetZoneDetails(zoneId, token);
 
             updatedZone.Name.Should().Be(TestData.Zones.Kitchen.Name);
             updatedZone.Description.Should().Be(TestData.Zones.Kitchen.Description);
+            updatedZone.MqttTopic.Should().Be("SomeTopic");
         }
 
         [Fact]

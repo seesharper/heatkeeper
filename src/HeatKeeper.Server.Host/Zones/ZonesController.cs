@@ -11,37 +11,37 @@ namespace HeatKeeper.Server.Host.Zones
     [Route("api/[controller]")]
     public class ZonesController : ControllerBase
     {
-        private readonly IQueryExecutor queryExecutor;
-        private readonly ICommandExecutor commandExecutor;
+        private readonly IQueryExecutor _queryExecutor;
+        private readonly ICommandExecutor _commandExecutor;
 
         public ZonesController(IQueryExecutor queryExecutor, ICommandExecutor commandExecutor)
         {
-            this.queryExecutor = queryExecutor;
-            this.commandExecutor = commandExecutor;
+            _queryExecutor = queryExecutor;
+            _commandExecutor = commandExecutor;
         }
 
         [HttpPatch("{zoneId}")]
         public async Task Patch([FromBodyAndRoute] UpdateZoneCommand updateZoneCommand)
-           => await commandExecutor.ExecuteAsync(updateZoneCommand);
+           => await _commandExecutor.ExecuteAsync(updateZoneCommand);
 
         [HttpDelete("{zoneId}")]
         public async Task Delete([FromRoute] DeleteZoneCommand deleteZoneCommand)
-            => await commandExecutor.ExecuteAsync(deleteZoneCommand);
+            => await _commandExecutor.ExecuteAsync(deleteZoneCommand);
 
         [HttpGet("{zoneId}")]
-        public async Task<ZoneDetails> GetZoneDetails([FromRoute]ZoneDetailsQuery query)
-            => await queryExecutor.ExecuteAsync(query);
+        public async Task<ZoneDetails> GetZoneDetails([FromRoute] ZoneDetailsQuery query)
+            => await _queryExecutor.ExecuteAsync(query);
 
         [HttpGet("{zoneId}/sensors")]
-        public async Task<Sensor[]> GetSensors([FromRoute]SensorsByZoneQuery query)
-            => await queryExecutor.ExecuteAsync(query);
+        public async Task<Sensor[]> GetSensors([FromRoute] SensorsByZoneQuery query)
+            => await _queryExecutor.ExecuteAsync(query);
 
         [HttpPost("{zoneId}/sensors")]
         public async Task AddSensorToZone([FromBodyAndRoute] AddSensorToZoneCommand command)
-            => await commandExecutor.ExecuteAsync(command);
+            => await _commandExecutor.ExecuteAsync(command);
 
         [HttpDelete("{zoneId}/sensors")]
         public async Task RemoveSensorFromZone([FromBodyAndRoute] RemoveSensorFromZoneCommand command)
-            => await commandExecutor.ExecuteAsync(command);
+            => await _commandExecutor.ExecuteAsync(command);
     }
 }
