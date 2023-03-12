@@ -1,5 +1,7 @@
+using System.Linq;
 using System.Threading.Tasks;
 using HeatKeeper.Server.Programs;
+using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Zones;
 using Janitor;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +22,17 @@ public class ChannelStateTests : TestBase
         var locationId = await client.CreateLocation(TestData.Locations.Home, token);
 
         var zoneId = await client.CreateZone(locationId, TestData.Zones.Kitchen, token);
+
+        await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, token);
+
+        var sensors = await client.GetSensors(zoneId, token);
+
+        var livingroomSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
+
+        await client.UpdateSensor(new UpdateSensorCommand() { SensorId = livingroomSensor.Id, Name = livingroomSensor.Name, Description = livingroomSensor.Description, ZoneId = zoneId }, token);
+
+        await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, token);
+
 
         var programId = await client.CreateProgram(new CreateProgramCommand("Normal", locationId), token);
 
