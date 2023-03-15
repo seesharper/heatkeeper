@@ -12,7 +12,7 @@ INNER JOIN
     Programs p 
 ON 
     s.ProgramId = p.Id AND
-    p.ActiveScheduleID = sp.Id
+    p.ActiveScheduleID = s.Id
 INNER JOIN 
     Locations l
 ON 
