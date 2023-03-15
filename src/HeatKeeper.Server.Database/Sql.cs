@@ -181,5 +181,9 @@ namespace HeatKeeper.Server.Database
         string GetMeasuredTemperatureValuePerZone { get; }
 
         string GetZoneMqttInfo { get; }
+
+        string AddLastSeenColumnToSensors { get; }
+
+        string UpdateLastSeenOnSensor { get; }
     }
 }

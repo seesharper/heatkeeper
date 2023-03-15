@@ -9,18 +9,16 @@ namespace HeatKeeper.Server.Measurements
 {
     public class InsertMeasurementCommandHandler : ICommandHandler<MeasurementCommand>
     {
-        private readonly IDbConnection dbConnection;
-        private readonly ISqlProvider sqlProvider;
+        private readonly IDbConnection _dbConnection;
+        private readonly ISqlProvider _sqlProvider;
 
         public InsertMeasurementCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
         {
-            this.dbConnection = dbConnection;
-            this.sqlProvider = sqlProvider;
+            _dbConnection = dbConnection;
+            _sqlProvider = sqlProvider;
         }
 
         public async Task HandleAsync(MeasurementCommand command, CancellationToken cancellationToken = default)
-        {
-            await dbConnection.ExecuteAsync(sqlProvider.InsertMeasurement, command);
-        }
+            => await _dbConnection.ExecuteAsync(_sqlProvider.InsertMeasurement, command);
     }
 }
