@@ -1,7 +1,8 @@
 SELECT 
     Id,
     Value,
-    Hysteresis
+    Hysteresis,
+    ZoneId
 FROM 
     SetPoints
 WHERE 
