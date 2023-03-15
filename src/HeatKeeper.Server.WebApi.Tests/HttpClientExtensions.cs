@@ -64,6 +64,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<User[]> GetAllUsers(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<User[]>(client, "api/users", token, success, problem);
 
+        public static async Task<DeadSensor[]> GetDeadSensors(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<DeadSensor[]>(client, "api/sensors/deadsensors", token, success, problem);
+
         public static async Task<User[]> GetUsersByLocation(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<User[]>(client, $"api/locations/{locationId}/users", token, success, problem);
 

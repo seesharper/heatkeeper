@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
+using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Sensors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,17 +10,25 @@ namespace HeatKeeper.Server.Host.Sensors
     [ApiController]
     public class SensorsController : ControllerBase
     {
-        private readonly ICommandExecutor commandExecutor;
+        private readonly ICommandExecutor _commandExecutor;
+        private readonly IQueryExecutor _queryExecutor;
 
-        public SensorsController(ICommandExecutor commandExecutor)
-            => this.commandExecutor = commandExecutor;
+        public SensorsController(ICommandExecutor commandExecutor, IQueryExecutor queryExecutor)
+        {
+            _commandExecutor = commandExecutor;
+            _queryExecutor = queryExecutor;
+        }
 
         [HttpDelete("{sensorId}")]
-        public async Task Delete([FromRoute]DeleteSensorCommand command)
-            => await commandExecutor.ExecuteAsync(command);
+        public async Task Delete([FromRoute] DeleteSensorCommand command)
+            => await _commandExecutor.ExecuteAsync(command);
 
         [HttpPatch("{sensorId}")]
         public async Task Patch([FromBodyAndRoute] UpdateSensorCommand command)
-            => await commandExecutor.ExecuteAsync(command);
+            => await _commandExecutor.ExecuteAsync(command);
+
+        [HttpGet("DeadSensors")]
+        public async Task<DeadSensor[]> GetDeadSensors()
+            => await _queryExecutor.ExecuteAsync(new DeadSensorsQuery());
     }
 }

@@ -185,5 +185,7 @@ namespace HeatKeeper.Server.Database
         string AddLastSeenColumnToSensors { get; }
 
         string UpdateLastSeenOnSensor { get; }
+
+        string GetDeadSensors { get; }
     }
 }
