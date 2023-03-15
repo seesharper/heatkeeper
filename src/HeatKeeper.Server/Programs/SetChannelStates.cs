@@ -32,9 +32,12 @@ public class SetChannelStates : ICommandHandler<SetChannelStatesCommand>
 
         foreach (TargetSetPoint targetSetPoint in targetSetPoints)
         {
+            _logger.Info($"The target set point for zone {targetSetPoint.ZoneId} is {targetSetPoint.Value} and we have an hysteresis set to {targetSetPoint.Hysteresis}");
+
             MeasuredZoneTemperature measuredZoneTemperature = measuredZoneTemperatures.SingleOrDefault(mzt => mzt.ZoneId == targetSetPoint.ZoneId);
             if (measuredZoneTemperature is null)
             {
+                _logger.Warning($"We could not get the measured temperature for zone {targetSetPoint.ZoneId}. Make sure that we don't have a dead sensor. We are turning the channel off");
                 await _commandExecutor.ExecuteAsync(new SetZoneHeatingStatusCommand(targetSetPoint.ZoneId, HeatingStatus.Off), cancellationToken);
             }
             else
