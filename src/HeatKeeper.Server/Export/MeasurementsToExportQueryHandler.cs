@@ -48,16 +48,18 @@ namespace HeatKeeper.Server.Export
         }
 
         public RetentionPolicy RetentionPolicy { get; set; }
-    
+
         public string MeasurementTypeName { get; set; }
-        
+
         public double Value { get; set; }
-        
+
         public DateTime Created { get; set; }
-        
+
         public string Zone { get; set; }
-        
+
         public string Location { get; set; }
+
+        public string ExternalSensorId { get; set; }
     }
 
 

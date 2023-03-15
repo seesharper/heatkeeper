@@ -12,7 +12,7 @@ namespace HeatKeeper.Server.Programs;
 [RequireUserRole]
 public record SetPointsByScheduleQuery(long ScheduleId) : IQuery<SetPoint[]>;
 
-public record SetPoint(long Id, double Value, double Hysteresis);
+public record SetPoint(long Id, double Value, double Hysteresis, long ZoneId);
 
 public class GetSetPointsByScheduleQueryHandler : IQueryHandler<SetPointsByScheduleQuery, SetPoint[]>
 {

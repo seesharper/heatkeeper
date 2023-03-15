@@ -78,13 +78,14 @@ namespace HeatKeeper.Server
                 .Decorate<ICommandHandler<MeasurementCommand[]>, ExportMeasurementsDecorator>()
                 .Decorate<ICommandHandler<DeleteScheduleCommand>, BeforeDeleteSchedule>()
                 .Decorate<ICommandHandler<DeleteProgramCommand>, BeforeDeleteProgram>()
+                .Decorate<ICommandHandler<ExportMeasurementsCommand>, WhenMeasurementAreExported>()
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidateSchedule<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(AfterScheduleHasBeenInsertedOrUpdated<>));
         }
 
         private InfluxDBClient CreateInfluxDbClient(IConfiguration configuration)
             => new InfluxDBClient(configuration.GetInfluxDbUrl(), configuration.GetInfluxDbApiKey());
-       
+
         private static IMqttClientWrapper CreateMqttClientWrapper(IConfiguration configuration)
         {
             string mqttBrokerAddress = configuration.GetMqttBrokerAddress();
