@@ -60,7 +60,7 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
-                .RegisterSingleton(sf => CreateMqttClientWrapper(sf.GetInstance<IConfiguration>()))
+                .RegisterSingleton(sf => CreateTasmotaClient(sf.GetInstance<IConfiguration>()))
                 .RegisterScoped<IInfluxDBClient>(f => CreateInfluxDbClient(f.GetInstance<IConfiguration>()))
                 //.Decorate<ICommandHandler<ExportMeasurementsCommand>, CumulativeMeasurementsExporter>()
                 .Decorate<ICommandHandler<UpdateUserCommand>, ValidatedUpdateUserCommandHandler>()
@@ -86,7 +86,7 @@ namespace HeatKeeper.Server
         private InfluxDBClient CreateInfluxDbClient(IConfiguration configuration)
             => new InfluxDBClient(configuration.GetInfluxDbUrl(), configuration.GetInfluxDbApiKey());
 
-        private static IMqttClientWrapper CreateMqttClientWrapper(IConfiguration configuration)
+        private static ITasmotaClient CreateTasmotaClient(IConfiguration configuration)
         {
             string mqttBrokerAddress = configuration.GetMqttBrokerAddress();
             string mqttBrokerUser = configuration.GetMqttBrokerUser();
@@ -103,7 +103,7 @@ namespace HeatKeeper.Server
 
             IManagedMqttClient managedClient = new MqttFactory().CreateManagedMqttClient();
             managedClient.StartAsync(options).Wait();
-            return new MqttClientWrapper(managedClient);
+            return new TasmotaClient(managedClient);
         }
 
 
