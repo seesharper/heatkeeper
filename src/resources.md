@@ -119,3 +119,7 @@ from(bucket: "None")
 
 
  https://linuxize.com/post/how-to-set-and-list-environment-variables-in-linux/  
+
+
+Shelly Plug S
+ https://www.youtube.com/watch?v=_huPdu7paYw

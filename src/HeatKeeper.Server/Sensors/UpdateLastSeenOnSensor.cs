@@ -9,7 +9,7 @@ using HeatKeeper.Server.Database;
 
 namespace HeatKeeper.Server.Sensors;
 
-[RequireReporterRole]
+[RequireBackgroundRole]
 public record UpdateLastSeenOnSensorCommand(string ExternalId, DateTime LastSeen);
 
 public class UpdateLastSeenOnSensorCommandHandler : ICommandHandler<UpdateLastSeenOnSensorCommand>

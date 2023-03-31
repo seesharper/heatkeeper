@@ -74,11 +74,10 @@ namespace HeatKeeper.Server
                 .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>))
                 .Decorate<ICommandHandler<DeleteUserCommand>, ValidatedDeleteUserCommandHandler>()
                 .Decorate(typeof(ICommandHandler<>), typeof(MaintainDefaultZonesCommandHandler<>))
-                .Decorate<ICommandHandler<MeasurementCommand>, MaintainLatestZoneMeasurementDecorator>()
-                .Decorate<ICommandHandler<MeasurementCommand[]>, ExportMeasurementsDecorator>()
                 .Decorate<ICommandHandler<DeleteScheduleCommand>, BeforeDeleteSchedule>()
                 .Decorate<ICommandHandler<DeleteProgramCommand>, BeforeDeleteProgram>()
-                .Decorate<ICommandHandler<ExportMeasurementsCommand>, WhenMeasurementAreExported>()
+                .Decorate<ICommandHandler<ExportMeasurementsToInfluxDbCommand>, WhenMeasurementAreExported>()
+                .Decorate<ICommandHandler<MeasurementCommand[]>, WhenMeasurementsAreInserted>()
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidateSchedule<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(AfterScheduleHasBeenInsertedOrUpdated<>));
         }

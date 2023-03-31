@@ -7,6 +7,8 @@ using HeatKeeper.Server.Export;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Sensors;
 using InfluxDB.Client;
+using Janitor;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests
@@ -38,13 +40,16 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var sensors = await client.GetSensors(livingRoomZoneId, token);
 
-            var livingroomSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
+            var livingRoomSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
             var outsideSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.OutsideSensor);
 
-            await client.UpdateSensor(new UpdateSensorCommand() { SensorId = livingroomSensor.Id, Name = livingroomSensor.Name, Description = livingroomSensor.Description, ZoneId = livingRoomZoneId }, token);
+            await client.UpdateSensor(new UpdateSensorCommand() { SensorId = livingRoomSensor.Id, Name = livingRoomSensor.Name, Description = livingRoomSensor.Description, ZoneId = livingRoomZoneId }, token);
             await client.UpdateSensor(new UpdateSensorCommand() { SensorId = outsideSensor.Id, Name = outsideSensor.Name, Description = outsideSensor.Description, ZoneId = outsideZoneId }, token);
 
             await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, apiKey.Token);
+
+            var janitor = Factory.Services.GetService<IJanitor>();
+            await janitor.Run("ExportMeasurements");
 
             var latestMeasurements = await client.GetLatestMeasurements(10, token);
 
@@ -67,10 +72,10 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var sensors = await client.GetSensors(livingRoomZoneId, token);
 
-            var livingroomSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
+            var livingRoomSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
             var outsideSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.OutsideSensor);
 
-            await client.UpdateSensor(new UpdateSensorCommand() { SensorId = livingroomSensor.Id, Name = livingroomSensor.Name, Description = livingroomSensor.Description, ZoneId = livingRoomZoneId }, token);
+            await client.UpdateSensor(new UpdateSensorCommand() { SensorId = livingRoomSensor.Id, Name = livingRoomSensor.Name, Description = livingRoomSensor.Description, ZoneId = livingRoomZoneId }, token);
             await client.UpdateSensor(new UpdateSensorCommand() { SensorId = outsideSensor.Id, Name = outsideSensor.Name, Description = outsideSensor.Description, ZoneId = outsideZoneId }, token);
 
             await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, apiKey.Token);
@@ -111,10 +116,13 @@ namespace HeatKeeper.Server.WebApi.Tests
         [Fact]
         public async Task ShouldExportMeasurementWithRetentionPolicy()
         {
+            bool wasIntercepted = false;
+
             var client = Factory.CreateClient(c =>
                 {
-                    c.RegisterCommandInterceptor<ExportMeasurementsCommand, IInfluxDBClient>(async (command, handler, client, token) =>
+                    c.RegisterCommandInterceptor<ExportMeasurementsToInfluxDbCommand, IInfluxDBClient>(async (command, handler, client, token) =>
                     {
+                        wasIntercepted = true;
                         // Set the zone to something we can query after the handler has been invoked.
                         var zone = Guid.NewGuid().ToString("N");
                         foreach (var measurementToExport in command.MeasurementsToExport)
@@ -158,6 +166,9 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             await client.UpdateSensor(new UpdateSensorCommand() { SensorId = livingroomSensor.Id, Name = livingroomSensor.Name, Description = livingroomSensor.Description, ZoneId = zoneId }, token);
             await client.CreateMeasurements(TestData.TemperatureMeasurementRequestsWithRetentionPolicy, token);
+            var janitor = Factory.Services.GetService<IJanitor>();
+            await janitor.Run("ExportMeasurements");
+            wasIntercepted.Should().BeTrue();
         }
     }
 

@@ -12,59 +12,59 @@ namespace HeatKeeper.Server.Host.Users
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly ICommandExecutor commandExecutor;
-        private readonly IQueryExecutor queryExecutor;
-        private readonly IApiKeyProvider apiKeyProvider;
-        private readonly IUserContext userContext;
+        private readonly ICommandExecutor _commandExecutor;
+        private readonly IQueryExecutor _queryExecutor;
+        private readonly IApiKeyProvider _apiKeyProvider;
+        private readonly IUserContext _userContext;
 
         public UsersController(ICommandExecutor commandExecutor, IQueryExecutor queryExecutor, IApiKeyProvider apiKeyProvider, IUserContext userContext)
         {
-            this.commandExecutor = commandExecutor;
-            this.queryExecutor = queryExecutor;
-            this.apiKeyProvider = apiKeyProvider;
-            this.userContext = userContext;
+            _commandExecutor = commandExecutor;
+            _queryExecutor = queryExecutor;
+            _apiKeyProvider = apiKeyProvider;
+            _userContext = userContext;
         }
 
         [HttpPost("authenticate")]
-        public async Task<AuthenticatedUser> Authenticate([FromBody]AuthenticatedUserQuery query)
-            => await queryExecutor.ExecuteAsync(query);
+        public async Task<AuthenticatedUser> Authenticate([FromBody] AuthenticatedUserQuery query)
+            => await _queryExecutor.ExecuteAsync(query);
 
         [HttpPost()]
-        public async Task<ActionResult<ResourceId>> Post([FromBody]RegisterUserCommand command)
+        public async Task<ActionResult<ResourceId>> Post([FromBody] RegisterUserCommand command)
         {
-            await commandExecutor.ExecuteAsync(command);
+            await _commandExecutor.ExecuteAsync(command);
             return Created(nameof(Post), new ResourceId(command.UserId));
         }
 
         [HttpDelete("{userId}")]
         public async Task<IActionResult> Delete([FromRoute] DeleteUserCommand command)
         {
-            await commandExecutor.ExecuteAsync(command);
+            await _commandExecutor.ExecuteAsync(command);
             return NoContent();
         }
 
         [HttpPatch("{userId}")]
-        public async Task PatchUser([FromBodyAndRoute]UpdateUserCommand command)
-            => await commandExecutor.ExecuteAsync(command);
+        public async Task PatchUser([FromBodyAndRoute] UpdateUserCommand command)
+            => await _commandExecutor.ExecuteAsync(command);
 
         [HttpPatch()]
-        public async Task<ActionResult<ResourceId>> PatchCurrentUser([FromBodyAndRoute]UpdateCurrentUserCommand command)
+        public async Task<ActionResult<ResourceId>> PatchCurrentUser([FromBodyAndRoute] UpdateCurrentUserCommand command)
         {
-            command.UserId = userContext.Id;
-            await commandExecutor.ExecuteAsync(command);
+            command.UserId = _userContext.Id;
+            await _commandExecutor.ExecuteAsync(command);
             return Ok();
         }
 
         [HttpGet]
-        public async Task<User[]> Get([FromQuery]AllUsersQuery query)
-            => await queryExecutor.ExecuteAsync(query);
+        public async Task<User[]> Get([FromQuery] AllUsersQuery query)
+            => await _queryExecutor.ExecuteAsync(query);
 
         [HttpPatch("password")]
-        public async Task ChangePassword([FromBody]ChangePasswordCommand command)
-            => await commandExecutor.ExecuteAsync(command);
+        public async Task ChangePassword([FromBody] ChangePasswordCommand command)
+            => await _commandExecutor.ExecuteAsync(command);
 
         [HttpGet("apikey")]
-        public async Task<ApiKey> GetApiKey([FromQuery]ApiKeyQuery query)
-            => await queryExecutor.ExecuteAsync(query);
+        public async Task<ApiKey> GetApiKey([FromQuery] ApiKeyQuery query)
+            => await _queryExecutor.ExecuteAsync(query);
     }
 }

@@ -12,8 +12,10 @@ using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Configuration;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Electricity;
+using HeatKeeper.Server.Export;
 using HeatKeeper.Server.Host.BackgroundTasks;
 using HeatKeeper.Server.Host.Swagger;
+using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Programs;
 using Janitor;
 using Microsoft.AspNetCore.Builder;
@@ -47,6 +49,11 @@ namespace HeatKeeper.Server.Host
                         => await commandExecutor.ExecuteAsync(new ExportAllMarketPricesCommand(), cancellationToken))
                     .WithSchedule(new CronSchedule("0 15,18,21 * * *")))
                 .Schedule(builder => builder
+                    .WithName("ExportMeasurements")
+                    .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
+                        => await commandExecutor.ExecuteAsync(new ExportMeasurementsCommand(), cancellationToken))
+                    .WithSchedule(new CronSchedule("* * * * *")))
+                .Schedule(builder => builder
                     .WithName("SetChannelStates")
                     .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
                         => await commandExecutor.ExecuteAsync(new SetChannelStatesCommand(), cancellationToken))
@@ -55,7 +62,7 @@ namespace HeatKeeper.Server.Host
 
             services.AddHostedService<JanitorHostedService>();
             services.AddHttpClient();
-
+ 
             services.AddCorsPolicy();
 
             services.AddRouting(options => options.LowercaseUrls = true);
@@ -84,12 +91,12 @@ namespace HeatKeeper.Server.Host
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseMigrator databaseMigrator, IEnumerable<IBootStrapper> bootstrappers, ApplicationConfiguration applicationConfiguration)
         {
-            databaseMigrator.Migrate();
+            // databaseMigrator.Migrate();
 
-            foreach (var bootStrapper in bootstrappers)
-            {
-                bootStrapper.Execute().GetAwaiter().GetResult();
-            }
+            // foreach (var bootStrapper in bootstrappers)
+            // {
+            //     bootStrapper.Execute().GetAwaiter().GetResult();
+            // }
 
 
 

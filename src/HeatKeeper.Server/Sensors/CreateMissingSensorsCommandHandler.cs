@@ -11,22 +11,22 @@ namespace HeatKeeper.Server.Sensors
 {
     public class CreateMissingSensorsCommandHandler : ICommandHandler<CreateMissingSensorsCommand>
     {
-        private readonly IQueryExecutor queryExecutor;
-        private readonly ICommandExecutor commandExecutor;
+        private readonly IQueryExecutor _queryExecutor;
+        private readonly ICommandExecutor _commandExecutor;
 
         public CreateMissingSensorsCommandHandler(IQueryExecutor queryExecutor, ICommandExecutor commandExecutor)
         {
-            this.queryExecutor = queryExecutor;
-            this.commandExecutor = commandExecutor;
+            _queryExecutor = queryExecutor;
+            _commandExecutor = commandExecutor;
         }
 
         public async Task HandleAsync(CreateMissingSensorsCommand command, CancellationToken cancellationToken = default)
         {
-            var allSensors = await queryExecutor.ExecuteAsync(new GetAllExternalSensorsQuery());
+            var allSensors = await _queryExecutor.ExecuteAsync(new GetAllExternalSensorsQuery(), cancellationToken);
             var unknownExternalSensorIds = command.ExternalSensorIds.Distinct().Except(allSensors.Select(s => s.ExternalId)).ToArray();
             foreach (var unknownExternalSensorId in unknownExternalSensorIds)
             {
-                await commandExecutor.ExecuteAsync(new CreateSensorCommand(unknownExternalSensorId, unknownExternalSensorId, "This sensor need to be assigned to a zone"));
+                await _commandExecutor.ExecuteAsync(new CreateSensorCommand(unknownExternalSensorId, unknownExternalSensorId, "This sensor need to be assigned to a zone"));
             }
         }
     }

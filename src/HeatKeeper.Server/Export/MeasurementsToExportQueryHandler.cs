@@ -26,7 +26,7 @@ namespace HeatKeeper.Server.Export
             => (await dbConnection.ReadAsync<MeasurementToExport>(sqlProvider.GetMeasurementsToExport, query)).ToArray();
     }
 
-    [RequireReporterRole]
+    [RequireBackgroundRole]
     public class MeasurementsToExportQuery : IQuery<MeasurementToExport[]>
     {
     }

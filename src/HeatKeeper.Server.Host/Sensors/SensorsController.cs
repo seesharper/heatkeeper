@@ -28,7 +28,7 @@ namespace HeatKeeper.Server.Host.Sensors
             => await _commandExecutor.ExecuteAsync(command);
 
         [HttpGet("DeadSensors")]
-        public async Task<DeadSensor[]> GetDeadSensors()
+        public async Task<DeadSensor[]> GetDeadSensors([FromQuery] DeadSensorsQuery query)
             => await _queryExecutor.ExecuteAsync(new DeadSensorsQuery());
     }
 }
