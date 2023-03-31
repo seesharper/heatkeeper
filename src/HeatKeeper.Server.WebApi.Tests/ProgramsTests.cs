@@ -15,18 +15,18 @@ public class ProgramsTests : TestBase
     [Fact]
     public async Task ShouldCreateProgram()
     {
-        HttpClient client = Factory.CreateClient();
-        string token = await client.AuthenticateAsAdminUser();
+        var client = Factory.CreateClient();
+        var token = await client.AuthenticateAsAdminUser();
 
-        long locationId = await client.CreateLocation(TestData.Locations.Home, token);
+        var locationId = await client.CreateLocation(TestData.Locations.Home, token);
 
         var insertProgramCommand = new CreateProgramCommand("Normal", locationId);
 
-        long programId = await client.CreateProgram(insertProgramCommand, token);
+        var programId = await client.CreateProgram(insertProgramCommand, token);
 
         await client.ActivateProgram(programId, token);
 
-        Program[] programs = await client.GetPrograms(locationId, token);
+        var programs = await client.GetPrograms(locationId, token);
 
         programs.Length.Should().Be(1);
         programs.Single().Name.Should().Be("Normal");
@@ -48,20 +48,20 @@ public class ProgramsTests : TestBase
     [Fact]
     public async Task ShouldCreateSchedule()
     {
-        HttpClient client = Factory.CreateClient();
-        string token = await client.AuthenticateAsAdminUser();
+        var client = Factory.CreateClient();
+        var token = await client.AuthenticateAsAdminUser();
 
-        long locationId = await client.CreateLocation(TestData.Locations.Home, token);
+        var locationId = await client.CreateLocation(TestData.Locations.Home, token);
 
         var insertProgramCommand = new CreateProgramCommand("Normal", locationId);
 
-        long programId = await client.CreateProgram(insertProgramCommand, token);
+        var programId = await client.CreateProgram(insertProgramCommand, token);
 
         var createScheduleCommand = new CreateScheduleCommand(programId, "DayTime", "0 15,18,21 * * *");
 
-        long scheduleId = await client.CreateSchedule(programId, createScheduleCommand, token);
+        var scheduleId = await client.CreateSchedule(programId, createScheduleCommand, token);
 
-        Schedule[] schedules = await client.GetSchedules(programId, token);
+        var schedules = await client.GetSchedules(programId, token);
 
         schedules.Length.Should().Be(1);
         schedules.Single().Id.Should().Be(scheduleId);
@@ -89,20 +89,20 @@ public class ProgramsTests : TestBase
     [Fact]
     public async Task ShouldCreateSetPoint()
     {
-        HttpClient client = Factory.CreateClient();
-        string token = await client.AuthenticateAsAdminUser();
+        var client = Factory.CreateClient();
+        var token = await client.AuthenticateAsAdminUser();
 
-        long locationId = await client.CreateLocation(TestData.Locations.Home, token);
+        var locationId = await client.CreateLocation(TestData.Locations.Home, token);
 
         var insertProgramCommand = new CreateProgramCommand("Normal", locationId);
 
-        long programId = await client.CreateProgram(insertProgramCommand, token);
+        var programId = await client.CreateProgram(insertProgramCommand, token);
 
         var createScheduleCommand = new CreateScheduleCommand(programId, "DayTime", "0 15,18,21 * * *");
 
-        long scheduleId = await client.CreateSchedule(programId, createScheduleCommand, token);
+        var scheduleId = await client.CreateSchedule(programId, createScheduleCommand, token);
 
-        long zoneId = await client.CreateZone(locationId, TestData.Zones.Kitchen, token);
+        var zoneId = await client.CreateZone(locationId, TestData.Zones.Kitchen, token);
 
         var createSetPointCommand = new CreateSetPointCommand(scheduleId, zoneId, 20, 2);
 
@@ -132,22 +132,22 @@ public class ProgramsTests : TestBase
     [Fact]
     public async Task ShouldAddSchedulesToJanitorWithBootStrapper()
     {
-        HttpClient client = Factory.CreateClient();
-        string token = await client.AuthenticateAsAdminUser();
+        var client = Factory.CreateClient();
+        var token = await client.AuthenticateAsAdminUser();
 
-        long locationId = await client.CreateLocation(TestData.Locations.Home, token);
+        var locationId = await client.CreateLocation(TestData.Locations.Home, token);
 
         var insertProgramCommand = new CreateProgramCommand("Normal", locationId);
 
-        long programId = await client.CreateProgram(insertProgramCommand, token);
+        var programId = await client.CreateProgram(insertProgramCommand, token);
 
         var dayTimeScheduleCommand = new CreateScheduleCommand(programId, "DayTime", "0 15,18,21 * * *");
 
-        long dayTimeScheduleId = await client.CreateSchedule(programId, dayTimeScheduleCommand, token);
+        var dayTimeScheduleId = await client.CreateSchedule(programId, dayTimeScheduleCommand, token);
 
         var nightTimeScheduleCommand = new CreateScheduleCommand(programId, "NightTime", "0 15,18,21 * * *");
 
-        long nightTimeScheduleId = await client.CreateSchedule(programId, nightTimeScheduleCommand, token);
+        var nightTimeScheduleId = await client.CreateSchedule(programId, nightTimeScheduleCommand, token);
 
         var bootStrapper = Factory.Services.GetServices<IBootStrapper>().Single(s => s.GetType() == typeof(JanitorBootStrapper));
 
@@ -161,22 +161,22 @@ public class ProgramsTests : TestBase
     [Fact]
     public async Task ShouldAddAndUpdateJanitorWhenScheduleIsInsertedAndUpdated()
     {
-        HttpClient client = Factory.CreateClient();
-        string token = await client.AuthenticateAsAdminUser();
+        var client = Factory.CreateClient();
+        var token = await client.AuthenticateAsAdminUser();
 
-        long locationId = await client.CreateLocation(TestData.Locations.Home, token);
+        var locationId = await client.CreateLocation(TestData.Locations.Home, token);
 
         var insertProgramCommand = new CreateProgramCommand("Normal", locationId);
 
-        long programId = await client.CreateProgram(insertProgramCommand, token);
+        var programId = await client.CreateProgram(insertProgramCommand, token);
 
         var dayTimeScheduleCommand = new CreateScheduleCommand(programId, "DayTime", "0 15,18,21 * * *");
 
-        long dayTimeScheduleId = await client.CreateSchedule(programId, dayTimeScheduleCommand, token);
+        var dayTimeScheduleId = await client.CreateSchedule(programId, dayTimeScheduleCommand, token);
 
         var nightTimeScheduleCommand = new CreateScheduleCommand(programId, "NightTime", "0 15,18,21 * * *");
 
-        long nightTimeScheduleId = await client.CreateSchedule(programId, nightTimeScheduleCommand, token);
+        await client.CreateSchedule(programId, nightTimeScheduleCommand, token);
 
         var janitor = Factory.Services.GetService<IJanitor>();
 

@@ -62,7 +62,7 @@ namespace HeatKeeper.Server.Host
 
             services.AddHostedService<JanitorHostedService>();
             services.AddHttpClient();
- 
+
             services.AddCorsPolicy();
 
             services.AddRouting(options => options.LowercaseUrls = true);
@@ -91,12 +91,12 @@ namespace HeatKeeper.Server.Host
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseMigrator databaseMigrator, IEnumerable<IBootStrapper> bootstrappers, ApplicationConfiguration applicationConfiguration)
         {
-            // databaseMigrator.Migrate();
+            databaseMigrator.Migrate();
 
-            // foreach (var bootStrapper in bootstrappers)
-            // {
-            //     bootStrapper.Execute().GetAwaiter().GetResult();
-            // }
+            foreach (var bootStrapper in bootstrappers)
+            {
+                bootStrapper.Execute().GetAwaiter().GetResult();
+            }
 
 
 
