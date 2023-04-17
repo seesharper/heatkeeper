@@ -123,3 +123,19 @@ from(bucket: "None")
 
 Shelly Plug S
  https://www.youtube.com/watch?v=_huPdu7paYw
+
+
+FINDING YOUR RASPBERRY PI ON THE NETWORK FROM A MAC
+
+ https://spellfoundry.com/docs/finding-your-raspberry-pi-on-the-network-from-a-mac/
+
+
+Clearing retained message on mosquitto 
+
+```
+mosquitto_pub -t "ShellyHT_Stue_Hytta/online" --username heatkeeper --pw overintermoduluasjonsforvregning -r -m ""
+```
+
+
+https://blogs.sap.com/2019/12/17/understanding-containers-part-03-one-shot-containers/
+

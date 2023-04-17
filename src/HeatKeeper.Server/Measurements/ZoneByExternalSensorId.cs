@@ -8,27 +8,21 @@ using HeatKeeper.Server.Database;
 
 namespace HeatKeeper.Server.Measurements
 {
+    [RequireReporterRole]
+    public record ZoneByExternalSensorQuery(string ExternalSensorId) : IQuery<long?>;
+
     public class ZoneByExternalSensorQueryHandler : IQueryHandler<ZoneByExternalSensorQuery, long?>
     {
-        private readonly IDbConnection dbConnection;
-        private readonly ISqlProvider sqlProvider;
+        private readonly IDbConnection _dbConnection;
+        private readonly ISqlProvider _sqlProvider;
 
         public ZoneByExternalSensorQueryHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
         {
-            this.dbConnection = dbConnection;
-            this.sqlProvider = sqlProvider;
+            _dbConnection = dbConnection;
+            _sqlProvider = sqlProvider;
         }
 
         public async Task<long?> HandleAsync(ZoneByExternalSensorQuery query, CancellationToken cancellationToken = default)
-        {
-            return await dbConnection.ExecuteScalarAsync<long?>(sqlProvider.GetZoneIdByExternalSensorId, query);
-        }
+            => await _dbConnection.ExecuteScalarAsync<long?>(_sqlProvider.GetZoneIdByExternalSensorId, query);
     }
-
-    [RequireReporterRole]
-    public class ZoneByExternalSensorQuery : IQuery<long?>
-    {
-        public string ExternalSensorId { get; set; }
-    }
-
 }

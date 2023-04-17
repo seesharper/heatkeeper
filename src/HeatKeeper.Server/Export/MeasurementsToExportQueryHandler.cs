@@ -13,17 +13,17 @@ namespace HeatKeeper.Server.Export
 {
     public class MeasurementsToExportQueryHandler : IQueryHandler<MeasurementsToExportQuery, MeasurementToExport[]>
     {
-        private readonly IDbConnection dbConnection;
-        private readonly ISqlProvider sqlProvider;
+        private readonly IDbConnection _dbConnection;
+        private readonly ISqlProvider _sqlProvider;
 
         public MeasurementsToExportQueryHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
         {
-            this.dbConnection = dbConnection;
-            this.sqlProvider = sqlProvider;
+            _dbConnection = dbConnection;
+            _sqlProvider = sqlProvider;
         }
 
         public async Task<MeasurementToExport[]> HandleAsync(MeasurementsToExportQuery query, CancellationToken cancellationToken = default)
-            => (await dbConnection.ReadAsync<MeasurementToExport>(sqlProvider.GetMeasurementsToExport, query)).ToArray();
+            => (await _dbConnection.ReadAsync<MeasurementToExport>(_sqlProvider.GetMeasurementsToExport, query)).ToArray();
     }
 
     [RequireBackgroundRole]

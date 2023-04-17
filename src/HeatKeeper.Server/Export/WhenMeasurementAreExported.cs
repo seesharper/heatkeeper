@@ -24,7 +24,7 @@ public class WhenMeasurementAreExported : ICommandHandler<ExportMeasurementsToIn
         var measurementsGroupedByExternalSensorId = command.MeasurementsToExport.Select(mte => new { mte.ExternalSensorId, mte.Created }).GroupBy(mte => mte.ExternalSensorId);
         foreach (var group in measurementsGroupedByExternalSensorId)
         {
-            DateTime latestCreatedDate = group.OrderBy(cr => cr.Created).Last().Created;
+            var latestCreatedDate = group.OrderBy(cr => cr.Created).Last().Created;
             await _commandExecutor.ExecuteAsync(new UpdateLastSeenOnSensorCommand(group.Key, latestCreatedDate), cancellationToken);
         }
     }

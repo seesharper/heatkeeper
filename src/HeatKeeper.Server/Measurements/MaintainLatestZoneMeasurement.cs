@@ -30,7 +30,7 @@ public class MaintainLatestZoneMeasurementCommandHandler : ICommandHandler<Maint
         foreach (var group in measurementsGroupedByExternalSensorId)
         {
             var latestMeasurement = group.OrderBy(m => m.Created).Last();
-            var zoneId = await _queryExecutor.ExecuteAsync(new ZoneByExternalSensorQuery() { ExternalSensorId = latestMeasurement.SensorId }, cancellationToken);
+            var zoneId = await _queryExecutor.ExecuteAsync(new ZoneByExternalSensorQuery(latestMeasurement.SensorId), cancellationToken);
 
             if (zoneId == null)
             {
