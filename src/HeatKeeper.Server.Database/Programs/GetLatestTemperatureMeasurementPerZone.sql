@@ -6,9 +6,8 @@ FROM
     Zones z
 INNER JOIN 
     LatestZoneMeasurements lzm
-ON             
-    z.Id = lzm.ZoneId AND 
-    lzm.MeasurementType = 1  
+WHERE             
+    z.Id = lzm.ZoneId
 GROUP BY
     lzm.ZoneId,
     lzm.Updated

@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using CQRS.Command.Abstractions;
 using CQRS.LightInject;
@@ -46,12 +47,12 @@ namespace HeatKeeper.Server
                 {
                     return sr.ServiceType.IsGenericType && sr.ServiceType.GetGenericTypeDefinition() == typeof(ICommandHandler<>) && sr.ImplementingType.GetConstructors()[0].GetParameters().Any(p => p.ParameterType == typeof(IDbConnection));
                 })
-                .Decorate<IDbConnection>((sf, c) =>
-                {
-                    var logger = sf.GetInstance<LogFactory>().CreateLogger<LoggedDbConnection>();
-                    return new LoggedDbConnection(c, (message) => logger.Debug(message));
-                })
-                .Decorate<IDbConnection, ConnectionDecorator>()
+                // .Decorate<IDbConnection>((sf, c) =>
+                // {
+                //     var logger = sf.GetInstance<LogFactory>().CreateLogger<LoggedDbConnection>();
+                //     return new LoggedDbConnection(c, (message) => logger.Debug(message));
+                // })
+                .Decorate<DbConnection, DbConnectionDecorator>()
                 .RegisterConstructorDependency<Logger>((f, p) => f.GetInstance<LogFactory>()(p.Member.DeclaringType))
                 .RegisterSingleton<IBootStrapper, InfluxDbBootStrapper>("InfluxDbBootStrapper")
                 .RegisterSingleton<IBootStrapper>(sf => new JanitorBootStrapper(sf), "JanitorBootStrapper")
@@ -79,7 +80,8 @@ namespace HeatKeeper.Server
                 .Decorate<ICommandHandler<ExportMeasurementsToInfluxDbCommand>, WhenMeasurementAreExported>()
                 .Decorate<ICommandHandler<MeasurementCommand[]>, WhenMeasurementsAreInserted>()
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidateSchedule<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(AfterScheduleHasBeenInsertedOrUpdated<>));
+                .Decorate(typeof(ICommandHandler<>), typeof(AfterScheduleHasBeenInsertedOrUpdated<>))
+                .Decorate<ICommandHandler<SetZoneHeatingStatusCommand>, WhenSettingZoneHeatingStatus>();
         }
 
         private InfluxDBClient CreateInfluxDbClient(IConfiguration configuration)

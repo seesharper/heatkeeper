@@ -187,5 +187,7 @@ namespace HeatKeeper.Server.Database
         string UpdateLastSeenOnSensor { get; }
 
         string GetDeadSensors { get; }
+
+        string GetZoneAndLocationByZoneId { get; }
     }
 }

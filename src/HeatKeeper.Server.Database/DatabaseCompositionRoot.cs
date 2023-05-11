@@ -1,4 +1,5 @@
 using System.Data;
+using System.Data.Common;
 using System.Data.SQLite;
 using DbReader;
 using HeatKeeper.Server.Database.Migrations;
@@ -19,12 +20,13 @@ namespace HeatKeeper.Server.Database
         {
             serviceRegistry
                 .RegisterScoped(CreateConnection)
+                .RegisterScoped<IDbConnection>(f => f.GetInstance<DbConnection>())
                 .RegisterSingleton<IDatabaseMigrator, DatabaseMigrator>()
                 .RegisterSingleton(f => new ResourceBuilder().Build<ISqlProvider>());
         }
 
 
-        private static IDbConnection CreateConnection(IServiceFactory serviceFactory)
+        private static DbConnection CreateConnection(IServiceFactory serviceFactory)
         {
             var configuration = serviceFactory.GetInstance<ApplicationConfiguration>();
             var connection = new SQLiteConnection(configuration.ConnectionString);
