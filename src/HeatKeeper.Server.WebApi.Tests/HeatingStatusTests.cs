@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using CQRS.AspNet.Testing;
 using CQRS.Command.Abstractions;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Programs;
@@ -19,6 +20,9 @@ public class HeatingStatusTests : TestBase
     [Fact]
     public async Task ShouldSetHeatingStatusOn()
     {
+        //var setZoneHeatingStatusCommandHandlerMock = Factory;
+
+
         Mock<ICommandHandler<SetZoneHeatingStatusCommand>> setZoneHeatingStatusCommandHandlerMock = new Mock<ICommandHandler<SetZoneHeatingStatusCommand>>();
 
 
@@ -33,7 +37,7 @@ public class HeatingStatusTests : TestBase
 
     private async Task<TestLocation> CreateTestLocation()
     {
-        var client = Factory.CreateClient(c => c.Mock<SetZoneHeatingStatusCommand>());
+        var client = Factory.CreateClient();
 
         var token = await client.AuthenticateAsAdminUser();
 

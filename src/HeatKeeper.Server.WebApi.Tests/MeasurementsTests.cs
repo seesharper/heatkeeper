@@ -8,7 +8,9 @@ using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Sensors;
 using InfluxDB.Client;
 using Janitor;
+using LightInject;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests
@@ -118,9 +120,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
             bool wasIntercepted = false;
 
-            var client = Factory.CreateClient(c =>
-                {
-                    c.RegisterCommandInterceptor<ExportMeasurementsToInfluxDbCommand, IInfluxDBClient>(async (command, handler, client, token) =>
+            Factory.ConfigureHostBuilder(builder => builder.ConfigureContainer<IServiceContainer>(c =>
+            {
+                 c.RegisterCommandInterceptor<ExportMeasurementsToInfluxDbCommand, IInfluxDBClient>(async (command, handler, client, token) =>
                     {
                         wasIntercepted = true;
                         // Set the zone to something we can query after the handler has been invoked.
@@ -152,9 +154,9 @@ namespace HeatKeeper.Server.WebApi.Tests
                             result.First().Records.Count().Should().Be(2);
                         }
                     });
-                });
+            }));
 
-
+            var client = Factory.CreateClient();
 
             var token = await client.AuthenticateAsAdminUser();
             var apiKey = await client.GetApiKey(token);
