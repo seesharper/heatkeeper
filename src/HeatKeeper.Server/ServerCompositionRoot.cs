@@ -45,7 +45,7 @@ namespace HeatKeeper.Server
                 .RegisterQueryHandlers()
                 .Decorate(typeof(ICommandHandler<>), typeof(TransactionalCommandHandler<>), sr =>
                 {
-                    return sr.ServiceType.IsGenericType && sr.ServiceType.GetGenericTypeDefinition() == typeof(ICommandHandler<>) && sr.ImplementingType.GetConstructors()[0].GetParameters().Any(p => p.ParameterType == typeof(IDbConnection));
+                    return sr.ServiceType.IsGenericType && sr.ServiceType.GetGenericTypeDefinition() == typeof(ICommandHandler<>) && sr.ImplementingType is not null && sr.ImplementingType.GetConstructors()[0].GetParameters().Any(p => p.ParameterType == typeof(IDbConnection));
                 })
                 // .Decorate<IDbConnection>((sf, c) =>
                 // {

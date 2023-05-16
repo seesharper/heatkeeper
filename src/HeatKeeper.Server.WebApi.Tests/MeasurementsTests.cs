@@ -28,6 +28,12 @@ namespace HeatKeeper.Server.WebApi.Tests
         }
 
         [Fact]
+        public async Task ShouldUpdateExportedMeasurements2()
+        {
+
+        }
+
+        [Fact]
         public async Task ShouldUpdateExportedMeasurements()
         {
             var client = Factory.CreateClient();
