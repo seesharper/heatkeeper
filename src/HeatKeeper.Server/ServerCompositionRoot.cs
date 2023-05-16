@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using CQRS.Command.Abstractions;
 using CQRS.LightInject;
@@ -44,14 +45,14 @@ namespace HeatKeeper.Server
                 .RegisterQueryHandlers()
                 .Decorate(typeof(ICommandHandler<>), typeof(TransactionalCommandHandler<>), sr =>
                 {
-                    return sr.ServiceType.IsGenericType && sr.ServiceType.GetGenericTypeDefinition() == typeof(ICommandHandler<>) && sr.ImplementingType.GetConstructors()[0].GetParameters().Any(p => p.ParameterType == typeof(IDbConnection));
+                    return sr.ServiceType.IsGenericType && sr.ServiceType.GetGenericTypeDefinition() == typeof(ICommandHandler<>) && sr.ImplementingType is not null && sr.ImplementingType.GetConstructors()[0].GetParameters().Any(p => p.ParameterType == typeof(IDbConnection));
                 })
-                .Decorate<IDbConnection>((sf, c) =>
-                {
-                    var logger = sf.GetInstance<LogFactory>().CreateLogger<LoggedDbConnection>();
-                    return new LoggedDbConnection(c, (message) => logger.Debug(message));
-                })
-                .Decorate<IDbConnection, ConnectionDecorator>()
+                // .Decorate<IDbConnection>((sf, c) =>
+                // {
+                //     var logger = sf.GetInstance<LogFactory>().CreateLogger<LoggedDbConnection>();
+                //     return new LoggedDbConnection(c, (message) => logger.Debug(message));
+                // })
+                .Decorate<DbConnection, DbConnectionDecorator>()
                 .RegisterConstructorDependency<Logger>((f, p) => f.GetInstance<LogFactory>()(p.Member.DeclaringType))
                 .RegisterSingleton<IBootStrapper, InfluxDbBootStrapper>("InfluxDbBootStrapper")
                 .RegisterSingleton<IBootStrapper>(sf => new JanitorBootStrapper(sf), "JanitorBootStrapper")
@@ -60,7 +61,7 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
-                .RegisterSingleton(sf => CreateMqttClientWrapper(sf.GetInstance<IConfiguration>()))
+                .RegisterSingleton(sf => CreateTasmotaClient(sf.GetInstance<IConfiguration>()))
                 .RegisterScoped<IInfluxDBClient>(f => CreateInfluxDbClient(f.GetInstance<IConfiguration>()))
                 //.Decorate<ICommandHandler<ExportMeasurementsCommand>, CumulativeMeasurementsExporter>()
                 .Decorate<ICommandHandler<UpdateUserCommand>, ValidatedUpdateUserCommandHandler>()
@@ -74,19 +75,19 @@ namespace HeatKeeper.Server
                 .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>))
                 .Decorate<ICommandHandler<DeleteUserCommand>, ValidatedDeleteUserCommandHandler>()
                 .Decorate(typeof(ICommandHandler<>), typeof(MaintainDefaultZonesCommandHandler<>))
-                .Decorate<ICommandHandler<MeasurementCommand>, MaintainLatestZoneMeasurementDecorator>()
-                .Decorate<ICommandHandler<MeasurementCommand[]>, ExportMeasurementsDecorator>()
                 .Decorate<ICommandHandler<DeleteScheduleCommand>, BeforeDeleteSchedule>()
                 .Decorate<ICommandHandler<DeleteProgramCommand>, BeforeDeleteProgram>()
-                .Decorate<ICommandHandler<ExportMeasurementsCommand>, WhenMeasurementAreExported>()
+                .Decorate<ICommandHandler<ExportMeasurementsToInfluxDbCommand>, WhenMeasurementAreExported>()
+                .Decorate<ICommandHandler<MeasurementCommand[]>, WhenMeasurementsAreInserted>()
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidateSchedule<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(AfterScheduleHasBeenInsertedOrUpdated<>));
+                .Decorate(typeof(ICommandHandler<>), typeof(AfterScheduleHasBeenInsertedOrUpdated<>))
+                .Decorate<ICommandHandler<SetZoneHeatingStatusCommand>, WhenSettingZoneHeatingStatus>();
         }
 
         private InfluxDBClient CreateInfluxDbClient(IConfiguration configuration)
             => new InfluxDBClient(configuration.GetInfluxDbUrl(), configuration.GetInfluxDbApiKey());
 
-        private static IMqttClientWrapper CreateMqttClientWrapper(IConfiguration configuration)
+        private static ITasmotaClient CreateTasmotaClient(IConfiguration configuration)
         {
             string mqttBrokerAddress = configuration.GetMqttBrokerAddress();
             string mqttBrokerUser = configuration.GetMqttBrokerUser();
@@ -103,7 +104,7 @@ namespace HeatKeeper.Server
 
             IManagedMqttClient managedClient = new MqttFactory().CreateManagedMqttClient();
             managedClient.StartAsync(options).Wait();
-            return new MqttClientWrapper(managedClient);
+            return new TasmotaClient(managedClient);
         }
 
 

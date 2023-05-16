@@ -52,5 +52,16 @@ namespace HeatKeeper.Server.Measurements
         /// The price per kWh; 
         /// </summary>
         ElectricalPricePerkWh = 13,
+
+        /// <summary>
+        /// Uses the value '1' to indicate that the zone is being heated
+        /// and the value `0` to indicate that the zone is not being heated.
+        /// </summary>
+        ZoneHeatingStatus = 14,
+
+        /// <summary>
+        /// The target temperature setpoint.
+        /// </summary>
+        TemperatureSetPoint = 15
     }
 }

@@ -12,8 +12,10 @@ using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Configuration;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Electricity;
+using HeatKeeper.Server.Export;
 using HeatKeeper.Server.Host.BackgroundTasks;
 using HeatKeeper.Server.Host.Swagger;
+using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Programs;
 using Janitor;
 using Microsoft.AspNetCore.Builder;
@@ -46,6 +48,11 @@ namespace HeatKeeper.Server.Host
                     .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
                         => await commandExecutor.ExecuteAsync(new ExportAllMarketPricesCommand(), cancellationToken))
                     .WithSchedule(new CronSchedule("0 15,18,21 * * *")))
+                .Schedule(builder => builder
+                    .WithName("ExportMeasurements")
+                    .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
+                        => await commandExecutor.ExecuteAsync(new ExportMeasurementsCommand(), cancellationToken))
+                    .WithSchedule(new CronSchedule("* * * * *")))
                 .Schedule(builder => builder
                     .WithName("SetChannelStates")
                     .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)

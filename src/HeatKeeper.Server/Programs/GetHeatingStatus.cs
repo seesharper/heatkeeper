@@ -11,40 +11,34 @@ public record GetHeatingStatusQuery(long ZoneId) : IQuery<HeatingStatusResult>;
 
 public class GetHeatingStatusQueryHandler : IQueryHandler<GetHeatingStatusQuery, HeatingStatusResult>
 {
-    private readonly IMqttClientWrapper _mqttClientWrapper;
+    private readonly ITasmotaClient _tasmotaClient;
     private readonly IQueryExecutor _queryExecutor;
-    private const string CommandPrefix = "cmnd/";
 
-    public GetHeatingStatusQueryHandler(IMqttClientWrapper mqttClientWrapper, IQueryExecutor queryExecutor)
+    public GetHeatingStatusQueryHandler(ITasmotaClient tasmotaClient, IQueryExecutor queryExecutor)
     {
-        _mqttClientWrapper = mqttClientWrapper;
+        _tasmotaClient = tasmotaClient;
         _queryExecutor = queryExecutor;
     }
 
     public async Task<HeatingStatusResult> HandleAsync(GetHeatingStatusQuery query, CancellationToken cancellationToken = default)
     {
-        var zoneMqttInfo = await _queryExecutor.ExecuteAsync(new GetZoneMqttInfoQuery(query.ZoneId), cancellationToken);
+        ZoneMqttInfo zoneMqttInfo = await _queryExecutor.ExecuteAsync(new GetZoneMqttInfoQuery(query.ZoneId), cancellationToken);
 
-        TaskCompletionSource<HeatingStatusResult> tsc = new();
         if (!string.IsNullOrWhiteSpace(zoneMqttInfo.Topic))
         {
-            await _mqttClientWrapper.Subscribe(new Subscription($"{CommandPrefix}{zoneMqttInfo.Topic}", async payload =>
+            string payload = await _tasmotaClient.GetStatus(zoneMqttInfo.Topic);
+
+            if (string.Equals(payload, "OFF"))
             {
-                if (string.Equals(payload, "OFF"))
-                {
-                    tsc.SetResult(HeatingStatusResult.Off);
-                }
-                else
-                {
-                    tsc.SetResult(HeatingStatusResult.On);
-                }
-            }));
-            return await tsc.Task;
-        }
-        else
-        {
-            return HeatingStatusResult.Unknown;
-        }
+                return HeatingStatusResult.Off;
+            }
+            else
+            {
+                return HeatingStatusResult.On;
+            }
+        };
+
+        return HeatingStatusResult.Unknown;
     }
 }
 

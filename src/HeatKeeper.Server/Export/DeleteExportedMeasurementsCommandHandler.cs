@@ -24,9 +24,6 @@ namespace HeatKeeper.Server.Export
             => await dbConnection.ExecuteAsync(sqlProvider.DeleteExportedMeasurements, command);
     }
 
-    [RequireReporterRole]
-    public class DeleteExportedMeasurementsCommand
-    {
-        public DateTime RetentionDate { get; set; }
-    }
+    [RequireBackgroundRole]
+    public record DeleteExportedMeasurementsCommand(DateTime RetentionDate);
 }

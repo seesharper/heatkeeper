@@ -14,7 +14,6 @@ public class SetZoneHeatingStatus : ICommandHandler<SetZoneHeatingStatusCommand>
 {
     private readonly IQueryExecutor _queryExecutor;
     private readonly ICommandExecutor _commandExecutor;
-    private const string CommandPrefix = "cmnd/";
     public SetZoneHeatingStatus(IQueryExecutor queryExecutor, ICommandExecutor commandExecutor)
     {
         _queryExecutor = queryExecutor;
@@ -27,11 +26,11 @@ public class SetZoneHeatingStatus : ICommandHandler<SetZoneHeatingStatusCommand>
 
         if (command.HeatingStatus == HeatingStatus.On)
         {
-            await _commandExecutor.ExecuteAsync(new SendMqttMessageCommand($"{CommandPrefix}{zoneMqttInfo.Topic}", zoneMqttInfo.OnPayload), cancellationToken);
+            await _commandExecutor.ExecuteAsync(new TasmotaCommand(zoneMqttInfo.Topic, zoneMqttInfo.OnPayload), cancellationToken);
         }
         else
         {
-            await _commandExecutor.ExecuteAsync(new SendMqttMessageCommand($"{CommandPrefix}{zoneMqttInfo.Topic}", zoneMqttInfo.OffPayload), cancellationToken);
+            await _commandExecutor.ExecuteAsync(new TasmotaCommand(zoneMqttInfo.Topic, zoneMqttInfo.OffPayload), cancellationToken);
         }
     }
 }

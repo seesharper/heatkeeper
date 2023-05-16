@@ -14,20 +14,20 @@ using InfluxDB.Client.Writes;
 using Microsoft.Extensions.Configuration;
 namespace HeatKeeper.Server.Export
 {
-    public class ExportMeasurementsCommandHandler : ICommandHandler<ExportMeasurementsCommand>
+    public class ExportMeasurementsToInfluxDbCommandHandler : ICommandHandler<ExportMeasurementsToInfluxDbCommand>
     {
         private readonly IInfluxDBClient _influxDBClient;
         private readonly IConfiguration _configuration;
         private readonly Logger _logger;
 
-        public ExportMeasurementsCommandHandler(IInfluxDBClient influxDBClient, IConfiguration configuration, Logger logger)
+        public ExportMeasurementsToInfluxDbCommandHandler(IInfluxDBClient influxDBClient, IConfiguration configuration, Logger logger)
         {
             _influxDBClient = influxDBClient;
             _configuration = configuration;
             _logger = logger;
         }
 
-        public async Task HandleAsync(ExportMeasurementsCommand command, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(ExportMeasurementsToInfluxDbCommand command, CancellationToken cancellationToken = default)
         {
             var measurementsGroupedByRetentionPolicy = command.MeasurementsToExport.GroupBy(m => m.RetentionPolicy);
 
@@ -56,9 +56,6 @@ namespace HeatKeeper.Server.Export
         }
     }
 
-    [RequireReporterRole]
-    public class ExportMeasurementsCommand
-    {
-        public MeasurementToExport[] MeasurementsToExport { get; set; }
-    }
+    [RequireBackgroundRole]
+    public record ExportMeasurementsToInfluxDbCommand(MeasurementToExport[] MeasurementsToExport);
 }

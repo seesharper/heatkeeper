@@ -1,11 +1,14 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using HeatKeeper.Server.Authorization;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using HeatKeeper.Server.Authorization;
-using System.Text.RegularExpressions;
 
 namespace HeatKeeper.Server.Host.Swagger
 {
@@ -19,9 +22,9 @@ namespace HeatKeeper.Server.Host.Swagger
                 throw new ArgumentOutOfRangeException($"Endpoints should have exactly one paramater ({context.MethodInfo.Name})");
             }
 
-            var parameterType = parameters[0].ParameterType;
-            var summary = parameterType.GetSummary();
-            var roleAttribute = parameters[0].ParameterType.GetRoleAttribute();
+            Type parameterType = parameters[0].ParameterType;
+            string summary = parameterType.GetSummary();
+            RequireRoleAttribute roleAttribute = parameters[0].ParameterType.GetRoleAttribute();
             operation.Summary = $"{summary} [AccessLevel: {roleAttribute.DisplayName}]";
         }
     }

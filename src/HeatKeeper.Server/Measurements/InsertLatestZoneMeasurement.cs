@@ -11,17 +11,17 @@ namespace HeatKeeper.Server.Measurements
 {
     public class InsertLatestZoneMeasurementCommandHandler : ICommandHandler<InsertLatestZoneMeasurementCommand>
     {
-        private readonly IDbConnection dbConnection;
-        private readonly ISqlProvider sqlProvider;
+        private readonly IDbConnection _dbConnection;
+        private readonly ISqlProvider _sqlProvider;
 
         public InsertLatestZoneMeasurementCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
         {
-            this.dbConnection = dbConnection;
-            this.sqlProvider = sqlProvider;
+            _dbConnection = dbConnection;
+            _sqlProvider = sqlProvider;
         }
 
         public async Task HandleAsync(InsertLatestZoneMeasurementCommand command, CancellationToken cancellationToken = default)
-            => await dbConnection.ExecuteAsync(sqlProvider.InsertLatestZoneMeasurement, command);
+            => await _dbConnection.ExecuteAsync(_sqlProvider.InsertLatestZoneMeasurement, command);
     }
 
     [RequireReporterRole]

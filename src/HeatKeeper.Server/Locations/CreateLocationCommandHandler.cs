@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
@@ -34,6 +35,7 @@ namespace HeatKeeper.Server.Locations
 
         public string Description { get; set; }
 
+        // [JsonIgnore]
         public long Id { get; set; }
     }
 

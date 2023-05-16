@@ -8,6 +8,8 @@
     "CHANNELSTATE",
     "cmnd",
     "CRONEXPRESSION",
-    "Cronos"
+    "Cronos",
+    "setpoint",
+    "Tasmota"
   ]
 }
