@@ -24,6 +24,7 @@ using HeatKeeper.Server.Zones;
 using InfluxDB.Client;
 using LightInject;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
@@ -61,7 +62,7 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
-                .RegisterSingleton(sf => CreateTasmotaClient(sf.GetInstance<IConfiguration>()))
+                .RegisterSingleton(sf => CreateTasmotaClient(sf.GetInstance<IConfiguration>(), sf.GetInstance<ILogger<TasmotaClient>>()))
                 .RegisterScoped<IInfluxDBClient>(f => CreateInfluxDbClient(f.GetInstance<IConfiguration>()))
                 //.Decorate<ICommandHandler<ExportMeasurementsCommand>, CumulativeMeasurementsExporter>()
                 .Decorate<ICommandHandler<UpdateUserCommand>, ValidatedUpdateUserCommandHandler>()
@@ -87,7 +88,7 @@ namespace HeatKeeper.Server
         private InfluxDBClient CreateInfluxDbClient(IConfiguration configuration)
             => new InfluxDBClient(configuration.GetInfluxDbUrl(), configuration.GetInfluxDbApiKey());
 
-        private static ITasmotaClient CreateTasmotaClient(IConfiguration configuration)
+        private static ITasmotaClient CreateTasmotaClient(IConfiguration configuration, ILogger<TasmotaClient> logger)
         {
             string mqttBrokerAddress = configuration.GetMqttBrokerAddress();
             string mqttBrokerUser = configuration.GetMqttBrokerUser();
@@ -104,7 +105,7 @@ namespace HeatKeeper.Server
 
             IManagedMqttClient managedClient = new MqttFactory().CreateManagedMqttClient();
             managedClient.StartAsync(options).Wait();
-            return new TasmotaClient(managedClient);
+            return new TasmotaClient(managedClient, logger);
         }
 
 
