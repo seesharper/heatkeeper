@@ -87,7 +87,7 @@ public class TasmotaClient : IDisposable, ITasmotaClient
     {
         var commandTopic = $"{CommandPrefix}{topic}";
         _logger.LogInformation("Publishing command to topic {topic} with payload {payload}", commandTopic, payload);
-        await _managedMqttClient.EnqueueAsync(commandTopic, "OFF");
+        await _managedMqttClient.EnqueueAsync(commandTopic, payload);
     }
 
     public void Dispose()
