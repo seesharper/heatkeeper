@@ -1,7 +1,7 @@
 SELECT 
     z.MqttTopic as Topic,
-    'ON' as OnPayLoad,
-    'OFF' as OffPayLoad
+    'on' as OnPayLoad,
+    'off' as OffPayLoad
 FROM 
     Zones z    
 WHERE 

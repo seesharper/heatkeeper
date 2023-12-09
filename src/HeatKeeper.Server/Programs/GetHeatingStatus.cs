@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Query.Abstractions;
@@ -28,7 +29,7 @@ public class GetHeatingStatusQueryHandler : IQueryHandler<GetHeatingStatusQuery,
         {
             string payload = await _tasmotaClient.GetStatus(zoneMqttInfo.Topic);
 
-            if (string.Equals(payload, "OFF"))
+            if (string.Equals(payload, "OFF", StringComparison.InvariantCultureIgnoreCase))
             {
                 return HeatingStatusResult.Off;
             }
