@@ -189,5 +189,7 @@ namespace HeatKeeper.Server.Database
         string GetDeadSensors { get; }
 
         string GetZoneAndLocationByZoneId { get; }
+
+        string CreateRefreshTokensTable { get; }
     }
 }

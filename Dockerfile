@@ -34,6 +34,6 @@ COPY --from=build-stage /heatkeeper/app .
 
 COPY --from=client-build-stage src/dist wwwroot
 
-EXPOSE 80
+EXPOSE 5000
 
 ENTRYPOINT [ "dotnet", "HeatKeeper.Server.Host.dll" ]
