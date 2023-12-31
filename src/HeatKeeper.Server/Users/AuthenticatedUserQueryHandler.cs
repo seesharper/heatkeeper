@@ -6,27 +6,32 @@ using System.Threading.Tasks;
 using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Authorization;
+using Microsoft.AspNetCore.Http;
 
 namespace HeatKeeper.Server.Users
 {
     public class AuthenticatedUserQueryHandler : IQueryHandler<AuthenticatedUserQuery, AuthenticatedUser>
     {
-        private readonly IPasswordManager passwordManager;
-        private readonly ITokenProvider tokenProvider;
-        private readonly IQueryExecutor queryExecutor;
+        private readonly IPasswordManager _passwordManager;
+        private readonly ITokenProvider _tokenProvider;
+        private readonly IQueryExecutor _queryExecutor;
+        private readonly IRefreshTokenProvider _refreshTokenProvider;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthenticatedUserQueryHandler(IPasswordManager passwordManager, ITokenProvider tokenProvider, IQueryExecutor queryExecutor)
+        public AuthenticatedUserQueryHandler(IPasswordManager passwordManager, ITokenProvider tokenProvider, IQueryExecutor queryExecutor, IRefreshTokenProvider refreshTokenProvider, IHttpContextAccessor httpContextAccessor)
         {
-            this.passwordManager = passwordManager;
-            this.tokenProvider = tokenProvider;
-            this.queryExecutor = queryExecutor;
+            this._passwordManager = passwordManager;
+            this._tokenProvider = tokenProvider;
+            this._queryExecutor = queryExecutor;
+            _refreshTokenProvider = refreshTokenProvider;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<AuthenticatedUser> HandleAsync(AuthenticatedUserQuery query, CancellationToken cancellationToken = default)
         {
-            var user = await queryExecutor.ExecuteAsync(new GetUserQuery(query.Email));
+            var user = await _queryExecutor.ExecuteAsync(new GetUserQuery(query.Email));
 
-            if (user == null || !passwordManager.VerifyPassword(query.Password, user.HashedPassword))
+            if (user == null || !_passwordManager.VerifyPassword(query.Password, user.HashedPassword))
             {
                 throw new AuthenticationFailedException("Invalid username/password");
             }
@@ -40,7 +45,21 @@ namespace HeatKeeper.Server.Users
                 new Claim(ClaimTypes.Sid, user.Id.ToString())
             };
 
-            var token = tokenProvider.CreateToken(claims, DateTime.UtcNow.AddDays(7));
+            var token = _tokenProvider.CreateToken(claims, DateTime.UtcNow.AddDays(7));
+
+            var refreshToken = _refreshTokenProvider.CreateRefreshToken();
+
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken.Token, new CookieOptions
+            {
+                Expires = refreshToken.Expires,
+                HttpOnly = true,
+                SameSite = SameSiteMode.None,
+                Secure = false
+                // Secure = true,
+                // SameSite = SameSiteMode.Strict
+            });
+
+            // var cookies = _httpContextAccessor.HttpContext.Response.Cookies.
 
             return new AuthenticatedUser(token, user.Id, user.Email, user.FirstName, user.LastName, user.IsAdmin);
         }

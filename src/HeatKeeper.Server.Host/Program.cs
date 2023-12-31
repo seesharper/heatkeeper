@@ -1,23 +1,28 @@
-﻿using LightInject.Microsoft.DependencyInjection;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using GenericHost = Microsoft.Extensions.Hosting.Host;
+﻿var builder = WebApplication.CreateBuilder(args);
 
-namespace HeatKeeper.Server.Host
+// Add services to the container.
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            GenericHost.CreateDefaultBuilder(args)
-                .UseLightInject(registry => registry.RegisterFrom<HostCompositionRoot>())
-                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
-                .ConfigureAppConfiguration(config => config.AddEnvironmentVariables(prefix: "HEATKEEPER_"));
-    }
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
+
+public partial class Program
+{ }

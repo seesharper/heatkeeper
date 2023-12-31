@@ -60,6 +60,7 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<IPasswordManager, PasswordManager>()
                 .RegisterSingleton<IPasswordPolicy, PasswordPolicy>()
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
+                .RegisterSingleton<IRefreshTokenProvider, RefreshTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
                 .RegisterSingleton(sf => CreateTasmotaClient(sf.GetInstance<IConfiguration>(), sf.GetInstance<ILogger<TasmotaClient>>()))

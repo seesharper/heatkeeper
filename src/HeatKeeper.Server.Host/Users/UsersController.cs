@@ -27,7 +27,17 @@ namespace HeatKeeper.Server.Host.Users
 
         [HttpPost("authenticate")]
         public async Task<AuthenticatedUser> Authenticate([FromBody] AuthenticatedUserQuery query)
-            => await _queryExecutor.ExecuteAsync(query);
+        {
+            Response.Cookies.Append("test", "test");
+            Response.Cookies.Append("refreshToken2", "test", new Microsoft.AspNetCore.Http.CookieOptions
+            {
+                Expires = System.DateTime.UtcNow.AddDays(7),
+                HttpOnly = true,
+                SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
+                Secure = false
+            });
+            return await _queryExecutor.ExecuteAsync(query);
+        }
 
         [HttpPost()]
         public async Task<ActionResult<ResourceId>> Post([FromBody] RegisterUserCommand command)
