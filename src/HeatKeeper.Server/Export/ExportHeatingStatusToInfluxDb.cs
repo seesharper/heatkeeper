@@ -3,9 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
-using HeatKeeper.Abstractions.Logging;
+using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Server.Authorization;
-using HeatKeeper.Server.Configuration;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Programs;
 using InfluxDB.Client;
@@ -13,6 +12,7 @@ using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Core.Exceptions;
 using InfluxDB.Client.Writes;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace HeatKeeper.Server.Export;
 
@@ -24,10 +24,10 @@ public class ExportHeatingStatusToInfluxDb : ICommandHandler<ExportHeatingStatus
 {
     private readonly IInfluxDBClient _influxDBClient;
     private readonly IConfiguration _configuration;
-    private readonly Logger _logger;
+    private readonly ILogger<ExportHeatingStatusToInfluxDb> _logger;
     private readonly IQueryExecutor _queryExecutor;
 
-    public ExportHeatingStatusToInfluxDb(IInfluxDBClient influxDBClient, IConfiguration configuration, Logger logger, IQueryExecutor queryExecutor)
+    public ExportHeatingStatusToInfluxDb(IInfluxDBClient influxDBClient, IConfiguration configuration, ILogger<ExportHeatingStatusToInfluxDb> logger, IQueryExecutor queryExecutor)
     {
         _influxDBClient = influxDBClient;
         _configuration = configuration;
@@ -53,7 +53,7 @@ public class ExportHeatingStatusToInfluxDb : ICommandHandler<ExportHeatingStatus
         }
         catch (UnprocessableEntityException ex)
         {
-            _logger.Warning("Failed to export measurement", ex);
+            _logger.LogWarning(ex, "Failed to export measurement");
         }
     }
 }

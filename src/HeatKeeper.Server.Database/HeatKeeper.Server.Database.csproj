@@ -1,13 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CQRS.Command.Abstractions" Version="1.0.0" />
     <PackageReference Include="DbReader" Version="2.5.6" />
     <PackageReference Include="ResourceReader" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' != 'Arm64' ">
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.116" />

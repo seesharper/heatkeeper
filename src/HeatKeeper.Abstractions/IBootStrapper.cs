@@ -9,4 +9,15 @@ namespace HeatKeeper.Abstractions
     {
         Task Execute();
     }
+
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public class OrderAttribute : System.Attribute
+    {
+        public OrderAttribute(int order)
+        {
+            Order = order;
+        }
+
+        public int Order { get; }
+    }
 }

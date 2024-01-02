@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using HeatKeeper.Abstractions;
-using HeatKeeper.Server.Configuration;
+using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Server.Measurements;
 using InfluxDB.Client;
 using InfluxDB.Client.Api.Domain;
@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace HeatKeeper.Server.Export
 {
+    [Order(1)]
     public class InfluxDbBootStrapper : IBootStrapper
     {
         private readonly IConfiguration _configuration;

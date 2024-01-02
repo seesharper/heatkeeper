@@ -26,8 +26,7 @@ namespace HeatKeeper.Server.Host.Users
         }
 
         [HttpPost("authenticate")]
-        public async Task<AuthenticatedUser> Authenticate([FromBody] AuthenticatedUserQuery query)
-            => await _queryExecutor.ExecuteAsync(query);
+        public async Task<AuthenticatedUser> Authenticate([FromBody] AuthenticatedUserQuery query) => await _queryExecutor.ExecuteAsync(query);
 
         [HttpPost()]
         public async Task<ActionResult<ResourceId>> Post([FromBody] RegisterUserCommand command)

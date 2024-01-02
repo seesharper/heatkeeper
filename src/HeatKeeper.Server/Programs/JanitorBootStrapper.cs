@@ -5,6 +5,7 @@ using LightInject;
 
 namespace HeatKeeper.Server.Programs;
 
+[Order(3)]
 public class JanitorBootStrapper : IBootStrapper
 {
     private readonly IServiceFactory _serviceFactory;

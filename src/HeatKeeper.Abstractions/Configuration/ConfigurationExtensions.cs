@@ -1,7 +1,8 @@
 using System;
 using Microsoft.Extensions.Configuration;
 
-namespace HeatKeeper.Server.Configuration;
+namespace HeatKeeper.Abstractions.Configuration;
+
 
 public static class ConfigurationExtensions
 {
@@ -26,6 +27,10 @@ public static class ConfigurationExtensions
 
     public static string GetChannelStateCronExpression(this IConfiguration configuration)
         => configuration.GetRequiredValue("CHANNELSTATE_CRONEXPRESSION");
+    public static string GetConnectionString(this IConfiguration configuration)
+        => configuration.GetRequiredValue("CONNECTIONSTRING");
+    public static string GetSecret(this IConfiguration configuration)
+        => configuration.GetRequiredValue("SECRET");
 
     internal static string GetRequiredValue(this IConfiguration configuration, string key)
     {

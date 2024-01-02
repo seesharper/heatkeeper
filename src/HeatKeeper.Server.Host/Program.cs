@@ -1,23 +1,51 @@
-﻿using LightInject.Microsoft.DependencyInjection;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using GenericHost = Microsoft.Extensions.Hosting.Host;
+﻿using HeatKeeper.Server.Host;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
-namespace HeatKeeper.Server.Host
+var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseLightInject(services => services.RegisterFrom<HostCompositionRoot>());
+// Add services to the container.
+
+builder.Services.AddJanitor();
+builder.Services.AddHttpClient();
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddExceptionHandler<ExceptionHandler>();
+builder.Services.AddMvc(options =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+    options.Filters.Add<DeleteActionFilter>();
+    var bodyModelBinderProvider = options.ModelBinderProviders.Single(p => p.GetType() == typeof(BodyModelBinderProvider));
+    options.ModelBinderProviders.Insert(0, new RouteAndBodyBinderProvider(bodyModelBinderProvider));
+});
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            GenericHost.CreateDefaultBuilder(args)
-                .UseLightInject(registry => registry.RegisterFrom<HostCompositionRoot>())
-                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
-                .ConfigureAppConfiguration(config => config.AddEnvironmentVariables(prefix: "HEATKEEPER_"));
-    }
+
+var app = builder.Build();
+
+await app.RunBootStrappers();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+else
+{
+    app.VerifySecret();
+}
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.UseExceptionHandler(_ => { });
+
+app.MapControllers();
+
+app.Run();
+
+public partial class Program
+{ }

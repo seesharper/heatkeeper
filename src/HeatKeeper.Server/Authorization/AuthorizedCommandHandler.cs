@@ -1,36 +1,34 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
-using HeatKeeper.Abstractions.Logging;
+using Microsoft.Extensions.Logging;
 
-namespace HeatKeeper.Server.Authorization
+namespace HeatKeeper.Server.Authorization;
+
+public class AuthorizedCommandHandler<TCommand> : ICommandHandler<TCommand>
 {
-    public class AuthorizedCommandHandler<TCommand> : ICommandHandler<TCommand>
+    private readonly ICommandHandler<TCommand> _commandHandler;
+    private readonly IUserContext _userContext;
+    private readonly ILogger<AuthorizedCommandHandler<TCommand>> _logger;
+    private static readonly RequireRoleAttribute RoleAttribute = typeof(TCommand).GetRoleAttribute();
+
+    public AuthorizedCommandHandler(ICommandHandler<TCommand> commandHandler, IUserContext userContext, ILogger<AuthorizedCommandHandler<TCommand>> logger)
     {
-        private readonly ICommandHandler<TCommand> commandHandler;
-        private readonly IUserContext userContext;
-        private readonly Logger logger;
-        private static readonly RequireRoleAttribute RoleAttribute = typeof(TCommand).GetRoleAttribute();
+        _commandHandler = commandHandler;
+        _userContext = userContext;
+        _logger = logger;
+    }
 
-        public AuthorizedCommandHandler(ICommandHandler<TCommand> commandHandler, IUserContext userContext, Logger logger)
+    public async Task HandleAsync(TCommand command, CancellationToken cancellationToken = default)
+    {
+        if (RoleAttribute.IsSatisfiedBy(_userContext.Role))
         {
-            this.commandHandler = commandHandler;
-            this.userContext = userContext;
-            this.logger = logger;
+            _logger.LogDebug("Successfully authorized access to '{typeof(TCommand)}' for user '{_userContext.Email}({_userContext.Role})'", typeof(TCommand), _userContext.Email, _userContext.Role);
+            await _commandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
         }
-
-        public async Task HandleAsync(TCommand command, CancellationToken cancellationToken = default)
+        else
         {
-            if (RoleAttribute.IsSatisfiedBy(userContext.Role))
-            {
-                logger.Debug($"Successfully authorized access to '{command.GetType()}' for user '{userContext.Email}({userContext.Role})'");
-                await commandHandler.HandleAsync(command, cancellationToken).ConfigureAwait(false);
-            }
-            else
-            {
-                throw new AuthorizationFailedException($"Failed to authorize access to '{command.GetType()}' for user '{userContext.Email}({userContext.Role})'");
-            }
-
+            throw new AuthorizationFailedException($"Failed to authorize access to '{command.GetType()}' for user '{_userContext.Email}({_userContext.Role})'");
         }
     }
 }

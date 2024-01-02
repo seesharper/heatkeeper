@@ -13,8 +13,7 @@ namespace HeatKeeper.Server.Host
                 .RegisterSingleton<IUserContext, UserContext>()
                 .RegisterSingleton<IHttpContextAccessor, HttpContextAccessor>()
                 .RegisterFrom<DatabaseCompositionRoot>()
-                .RegisterFrom<ServerCompositionRoot>()
-                .ConfigureLogging();
+                .RegisterFrom<ServerCompositionRoot>();
         }
     }
 }

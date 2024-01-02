@@ -8,12 +8,10 @@ using CQRS.Query.Abstractions;
 using CQRS.Transactions;
 using DbReader;
 using HeatKeeper.Abstractions;
-using HeatKeeper.Abstractions.Logging;
+using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Authorization;
-using HeatKeeper.Server.Configuration;
-using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Export;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
@@ -54,12 +52,13 @@ namespace HeatKeeper.Server
                 //     return new LoggedDbConnection(c, (message) => logger.Debug(message));
                 // })
                 .Decorate<DbConnection, DbConnectionDecorator>()
-                .RegisterConstructorDependency<Logger>((f, p) => f.GetInstance<LogFactory>()(p.Member.DeclaringType))
                 .RegisterSingleton<IBootStrapper, InfluxDbBootStrapper>("InfluxDbBootStrapper")
                 .RegisterSingleton<IBootStrapper>(sf => new JanitorBootStrapper(sf), "JanitorBootStrapper")
+                .RegisterSingleton<IBootStrapper, DatabaseBootStrapper>("DatabaseBootStrapper")
                 .RegisterSingleton<IPasswordManager, PasswordManager>()
                 .RegisterSingleton<IPasswordPolicy, PasswordPolicy>()
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
+                .RegisterSingleton<IRefreshTokenProvider, RefreshTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
                 .RegisterSingleton(sf => CreateTasmotaClient(sf.GetInstance<IConfiguration>(), sf.GetInstance<ILogger<TasmotaClient>>()))
