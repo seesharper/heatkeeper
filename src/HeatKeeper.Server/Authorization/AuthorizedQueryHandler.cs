@@ -1,39 +1,34 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Query.Abstractions;
-using HeatKeeper.Abstractions.Logging;
-using HeatKeeper.Server.Users;
+using Microsoft.Extensions.Logging;
 
-namespace HeatKeeper.Server.Authorization
+namespace HeatKeeper.Server.Authorization;
+
+public class AuthorizedQueryHandler<TQuery, TResult> : IQueryHandler<TQuery, TResult> where TQuery : IQuery<TResult>
 {
-    public class AuthorizedQueryHandler<TQuery, TResult> : IQueryHandler<TQuery, TResult> where TQuery : IQuery<TResult>
+    private readonly IQueryHandler<TQuery, TResult> _queryHandler;
+    private readonly IUserContext _userContext;
+    private readonly ILogger<AuthorizedQueryHandler<TQuery, TResult>> _logger;
+    private static readonly RequireRoleAttribute RoleAttribute = typeof(TQuery).GetRoleAttribute();
+
+    public AuthorizedQueryHandler(IQueryHandler<TQuery, TResult> queryHandler, IUserContext userContext, ILogger<AuthorizedQueryHandler<TQuery, TResult>> logger)
     {
-        private readonly IQueryHandler<TQuery, TResult> queryHandler;
-        private readonly IUserContext userContext;
-        private readonly Logger logger;
-        private static readonly RequireRoleAttribute RoleAttribute = typeof(TQuery).GetRoleAttribute();
-
-        public AuthorizedQueryHandler(IQueryHandler<TQuery, TResult> queryHandler, IUserContext userContext, Logger logger)
-        {
-            this.queryHandler = queryHandler;
-            this.userContext = userContext;
-            this.logger = logger;
-        }
-
-        public async Task<TResult> HandleAsync(TQuery query, CancellationToken cancellationToken = default)
-        {
-            if (RoleAttribute.IsSatisfiedBy(userContext.Role))
-            {
-                logger.Debug($"Successfully authorized access to '{query.GetType()}' for user '{userContext.Email}({userContext.Role})'");
-                return await queryHandler.HandleAsync(query, cancellationToken).ConfigureAwait(false);
-            }
-            else
-            {
-                throw new AuthorizationFailedException($"Failed to authorize access to '{query.GetType()}' for user '{userContext.Email}({userContext.Role})'");
-            }
-        }
+        _queryHandler = queryHandler;
+        _userContext = userContext;
+        _logger = logger;
     }
 
-
-
+    public async Task<TResult> HandleAsync(TQuery query, CancellationToken cancellationToken = default)
+    {
+        if (RoleAttribute.IsSatisfiedBy(_userContext.Role))
+        {
+            _logger.LogDebug("Successfully authorized access to '{typeof(TQuery)}' for user '{_userContext.Email}({_userContext.Role})'", typeof(TQuery), _userContext.Email, _userContext.Role);
+            return await _queryHandler.HandleAsync(query, cancellationToken).ConfigureAwait(false);
+        }
+        else
+        {
+            throw new AuthorizationFailedException($"Failed to authorize access to '{query.GetType()}' for user '{_userContext.Email}({_userContext.Role})'");
+        }
+    }
 }

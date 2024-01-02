@@ -3,8 +3,10 @@ using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using DbReader;
-using HeatKeeper.Abstractions.Logging;
+using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Server.Database.Migrations;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace HeatKeeper.Server.Database
 {
@@ -15,37 +17,38 @@ namespace HeatKeeper.Server.Database
 
     public class DatabaseMigrator : IDatabaseMigrator
     {
-        private readonly ApplicationConfiguration configuration;
-        private readonly ISqlProvider sqlProvider;
-        private readonly Logger log;
+        private readonly ISqlProvider _sqlProvider;
+        private readonly ILogger<DatabaseMigrator> _logger;
 
-        public DatabaseMigrator(ApplicationConfiguration configuration, ISqlProvider sqlProvider, Logger log)
+        private readonly IConfiguration _configuration;
+
+        public DatabaseMigrator(IConfiguration configuration, ISqlProvider sqlProvider, ILogger<DatabaseMigrator> logger)
         {
-            this.configuration = configuration;
-            this.sqlProvider = sqlProvider;
-            this.log = log;
+            _configuration = configuration;
+            _sqlProvider = sqlProvider;
+            _logger = logger;
         }
 
         public void Migrate()
         {
-            using (var connection = new SQLiteConnection(configuration.ConnectionString))
+            using (var connection = new SQLiteConnection(_configuration.GetConnectionString()))
             {
-                log.Debug($"Open database connection using connection string: {configuration.ConnectionString}");
+                _logger.LogDebug("Open database connection using connection string: {_configuration.ConnectionString}", _configuration.GetConnectionString());
                 connection.Open();
                 var appliedVersions = GetDatabaseVersion(connection);
                 var databaseVersion = appliedVersions.OrderBy(vi => vi.Version).LastOrDefault()?.Version ?? 0;
-                log.Info($"Database is at version {databaseVersion}");
+                _logger.LogInformation("Database is at version {databaseVersion}", databaseVersion);
 
                 var migrationsGroupedByVersion = GetMigrationsGroupedByVersion(databaseVersion);
 
                 foreach (var migrations in migrationsGroupedByVersion)
                 {
                     var appliedMigrationsDescription = string.Empty;
-                    log.Info($"Found {migrations.Count()} migration(s) to be applied for version {migrations.Key}");
+                    _logger.LogInformation("Applying {migrations.Count()} migration(s) to be applied for version {migrations.Key}", migrations.Count(), migrations.Key);
                     foreach (var migration in migrations.OrderBy(m => m.Order))
                     {
-                        log.Info($"Applying migration {migration.MigrationType.Name}");
-                        var migrationInstance = (IMigration)Activator.CreateInstance(migration.MigrationType, sqlProvider);
+                        _logger.LogInformation("Applying migration {migration.MigrationType.Name}", migration.MigrationType.Name);
+                        var migrationInstance = (IMigration)Activator.CreateInstance(migration.MigrationType, _sqlProvider);
                         migrationInstance.Migrate(connection);
                         if (string.IsNullOrWhiteSpace(appliedMigrationsDescription))
                         {
@@ -56,8 +59,9 @@ namespace HeatKeeper.Server.Database
                             appliedMigrationsDescription = $"{appliedMigrationsDescription}, {migration.MigrationType.Name}";
                         }
                     }
-                    connection.Execute(sqlProvider.InsertVersionInfo, new VersionInfo() { Version = migrations.Key, AppliedOn = DateTime.UtcNow, Description = appliedMigrationsDescription });
-                    log.Info($"Database is now at version {migrations.Key}");
+                    connection.Execute(_sqlProvider.InsertVersionInfo, new VersionInfo() { Version = migrations.Key, AppliedOn = DateTime.UtcNow, Description = appliedMigrationsDescription });
+                    _logger.LogInformation("Database is now at version {migrations.Key}", migrations.Key);
+
                 }
 
                 connection.Close();
@@ -78,14 +82,14 @@ namespace HeatKeeper.Server.Database
 
         private VersionInfo[] GetDatabaseVersion(IDbConnection connection)
         {
-            var isEmpty = connection.ExecuteScalar<long>(sqlProvider.IsEmptyDatabase) == 1;
+            var isEmpty = connection.ExecuteScalar<long>(_sqlProvider.IsEmptyDatabase) == 1;
             if (isEmpty)
             {
                 return Array.Empty<VersionInfo>();
             }
             else
             {
-                return connection.Read<VersionInfo>(sqlProvider.GetVersionInfo).ToArray();
+                return connection.Read<VersionInfo>(_sqlProvider.GetVersionInfo).ToArray();
             }
         }
 

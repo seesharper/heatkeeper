@@ -1,31 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using CQRS.Command.Abstractions;
 using HeatKeeper.Abstractions;
+using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Server.Authentication;
-using HeatKeeper.Server.Configuration;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Electricity;
-using HeatKeeper.Server.Export;
 using HeatKeeper.Server.Host.BackgroundTasks;
 using HeatKeeper.Server.Host.Swagger;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Programs;
 using Janitor;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 namespace HeatKeeper.Server.Host
 {
@@ -40,8 +27,6 @@ namespace HeatKeeper.Server.Host
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var appConfig = services.AddApplicationConfiguration(Configuration);
-
             services.AddJanitor((sp, config) => config
                 .Schedule(builder => builder
                     .WithName("ExportElectricalMarketPrices")
@@ -75,7 +60,7 @@ namespace HeatKeeper.Server.Host
                 options.ModelBinderProviders.Insert(0, new RouteAndBodyBinderProvider(bodyModelBinderProvider));
             }).AddControllersAsServices().AddNewtonsoftJson();
 
-            services.AddJwtAuthentication(appConfig);
+            services.AddJwtAuthentication(Configuration);
             services.AddSpaStaticFiles(config => config.RootPath = "wwwroot");
             services.AddSwaggerGen(c =>
             {
@@ -89,14 +74,9 @@ namespace HeatKeeper.Server.Host
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseMigrator databaseMigrator, IEnumerable<IBootStrapper> bootstrappers, ApplicationConfiguration applicationConfiguration)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseMigrator databaseMigrator, IEnumerable<IBootStrapper> bootstrappers)
         {
-            databaseMigrator.Migrate();
 
-            foreach (var bootStrapper in bootstrappers)
-            {
-                bootStrapper.Execute().GetAwaiter().GetResult();
-            }
 
 
 
@@ -115,14 +95,6 @@ namespace HeatKeeper.Server.Host
                 app.UseCors("DevelopmentPolicy");
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                if (applicationConfiguration.Secret == DefaultSecret.Value)
-                {
-                    throw new Exception("Cannot run in production with the default secret.");
-                }
-                app.UseDeveloperExceptionPage();
-            }
 
             app.UseRouting();
             app.UseAuthentication();
@@ -137,63 +109,5 @@ namespace HeatKeeper.Server.Host
         }
     }
 
-    public class RouteAndBodyModelBinder : IModelBinder
-    {
-        private readonly IModelBinder bodyModelBinder;
-
-        public RouteAndBodyModelBinder(IModelBinder bodyModelBinder)
-        {
-            this.bodyModelBinder = bodyModelBinder;
-        }
-
-        public async Task BindModelAsync(ModelBindingContext bindingContext)
-        {
-
-            await bodyModelBinder.BindModelAsync(bindingContext);
-
-            var routeValues = bindingContext.HttpContext.Request.RouteValues.Select(rv => rv.Key);
-
-            var routeProperties = bindingContext.ModelMetadata.Properties.Where(p => routeValues.Contains(p.Name, StringComparer.OrdinalIgnoreCase)).ToArray();
-
-            if (bindingContext.Result.Model == null)
-            {
-                bindingContext.Result = ModelBindingResult.Success(Activator.CreateInstance(bindingContext.ModelType));
-            }
-            foreach (var routeProperty in routeProperties)
-            {
-                var routeValue = bindingContext.ValueProvider.GetValue(routeProperty.Name).FirstValue;
-                var convertedValue = Convert.ChangeType(routeValue, routeProperty.UnderlyingOrModelType);
-                routeProperty.PropertySetter(bindingContext.Result.Model, convertedValue);
-            }
-        }
-    }
-
-    public class RouteAndBodyBinderProvider : IModelBinderProvider
-    {
-        private readonly IModelBinderProvider bodyModelBinderProvider;
-
-        public RouteAndBodyBinderProvider(IModelBinderProvider bodyModelBinderProvider)
-        {
-            this.bodyModelBinderProvider = bodyModelBinderProvider;
-        }
-
-        public IModelBinder GetBinder(ModelBinderProviderContext context)
-        {
-            var identity = (ModelMetadataIdentity)typeof(ModelMetadata).GetProperty("Identity", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(context.Metadata);
-            if (identity.MetadataKind == ModelMetadataKind.Parameter)
-            {
-                if (identity.ParameterInfo.IsDefined(typeof(FromBodyAndRouteAttribute)))
-                {
-                    return new RouteAndBodyModelBinder(bodyModelBinderProvider.GetBinder(context));
-                }
-            }
-
-            return null;
-        }
-    }
-
-    public class FromBodyAndRouteAttribute : Attribute
-    {
-
-    }
+    
 }

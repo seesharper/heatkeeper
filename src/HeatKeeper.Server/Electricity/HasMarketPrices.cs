@@ -2,8 +2,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Server.Authorization;
-using HeatKeeper.Server.Configuration;
 using InfluxDB.Client;
 using Microsoft.Extensions.Configuration;
 

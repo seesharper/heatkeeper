@@ -15,7 +15,7 @@
       // If you have changed target frameworks, make sure to update the program path.
       "program": "${workspaceFolder}/src/HeatKeeper.Server.Host/bin/Debug/net8.0/HeatKeeper.Server.Host.dll",
       "args": [],
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/src/HeatKeeper.Server.Host",
       "stopAtEntry": false,
       // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
       "serverReadyAction": {

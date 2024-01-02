@@ -53,10 +53,7 @@ namespace HeatKeeper.Server.Users
             {
                 Expires = refreshToken.Expires,
                 HttpOnly = true,
-                SameSite = SameSiteMode.None,
-                Secure = false
-                // Secure = true,
-                // SameSite = SameSiteMode.Strict
+                Secure = true
             });
 
             // var cookies = _httpContextAccessor.HttpContext.Response.Cookies.

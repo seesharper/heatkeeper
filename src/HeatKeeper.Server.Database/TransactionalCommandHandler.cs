@@ -2,31 +2,32 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
-using HeatKeeper.Abstractions.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace HeatKeeper.Abstractions.Transactions
 {
     public class TransactionalCommandHandler<TCommand> : ICommandHandler<TCommand>
     {
-        private readonly IDbConnection dbConnection;
-        private readonly ICommandHandler<TCommand> commandHandler;
-        private readonly Logger logger;
+        private readonly IDbConnection _dbConnection;
+        private readonly ICommandHandler<TCommand> _commandHandler;
 
-        public TransactionalCommandHandler(IDbConnection dbConnection, ICommandHandler<TCommand> commandHandler, Logger logger)
+        private readonly ILogger<TransactionalCommandHandler<TCommand>> _logger;
+
+        public TransactionalCommandHandler(IDbConnection dbConnection, ICommandHandler<TCommand> commandHandler, ILogger<TransactionalCommandHandler<TCommand>> logger)
         {
-            this.dbConnection = dbConnection;
-            this.commandHandler = commandHandler;
-            this.logger = logger;
+            _dbConnection = dbConnection;
+            _commandHandler = commandHandler;
+            _logger = logger;
         }
 
         public async Task HandleAsync(TCommand command, CancellationToken cancellationToken)
         {
-            logger.Debug($"Starting transaction for {typeof(TCommand)}");
-            using (var transaction = dbConnection.BeginTransaction())
+            _logger.LogDebug("Starting transaction for {typeof(TCommand)}", typeof(TCommand));
+            using (var transaction = _dbConnection.BeginTransaction())
             {
-                await commandHandler.HandleAsync(command, cancellationToken);
+                await _commandHandler.HandleAsync(command, cancellationToken);
                 transaction.Commit();
-                logger.Debug($"Transaction committed for {typeof(TCommand)}");
+                _logger.LogDebug("Transaction committed for {typeof(TCommand)}", typeof(TCommand));
             }
         }
     }
