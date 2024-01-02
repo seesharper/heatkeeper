@@ -6,6 +6,7 @@ builder.Host.UseLightInject(services => services.RegisterFrom<HostCompositionRoo
 // Add services to the container.
 
 builder.Services.AddJanitor();
+builder.Services.AddHttpClient();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
