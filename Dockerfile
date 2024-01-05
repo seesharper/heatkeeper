@@ -15,7 +15,7 @@ RUN npm install
 RUN npm run build
 
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-stage
 
 COPY src /src
 
@@ -24,7 +24,7 @@ WORKDIR /src/HeatKeeper.Server.Host
 RUN dotnet publish -c release -o /heatkeeper/app
 
 # Runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:7.0
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 
 VOLUME [ "/db" ]
 
