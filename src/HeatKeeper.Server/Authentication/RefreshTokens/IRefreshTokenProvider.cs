@@ -1,7 +1,7 @@
 using System;
 using System.Security.Cryptography;
 
-namespace HeatKeeper.Server.Authentication;
+namespace HeatKeeper.Server.Authentication.RefreshTokens;
 
 
 public interface IRefreshTokenProvider

@@ -191,5 +191,11 @@ namespace HeatKeeper.Server.Database
         string GetZoneAndLocationByZoneId { get; }
 
         string CreateRefreshTokensTable { get; }
+
+        string InsertRefreshToken { get; }
+
+        string DeleteRefreshToken { get; }
+
+        string UpdateRefreshToken { get; }
     }
 }
