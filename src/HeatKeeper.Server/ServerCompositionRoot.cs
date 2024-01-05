@@ -11,6 +11,7 @@ using HeatKeeper.Abstractions;
 using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Authentication;
+using HeatKeeper.Server.Authentication.RefreshTokens;
 using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Export;
 using HeatKeeper.Server.Locations;

@@ -26,7 +26,8 @@ namespace HeatKeeper.Server.Host.Users
         }
 
         [HttpPost("authenticate")]
-        public async Task<AuthenticatedUser> Authenticate([FromBody] AuthenticatedUserQuery query) => await _queryExecutor.ExecuteAsync(query);
+        public async Task<AuthenticatedUser> Authenticate([FromBody] AuthenticatedUserQuery query)
+            => await _queryExecutor.ExecuteAsync(query);
 
         [HttpPost()]
         public async Task<ActionResult<ResourceId>> Post([FromBody] RegisterUserCommand command)
@@ -65,5 +66,25 @@ namespace HeatKeeper.Server.Host.Users
         [HttpGet("apikey")]
         public async Task<ApiKey> GetApiKey([FromQuery] ApiKeyQuery query)
             => await _queryExecutor.ExecuteAsync(query);
+
+        [HttpPost("refresh-access-token")]
+        public async Task<string> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refresh-token"];
+
+            // 1  . Check if refresh token is valid
+            // 2. If valid, return new access token
+            // 3. If not valid, return 401
+
+
+            // if (refreshToken == null)
+            // {
+            //     throw new AuthenticationFailedException("No refresh token found");
+            // }
+            return string.Empty;
+
+
+            //return await _apiKeyProvider.RefreshToken(refreshToken);
+        }
     }
 }

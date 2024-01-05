@@ -5,7 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Authentication;
+using HeatKeeper.Server.Authentication.RefreshTokens;
 using HeatKeeper.Server.Authorization;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 
 namespace HeatKeeper.Server.Users
@@ -20,9 +23,9 @@ namespace HeatKeeper.Server.Users
 
         public AuthenticatedUserQueryHandler(IPasswordManager passwordManager, ITokenProvider tokenProvider, IQueryExecutor queryExecutor, IRefreshTokenProvider refreshTokenProvider, IHttpContextAccessor httpContextAccessor)
         {
-            this._passwordManager = passwordManager;
-            this._tokenProvider = tokenProvider;
-            this._queryExecutor = queryExecutor;
+            _passwordManager = passwordManager;
+            _tokenProvider = tokenProvider;
+            _queryExecutor = queryExecutor;
             _refreshTokenProvider = refreshTokenProvider;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -45,18 +48,54 @@ namespace HeatKeeper.Server.Users
                 new Claim(ClaimTypes.Sid, user.Id.ToString())
             };
 
-            var token = _tokenProvider.CreateToken(claims, DateTime.UtcNow.AddDays(7));
+            var token = _tokenProvider.CreateToken(claims, DateTime.UtcNow.AddHours(1));
 
             var refreshToken = _refreshTokenProvider.CreateRefreshToken();
 
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken.Token, new CookieOptions
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("refresh-token", refreshToken.Token, new CookieOptions
             {
                 Expires = refreshToken.Expires,
                 HttpOnly = true,
                 Secure = true
             });
 
-            // var cookies = _httpContextAccessor.HttpContext.Response.Cookies.
+            var authProperties = new AuthenticationProperties
+            {
+                AllowRefresh = true,
+                // Refreshing the authentication session should be allowed.
+
+                //ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
+                // The time at which the authentication ticket expires. A 
+                // value set here overrides the ExpireTimeSpan option of 
+                // CookieAuthenticationOptions set with AddCookie.
+
+                IsPersistent = true,
+                // Whether the authentication session is persisted across 
+                // multiple requests. When used with cookies, controls
+                // whether the cookie's lifetime is absolute (matching the
+                // lifetime of the authentication ticket) or session-based.
+
+                //IssuedUtc = <DateTimeOffset>,
+                // The time at which the authentication ticket was issued.
+
+                //RedirectUri = <string>
+                // The full path or absolute URI to be used as an http 
+                // redirect response value.
+            };
+
+
+            ClaimsIdentity ct = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            ClaimsPrincipal cp = new ClaimsPrincipal(ct);
+            await _httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, cp, authProperties);
+
+            // _httpContextAccessor.HttpContext.Response.Cookies.Append("access-token", token, new CookieOptions
+            // {
+            //     Expires = DateTime.UtcNow.AddHours(1),
+            //     HttpOnly = true,
+            //     Secure = true
+            // });
+
+            var cookies = _httpContextAccessor.HttpContext.Response.Cookies;
 
             return new AuthenticatedUser(token, user.Id, user.Email, user.FirstName, user.LastName, user.IsAdmin);
         }

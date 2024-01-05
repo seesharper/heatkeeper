@@ -1,27 +1,16 @@
 using System.Text;
 using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Server.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 
 
 namespace HeatKeeper.Server.Host
 {
     internal static class ConfigurationExtensions
     {
-        // public static ApplicationConfiguration AddApplicationConfiguration(this IServiceCollection services, IConfiguration configuration)
-        // {
-        //     var applicationConfiguration = configuration.Get<ApplicationConfiguration>(c => c.BindNonPublicProperties = true);
-        //     if (string.IsNullOrWhiteSpace(applicationConfiguration.Secret))
-        //     {
-        //         applicationConfiguration.Secret = DefaultSecret.Value;
-        //     }
-
-        //     services.AddSingleton(applicationConfiguration);
-
-        //     return applicationConfiguration;
-        // }
-
         public static IServiceCollection AddCorsPolicy(this IServiceCollection services)
         {
             services.AddCors(options =>
@@ -44,22 +33,44 @@ namespace HeatKeeper.Server.Host
 
             var key = Encoding.ASCII.GetBytes(secret);
 
-            services.AddAuthentication(x =>
+            _ = services.AddAuthentication(options =>
             {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                // custom scheme defined in .AddPolicyScheme() below
+                options.DefaultScheme = "JWT_OR_COOKIE";
+                options.DefaultChallengeScheme = "JWT_OR_COOKIE";
+            })
+            .AddCookie("Cookies", options =>
+            {
+                options.Cookie.Name = "HeatKeeper";
+                options.SlidingExpiration = true;
             })
             .AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
+                        {
+                            x.RequireHttpsMetadata = true;
+                            x.SaveToken = true;
+                            x.TokenValidationParameters = new TokenValidationParameters
+                            {
+                                ValidateIssuerSigningKey = true,
+                                IssuerSigningKey = new SymmetricSecurityKey(key),
+                                ValidateIssuer = false,
+                                ValidateAudience = false,
 
+                            };
+                        })
+            // this is the key piece!
+            .AddPolicyScheme("JWT_OR_COOKIE", "JWT_OR_COOKIE", options =>
+            {
+                // runs on each request
+                options.ForwardDefaultSelector = context =>
+                {
+                    // filter by auth type
+                    string authorization = context.Request.Headers[HeaderNames.Authorization];
+                    if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith($"{JwtBearerDefaults.AuthenticationScheme} "))
+                    {
+                        return JwtBearerDefaults.AuthenticationScheme;
+                    }
+                    // otherwise always check for cookie auth
+                    return CookieAuthenticationDefaults.AuthenticationScheme;
                 };
             });
 

@@ -160,6 +160,7 @@ namespace HeatKeeper.Server.WebApi.Tests
                 .Build();
 
             var response = await SendAndHandleRequest(client, success, problem, httpRequest);
+
             return await response.ContentAs<TResponse>();
         }
 
