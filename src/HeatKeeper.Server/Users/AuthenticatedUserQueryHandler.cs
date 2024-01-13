@@ -49,16 +49,7 @@ namespace HeatKeeper.Server.Users
             };
 
             var token = _tokenProvider.CreateToken(claims, DateTime.UtcNow.AddHours(1));
-
-            var refreshToken = _refreshTokenProvider.CreateRefreshToken();
-
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("refresh-token", refreshToken.Token, new CookieOptions
-            {
-                Expires = refreshToken.Expires,
-                HttpOnly = true,
-                Secure = true
-            });
-
+                        
             var authProperties = new AuthenticationProperties
             {
                 AllowRefresh = true,
@@ -81,21 +72,13 @@ namespace HeatKeeper.Server.Users
                 //RedirectUri = <string>
                 // The full path or absolute URI to be used as an http 
                 // redirect response value.
-            };
 
+
+            };
 
             ClaimsIdentity ct = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             ClaimsPrincipal cp = new ClaimsPrincipal(ct);
             await _httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, cp, authProperties);
-
-            // _httpContextAccessor.HttpContext.Response.Cookies.Append("access-token", token, new CookieOptions
-            // {
-            //     Expires = DateTime.UtcNow.AddHours(1),
-            //     HttpOnly = true,
-            //     Secure = true
-            // });
-
-            var cookies = _httpContextAccessor.HttpContext.Response.Cookies;
 
             return new AuthenticatedUser(token, user.Id, user.Email, user.FirstName, user.LastName, user.IsAdmin);
         }

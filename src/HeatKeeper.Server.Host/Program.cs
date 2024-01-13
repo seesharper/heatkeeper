@@ -1,4 +1,5 @@
 ﻿using HeatKeeper.Server.Host;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,12 +8,15 @@ builder.Host.UseLightInject(services => services.RegisterFrom<HostCompositionRoo
 
 builder.Services.AddJanitor();
 builder.Services.AddHttpClient();
+builder.Services.AddCorsPolicy();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddSpaStaticFiles(config => config.RootPath = "wwwroot");
 builder.Services.AddExceptionHandler<ExceptionHandler>();
 builder.Services.AddMvc(options =>
 {
@@ -31,6 +35,14 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors("DevelopmentPolicy");
+
+    app.UseCookiePolicy(new CookiePolicyOptions
+    {
+        MinimumSameSitePolicy = SameSiteMode.Strict,
+        HttpOnly = HttpOnlyPolicy.Always,
+        Secure = CookieSecurePolicy.Always
+    });
 }
 else
 {
@@ -38,8 +50,12 @@ else
 }
 
 app.UseHttpsRedirection();
-
+app.UseStaticFiles();
+app.UseSpaStaticFiles();
+app.UseSpa(config => config.Options.SourcePath = "wwwroot");
 app.UseAuthorization();
+
+
 
 app.UseExceptionHandler(_ => { });
 

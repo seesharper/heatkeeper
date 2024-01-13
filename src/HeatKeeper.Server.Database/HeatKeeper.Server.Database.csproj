@@ -23,21 +23,5 @@
     <Reference Include="System.Data.SQLite">
       <HintPath>SQLite116\System.Data.SQLite.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <TestItem Include="test1" />
-    <TestItem Include="test2" />
-    <TestItem Include="test3" />
-  </ItemGroup>
-  <Target Name="TestMessage" AfterTargets="Build">
-    <!-- Use $(Property Name) to reference a property -->
-    <Message Text="$(CPU)" Importance="high" />
-    <!-- Use @(Item Name) to output a semi-colon
-         separated list of items on one line      -->
-    <Message Text="@(TestItem)" Importance="high" />
-    <!-- Use %(Item Name.Metadata Property Name) to 
-         call the Message task once for each item.   -->
-    <!-- This will output each item on a separate line -->
-    <Message Text="%(TestItem.Identity)" Importance="high" />
-  </Target>
+  </ItemGroup>  
 </Project>

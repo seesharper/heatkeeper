@@ -1,4 +1,22 @@
+<script>
+  async function login() {
+
+
+    var payload = { email: "admin@no.org", password: "Admin-1234" };
+
+    var request = new Request(`https://localhost:7167/api/users/authenticate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      credentials: 'same-origin',
+    });
+
+    await fetch(request);
+  }
+</script>
+
 <p>
   If you want to serve up a single-page application, place the app inside the
   wwwroot folder. <a href="/swagger">Swagger</a>
 </p>
+<button onclick="login()">Login</button>
