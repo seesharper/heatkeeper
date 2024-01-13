@@ -1,6 +1,5 @@
 using System.Text;
 using HeatKeeper.Abstractions.Configuration;
-using HeatKeeper.Server.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -15,7 +14,6 @@ namespace HeatKeeper.Server.Host
         {
             services.AddCors(options =>
             {
-
                 options.AddPolicy("DevelopmentPolicy", config =>
                 {
                     config.AllowAnyOrigin();
@@ -42,7 +40,9 @@ namespace HeatKeeper.Server.Host
             .AddCookie("Cookies", options =>
             {
                 options.Cookie.Name = "HeatKeeper";
+                // options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
                 options.SlidingExpiration = true;
+                options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
             })
             .AddJwtBearer(x =>
                         {
@@ -76,7 +76,5 @@ namespace HeatKeeper.Server.Host
 
             return services;
         }
-
-
     }
 }

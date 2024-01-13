@@ -40,8 +40,10 @@ namespace HeatKeeper.Server.Host.Locations
 
         [HttpGet]
         public async Task<Location[]> Get([FromQuery] GetAllLocationsQuery query)
-            => await queryExecutor.ExecuteAsync(query);
-
+        {
+            var request = Request;
+            return await queryExecutor.ExecuteAsync(query);
+        }
 
         [HttpGet("{locationId}/zones")]
         public async Task<Zone[]> Zones([FromRoute] ZonesByLocationQuery query)
