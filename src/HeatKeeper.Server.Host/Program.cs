@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseLightInject(services => services.RegisterFrom<HostCompositionRoot>());
+builder.Configuration.AddEnvironmentVariables(prefix: "HEATKEEPER_");
 // Add services to the container.
 
 builder.Services.AddJanitor();
