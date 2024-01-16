@@ -19,9 +19,9 @@ namespace HeatKeeper.Server.Measurements
         }
 
         [HttpGet]
-        public async Task<AppVersion> Get([FromQuery]VersionQuery query)
+        public async Task<AppVersion> Get()
         {
-            return await queryExecutor.ExecuteAsync(query);
+            return await queryExecutor.ExecuteAsync(new VersionQuery(Assembly.GetExecutingAssembly()));
         }
     }
 }
