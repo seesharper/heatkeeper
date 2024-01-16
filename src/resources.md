@@ -139,3 +139,7 @@ mosquitto_pub -t "ShellyHT_Stue_Hytta/online" --username heatkeeper --pw overint
 
 https://blogs.sap.com/2019/12/17/understanding-containers-part-03-one-shot-containers/
 
+
+
+
+https://devops.stackexchange.com/questions/4540/how-to-change-the-owner-of-volume-directory-in-dockerfile

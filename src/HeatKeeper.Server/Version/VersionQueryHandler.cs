@@ -14,14 +14,13 @@ namespace HeatKeeper.Server.Version
     {
         public Task<AppVersion> HandleAsync(VersionQuery query, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new AppVersion(Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyInformationalVersionAttribute>().Single().InformationalVersion));
+            return Task.FromResult(new AppVersion(query.Assembly.GetCustomAttributes<AssemblyInformationalVersionAttribute>().Single().InformationalVersion));
         }
     }
 
     [RequireAnonymousRole]
-    public class VersionQuery : IQuery<AppVersion>
-    {
-    }
+    public record VersionQuery(Assembly Assembly) : IQuery<AppVersion>;
+
 
     public class AppVersion
     {
