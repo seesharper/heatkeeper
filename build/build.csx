@@ -48,7 +48,7 @@ AsyncStep deploy = async () =>
 AsyncStep BuildContainer = async () =>
 {
     WriteLine($"Building container for version {TagVersion}");
-    await Command.ExecuteAsync("docker", $"build --pull --rm  --no-cache -t bernhardrichter/{dockerImageName}:latest .", BuildContext.RepositoryFolder);
+    await Command.ExecuteAsync("docker", $"build --pull --rm --build-arg APP_VERSION={TagVersion} --no-cache -t bernhardrichter/{dockerImageName}:latest .", BuildContext.RepositoryFolder);
     await Command.ExecuteAsync("docker", $"tag bernhardrichter/{dockerImageName}:latest bernhardrichter/{dockerImageName}:{TagVersion}");
 };
 
