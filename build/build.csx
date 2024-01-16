@@ -3,6 +3,10 @@
 
 BuildContext.CodeCoverageThreshold = 30;
 
+var dockerImageName = "heatkeeper";
+var TagVersion = BuildContext.LatestTag;
+
+
 [StepDescription("Runs the tests with test coverage")]
 Step testcoverage = () =>
 {
@@ -31,15 +35,32 @@ AsyncStep deploy = async () =>
 {
     test();
     testcoverage();
+    await BuildContainer();
 
     if (BuildEnvironment.IsSecure && BuildEnvironment.IsTagCommit)
     {
-        await dockerImage();
-        await Docker.PushAsync("bernhardrichter/heatkeeper", BuildContext.LatestTag, BuildContext.BuildFolder);
+        await PushContainer();
     }
 
     await Artifacts.Deploy();
 };
+
+AsyncStep BuildContainer = async () =>
+{
+    WriteLine($"Building container for version {TagVersion}");
+    await Command.ExecuteAsync("docker", $"build --pull --rm  --no-cache -t bernhardrichter/{dockerImageName}:latest .", BuildContext.RepositoryFolder);
+    await Command.ExecuteAsync("docker", $"tag bernhardrichter/{dockerImageName}:latest bernhardrichter/{dockerImageName}:{TagVersion}");
+};
+
+AsyncStep PushContainer = async () =>
+{
+    var username = Environment.GetEnvironmentVariable("DOCKERHUB_USERNAME");
+    var password = Environment.GetEnvironmentVariable("DOCKERHUB_PASSWORD");
+    await Command.ExecuteAsync("docker", $"login --username {username} --password {password}", BuildContext.RepositoryFolder);
+    await Command.ExecuteAsync("docker", $@"push bernhardrichter/{dockerImageName}:{BuildContext.LatestTag}", BuildContext.RepositoryFolder);
+    await Command.ExecuteAsync("docker", $@"push bernhardrichter/{dockerImageName}:latest", BuildContext.RepositoryFolder);
+};
+
 
 await StepRunner.Execute(Args);
 return 0;

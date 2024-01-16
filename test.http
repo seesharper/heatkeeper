@@ -1,10 +1,15 @@
-POST http://localhost:5000/api/users/authenticate
+POST https://heatkeeper.no/api/users/authenticate
 content-type: application/json
 
 {
     "email": "admin@no.org",
     "password": "Admin-1234"
 }
+
+
+###
+GET https://heatkeeper.no/api/locations
+
 
 ###
 POST http://localhost:5000/api/measurements
