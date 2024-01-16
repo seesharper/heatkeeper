@@ -1,4 +1,5 @@
 
+ARG APP_VERSION=1.0.0
 FROM alpine/git as clone-client-stage
 
 WORKDIR /github
@@ -14,14 +15,16 @@ COPY --from=clone-client-stage github/heatkeeper.client .
 RUN npm install
 RUN npm run build
 
+
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-stage
-
+ARG APP_VERSION
 COPY src /src
 
 WORKDIR /src/HeatKeeper.Server.Host
 
-RUN dotnet publish -c release -o /heatkeeper/app
+RUN echo "Building version " $APP_VERSION
+RUN dotnet publish -c release -o /heatkeeper/app /property:Version=$APP_VERSION
 
 # Runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
