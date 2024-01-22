@@ -76,6 +76,11 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<DashboardLocation[]> GetDashboardLocations(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<DashboardLocation[]>(client, "api/dashboard/locations", token, success, problem);
 
+        public static async Task<DashboardTemperature[]> GetDashboardTemperatures(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+         => await Get<DashboardTemperature[]>(client, "api/dashboard/temperatures", token, success, problem);
+
+
+
         public static async Task AddUserToLocation(this HttpClient client, long locationId, AddUserToLocationCommand addUserLocationRequest, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
             await PostWithNoResponse(client, $"api/locations/{locationId}/users", addUserLocationRequest, token, success, problem);

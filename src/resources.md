@@ -143,3 +143,7 @@ https://blogs.sap.com/2019/12/17/understanding-containers-part-03-one-shot-conta
 
 
 https://devops.stackexchange.com/questions/4540/how-to-change-the-owner-of-volume-directory-in-dockerfile
+
+https://duncanlock.net/blog/2023/05/23/using-git-hashes-in-vite-vuejs/
+
+https://stackoverflow.com/questions/77647463/sveltekit-webapp-to-pwa-progressive-web-app-how-to-do-it-in-the-most-simple-w
