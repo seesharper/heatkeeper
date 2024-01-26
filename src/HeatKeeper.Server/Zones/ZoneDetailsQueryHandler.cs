@@ -43,5 +43,7 @@ namespace HeatKeeper.Server.Zones
         public bool IsDefaultOutsideZone { get; set; }
 
         public bool IsDefaultInsideZone { get; set; }
+
+        public long LocationId { get; set; }
     }
 }

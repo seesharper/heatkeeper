@@ -2,6 +2,7 @@ UPDATE Zones
 SET
     name = @name,
     description = @description,
-    mqttTopic = @mqttTopic
+    mqttTopic = @mqttTopic,
+    locationId = @locationId
 WHERE
     id = @ZoneId

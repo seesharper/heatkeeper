@@ -16,10 +16,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         [Fact]
         public async Task ShouldGetZonesForLocation()
         {
-            var client = Factory.CreateClient();
-            var token = await client.AuthenticateAsAdminUser();
-            await client.GetZones(12, token);
-
+            var testLocation = await Factory.CreateTestLocation();
+            var zones = await testLocation.HttpClient.GetZones(testLocation.LocationId, testLocation.Token);
+            zones.Length.Should().Be(2);
         }
 
         [Fact]
@@ -83,7 +82,8 @@ namespace HeatKeeper.Server.WebApi.Tests
                 ZoneId = zoneId,
                 Name = TestData.Zones.Kitchen.Name,
                 MqttTopic = "SomeTopic",
-                Description = TestData.Zones.Kitchen.Description
+                Description = TestData.Zones.Kitchen.Description,
+                LocationId = locationId
             };
 
             await client.UpdateZone(updateZoneCommand, token);
