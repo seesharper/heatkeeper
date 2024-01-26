@@ -10,7 +10,7 @@ namespace HeatKeeper.Server.WebApi.Tests
     {
         [Fact]
         public async Task ShouldCreateLocation()
-        {            
+        {
             var client = Factory.CreateClient();
             var token = await client.AuthenticateAsAdminUser();
 
@@ -220,6 +220,17 @@ namespace HeatKeeper.Server.WebApi.Tests
             await client.DeleteLocation(locationId, token);
 
             (await client.GetLocations(token)).Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task ShouldGetLocationDetails()
+        {
+            var testLocation = await Factory.CreateTestLocation();
+            var client = Factory.CreateClient();
+            var locationDetails = await client.GetLocationDetails(testLocation.LocationId, testLocation.Token);
+            locationDetails.Name.Should().Be(TestData.Locations.Home.Name);
+            locationDetails.Description.Should().Be(TestData.Locations.Home.Description);
+            locationDetails.DefaultInsideZoneId.Should().Be(testLocation.LivingRoomZoneId);
         }
     }
 }

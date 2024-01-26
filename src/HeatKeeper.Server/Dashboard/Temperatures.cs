@@ -24,7 +24,10 @@ public class TemperaturesQueryHandler : IQueryHandler<DashboardTemperaturesQuery
 
 
     public async Task<DashboardTemperature[]> HandleAsync(DashboardTemperaturesQuery query, CancellationToken cancellationToken = default)
-        => (await _dbConnection.ReadAsync<DashboardTemperature>(_sqlProvider.GetDashboardTemperatures, new { UserId = _userContext.Id })).ToArray();
+    {
+        var result = (await _dbConnection.ReadAsync<DashboardTemperature>(_sqlProvider.GetDashboardTemperatures, new { UserId = _userContext.Id })).ToArray();
+        return result;
+    }
 }
 
 
@@ -39,5 +42,5 @@ public record DashboardTemperature(
     string Name,
     double? Temperature,
     double? Humidity,
-    DateTimeOffset Updated
+    DateTime Updated
     );
