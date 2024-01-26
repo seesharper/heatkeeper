@@ -16,6 +16,6 @@ public class DatabaseBootStrapper : IBootStrapper
 
     public async Task Execute()
     {
-        _databaseMigrator.Migrate();
+        // _databaseMigrator.Migrate();
     }
 }

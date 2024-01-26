@@ -147,3 +147,5 @@ https://devops.stackexchange.com/questions/4540/how-to-change-the-owner-of-volum
 https://duncanlock.net/blog/2023/05/23/using-git-hashes-in-vite-vuejs/
 
 https://stackoverflow.com/questions/77647463/sveltekit-webapp-to-pwa-progressive-web-app-how-to-do-it-in-the-most-simple-w
+
+https://www.danielzotti.it/blog/notifications-in-browsers

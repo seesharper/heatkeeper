@@ -38,10 +38,15 @@ namespace HeatKeeper.Server.Host.Locations
         public async Task Patch([FromBodyAndRoute] UpdateLocationCommand updateLocationCommand)
             => await commandExecutor.ExecuteAsync(updateLocationCommand).ConfigureAwait(false);
 
+        [HttpGet("{locationId}")]
+        public async Task<LocationDetails> GetLocationDetails([FromRoute] GetLocationDetailsQuery query)
+        {
+            return await queryExecutor.ExecuteAsync(query);
+        }
+
         [HttpGet]
         public async Task<Location[]> Get([FromQuery] GetAllLocationsQuery query)
         {
-            var request = Request;
             return await queryExecutor.ExecuteAsync(query);
         }
 

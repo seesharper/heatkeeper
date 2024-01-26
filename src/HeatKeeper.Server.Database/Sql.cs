@@ -199,5 +199,7 @@ namespace HeatKeeper.Server.Database
         string UpdateRefreshToken { get; }
 
         string GetDashboardTemperatures { get; }
+
+        string GetLocationDetails { get; }
     }
 }
