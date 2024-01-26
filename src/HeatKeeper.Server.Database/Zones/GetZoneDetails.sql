@@ -4,7 +4,8 @@ SELECT
     z.description,
     z.mqttTopic,
     (l.DefaultOutsideZoneId = z.Id) as IsDefaultOutsideZone,
-    (l.DefaultInsideZoneId = z.Id) as IsDefaultInsideZone
+    (l.DefaultInsideZoneId = z.Id) as IsDefaultInsideZone,
+    z.LocationId
 
 FROM
     Zones as z
