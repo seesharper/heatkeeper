@@ -34,9 +34,11 @@ namespace HeatKeeper.Server.Locations
         public string Name { get; set; }
 
         public string Description { get; set; }
-
-        // [JsonIgnore]
         public long Id { get; set; }
+
+        public long? DefaultOutsideZoneId { get; set; }
+
+        public long? DefaultInsideZoneId { get; set; }
     }
 
 
