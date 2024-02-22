@@ -10,7 +10,7 @@ namespace HeatKeeper.Server.Programs;
 
 
 [RequireUserRole]
-public record CreateProgramCommand(string Name, long LocationId)
+public record CreateProgramCommand(string Name, string Description, long LocationId)
 {
     public long ProgramId { get; set; }
 }

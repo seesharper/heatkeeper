@@ -1,5 +1,6 @@
 UPDATE Programs
 SET
     ActiveScheduleId = @ActiveScheduleId,
-    Name = @Name
+    Name = @Name,
+    Description = @Description
 WHERE Id = @ProgramId    

@@ -7,7 +7,7 @@ using Janitor;
 namespace HeatKeeper.Server.Programs;
 
 [RequireBackgroundRole]
-public record AddScheduleToJanitorCommand(long ScheduleId, long ProgramId, string Name, string CronExpression);
+public record AddScheduleToJanitorCommand(long ScheduleId, string Name, string CronExpression);
 
 public class AddScheduleToJanitorCommandHandler : ICommandHandler<AddScheduleToJanitorCommand>
 {
@@ -22,8 +22,9 @@ public class AddScheduleToJanitorCommandHandler : ICommandHandler<AddScheduleToJ
         _janitor.Schedule(builder =>
         {
             builder
-                .WithName($"{Prefix}_{command.Name}")
+                .WithName($"{Prefix}_{command.ScheduleId}")
                 .WithSchedule(new CronSchedule(command.CronExpression))
+                .WithStateHandler(async (TaskState state) => { })
                 .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken ct) =>
                 {
                     await commandExecutor.ExecuteAsync(new SetActiveScheduleCommand(command.ScheduleId), ct);

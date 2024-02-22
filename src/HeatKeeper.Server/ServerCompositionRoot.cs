@@ -81,7 +81,9 @@ namespace HeatKeeper.Server
                 .Decorate<ICommandHandler<ExportMeasurementsToInfluxDbCommand>, WhenMeasurementAreExported>()
                 .Decorate<ICommandHandler<MeasurementCommand[]>, WhenMeasurementsAreInserted>()
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidateSchedule<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(AfterScheduleHasBeenInsertedOrUpdated<>))
+                .Decorate<ICommandHandler<CreateScheduleCommand>, WhenScheduleIsCreated>()
+                .Decorate<ICommandHandler<UpdateScheduleCommand>, WhenScheduleIsUpdated>()
+                .Decorate<ICommandHandler<DeleteScheduleCommand>, WhenScheduleIsDeleted>()
                 .Decorate<ICommandHandler<SetZoneHeatingStatusCommand>, WhenSettingZoneHeatingStatus>();
         }
 

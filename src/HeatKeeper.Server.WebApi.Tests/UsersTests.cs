@@ -2,14 +2,11 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Users;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Mvc.Testing.Handlers;
 using Microsoft.Net.Http.Headers;

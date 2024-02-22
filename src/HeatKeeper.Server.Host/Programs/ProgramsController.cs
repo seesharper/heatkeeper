@@ -19,6 +19,12 @@ public class ProgramsController : ControllerBase
         _queryExecutor = queryExecutor;
     }
 
+    [HttpGet("{programId}")]
+    public async Task<ProgramDetails> GetProgramDetails([FromRoute] GetProgramDetailsQuery query)
+    {
+        return await _queryExecutor.ExecuteAsync(query);
+    }
+
     [HttpPost("{programId}/schedules")]
     public async Task<IActionResult> CreateSchedule([FromBodyAndRoute] CreateScheduleCommand command)
     {
@@ -34,7 +40,7 @@ public class ProgramsController : ControllerBase
     }
 
     [HttpGet("{programId}/schedules")]
-    public async Task<Schedule[]> Programs([FromRoute] SchedulesByProgramQuery query)
+    public async Task<ScheduleInfo[]> Programs([FromRoute] SchedulesByProgramQuery query)
             => await _queryExecutor.ExecuteAsync(query);
 
     [HttpPatch(template: "{programId}")]

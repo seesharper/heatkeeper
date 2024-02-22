@@ -1,11 +1,11 @@
 using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Query.Abstractions;
-using HeatKeeper.Server.Database;
 using DbReader;
-using System.Linq;
 using HeatKeeper.Server.Authorization;
+using HeatKeeper.Server.Database;
 
 namespace HeatKeeper.Server.Locations;
 
@@ -29,5 +29,5 @@ public class GetLocationDetails : IQueryHandler<GetLocationDetailsQuery, Locatio
 [RequireAdminRole]
 public record GetLocationDetailsQuery(long LocationId) : IQuery<LocationDetails>;
 
-public record LocationDetails(long Id, string Name, string Description, long? DefaultOutsideZoneId, long? DefaultInsideZoneId);
+public record LocationDetails(long Id, string Name, string Description, long? DefaultOutsideZoneId, long? DefaultInsideZoneId, long? ActiveProgramId);
 

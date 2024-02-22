@@ -8,8 +8,13 @@ public class CronSchedule : ISchedule
 {
     private readonly CronExpression _cronExpression;
 
-    public CronSchedule(string cronExpression)
-        => _cronExpression = CronExpression.Parse(cronExpression);
+    public CronSchedule(string cronScheduleExpression)
+    {
+        _cronExpression = CronExpression.Parse(cronScheduleExpression);
+        CronScheduleExpression = cronScheduleExpression;
+    }
+
+    public string CronScheduleExpression { get; }
 
     public DateTime? GetNext(DateTime utcNow)
         => _cronExpression.GetNextOccurrence(utcNow);

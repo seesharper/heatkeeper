@@ -2,7 +2,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Sensors;
-using HeatKeeper.Server.Zones;
 using Janitor;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -34,13 +33,13 @@ public class ChannelStateTests : TestBase
         await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, token);
 
 
-        var programId = await client.CreateProgram(new CreateProgramCommand("Normal", locationId), token);
+        var programId = await client.CreateProgram(new CreateProgramCommand("Normal", "", locationId), token);
 
         await client.ActivateProgram(programId, token);
 
         var createScheduleCommand = new CreateScheduleCommand(programId, "DayTime", "0 15,18,21 * * *");
 
-        long scheduleId = await client.CreateSchedule(programId, createScheduleCommand, token);
+        long scheduleId = await client.CreateSchedule(createScheduleCommand, token);
 
         await client.ActivateSchedule(scheduleId, token);
 
