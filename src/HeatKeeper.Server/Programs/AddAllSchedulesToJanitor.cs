@@ -25,7 +25,7 @@ public class AddAllSchedulesToJanitorCommandHandler : ICommandHandler<AddAllSche
         GetAllSchedules.Result[] allSchedules = await _queryExecutor.ExecuteAsync(new GetAllSchedulesQuery());
         foreach (GetAllSchedules.Result schedule in allSchedules)
         {
-            await _commandExecutor.ExecuteAsync(new AddScheduleToJanitorCommand(schedule.Id, schedule.ProgramId, schedule.Name, schedule.CronExpression), cancellationToken);
+            await _commandExecutor.ExecuteAsync(new AddScheduleToJanitorCommand(schedule.Id, schedule.Name, schedule.CronExpression), cancellationToken);
         }
     }
 }

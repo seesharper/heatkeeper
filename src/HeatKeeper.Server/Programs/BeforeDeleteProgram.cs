@@ -20,8 +20,8 @@ public class BeforeDeleteProgram : ICommandHandler<DeleteProgramCommand>
 
     public async Task HandleAsync(DeleteProgramCommand command, CancellationToken cancellationToken = default)
     {
-        Schedule[] schedules = await _queryExecutor.ExecuteAsync(new SchedulesByProgramQuery(command.ProgramId), cancellationToken);
-        foreach (Schedule schedule in schedules)
+        ScheduleInfo[] schedules = await _queryExecutor.ExecuteAsync(new SchedulesByProgramQuery(command.ProgramId), cancellationToken);
+        foreach (ScheduleInfo schedule in schedules)
         {
             await _commandExecutor.ExecuteAsync(new DeleteScheduleCommand(schedule.Id), cancellationToken);
         }

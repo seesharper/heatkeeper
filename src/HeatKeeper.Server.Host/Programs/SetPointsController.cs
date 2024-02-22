@@ -11,9 +11,13 @@ namespace HeatKeeper.Server.Host.Programs;
 public class SetPointsController : ControllerBase
 {
     private readonly ICommandExecutor _commandExecutor;
+    private readonly IQueryExecutor _queryExecutor;
 
-    public SetPointsController(ICommandExecutor commandExecutor)
-        => _commandExecutor = commandExecutor;
+    public SetPointsController(ICommandExecutor commandExecutor, IQueryExecutor queryExecutor)
+    {
+        _commandExecutor = commandExecutor;
+        _queryExecutor = queryExecutor;
+    }
 
     [HttpPatch("{setPointId}")]
     public async Task Patch([FromBodyAndRoute] UpdateSetPointCommand command)
@@ -22,4 +26,10 @@ public class SetPointsController : ControllerBase
     [HttpDelete("{setPointId}")]
     public async Task Delete([FromRoute] DeleteSetPointCommand command)
             => await _commandExecutor.ExecuteAsync(command);
+
+    [HttpGet("{setPointId}")]
+    public async Task<SetPointDetails> GetSetPointDetails([FromRoute] GetSetPointDetailsQuery query)
+    {
+        return await _queryExecutor.ExecuteAsync(query);
+    }
 }

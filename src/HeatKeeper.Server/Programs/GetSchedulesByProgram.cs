@@ -10,11 +10,11 @@ using HeatKeeper.Server.Database;
 namespace HeatKeeper.Server.Programs;
 
 [RequireUserRole]
-public record SchedulesByProgramQuery(long ProgramId) : IQuery<Schedule[]>;
+public record SchedulesByProgramQuery(long ProgramId) : IQuery<ScheduleInfo[]>;
 
-public record Schedule(long Id, string Name, string CronExpression);
+public record ScheduleInfo(long Id, string Name, string CronExpression);
 
-public class GetSchedulesByProgramQueryHandler : IQueryHandler<SchedulesByProgramQuery, Schedule[]>
+public class GetSchedulesByProgramQueryHandler : IQueryHandler<SchedulesByProgramQuery, ScheduleInfo[]>
 {
     private readonly IDbConnection _dbConnection;
     private readonly ISqlProvider _sqlProvider;
@@ -25,7 +25,7 @@ public class GetSchedulesByProgramQueryHandler : IQueryHandler<SchedulesByProgra
         _sqlProvider = sqlProvider;
     }
 
-    public async Task<Schedule[]> HandleAsync(SchedulesByProgramQuery query, CancellationToken cancellationToken = default)
-        => (await _dbConnection.ReadAsync<Schedule>(_sqlProvider.GetSchedulesByProgram, query)).ToArray();
+    public async Task<ScheduleInfo[]> HandleAsync(SchedulesByProgramQuery query, CancellationToken cancellationToken = default)
+        => (await _dbConnection.ReadAsync<ScheduleInfo>(_sqlProvider.GetSchedulesByProgram, query)).ToArray();
 }
 

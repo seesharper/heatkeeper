@@ -43,5 +43,11 @@ public class SchedulesController : ControllerBase
     {
         await _commandExecutor.ExecuteAsync(command);
         return CreatedAtAction(nameof(Activate), null);
-    }            
+    }
+
+    [HttpGet("{scheduleId}")]
+    public async Task<ScheduleDetails> GetScheduleDetails([FromRoute] GetScheduleDetailsQuery query)
+    {
+        return await _queryExecutor.ExecuteAsync(query);
+    }
 }

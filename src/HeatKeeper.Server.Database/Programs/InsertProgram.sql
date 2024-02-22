@@ -1,2 +1,2 @@
-INSERT INTO Programs(LocationId, Name)
-VALUES(@LocationId,@Name)
+INSERT INTO Programs(LocationId, Name, Description)
+VALUES(@LocationId,@Name, @Description)

@@ -79,6 +79,14 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<LocationDetails> GetLocationDetails(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<LocationDetails>(client, $"api/locations/{locationId}", token, success, problem);
 
+        public static async Task<ProgramDetails> GetProgramDetails(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<ProgramDetails>(client, $"api/programs/{programId}", token, success, problem);
+
+        public static async Task<ScheduleDetails> GetScheduleDetails(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<ScheduleDetails>(client, $"api/schedules/{scheduleId}", token, success, problem);
+
+        public static async Task<SetPointDetails> GetSetPointDetails(this HttpClient client, long setPointId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Get<SetPointDetails>(client, $"api/setpoints/{setPointId}", token, success, problem);
 
         public static async Task<DashboardTemperature[]> GetDashboardTemperatures(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
          => await Get<DashboardTemperature[]>(client, "api/dashboard/temperatures", token, success, problem);
@@ -233,8 +241,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<long> CreateZone(this HttpClient client, long locationId, CreateZoneCommand request, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/locations/{locationId}/zones", request, token, success, problem);
 
-        public static async Task<long> CreateSchedule(this HttpClient client, long programId, CreateScheduleCommand request, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Post(client, $"api/programs/{programId}/schedules", request, token, success, problem);
+        public static async Task<long> CreateSchedule(this HttpClient client, CreateScheduleCommand request, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, $"api/programs/{request.ProgramId}/schedules", request, token, success, problem);
 
         public static async Task<long> CreateSetPoint(this HttpClient client, long scheduleId, CreateSetPointCommand request, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/schedules/{scheduleId}/setPoints", request, token, success, problem);
@@ -254,8 +262,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<Programs.Program[]> GetPrograms(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<Programs.Program[]>(client, $"api/locations/{locationId}/programs", token, success, problem);
 
-        public static async Task<Schedule[]> GetSchedules(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<Schedule[]>(client, $"api/programs/{programId}/schedules", token, success, problem);
+        public static async Task<ScheduleInfo[]> GetSchedules(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<ScheduleInfo[]>(client, $"api/programs/{programId}/schedules", token, success, problem);
 
         public static async Task<SetPoint[]> GetSetPoints(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<SetPoint[]>(client, $"api/schedules/{scheduleId}/setPoints", token, success, problem);

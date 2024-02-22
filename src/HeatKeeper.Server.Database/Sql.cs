@@ -201,5 +201,13 @@ namespace HeatKeeper.Server.Database
         string GetDashboardTemperatures { get; }
 
         string GetLocationDetails { get; }
+
+        string GetProgramDetails { get; }
+
+        string AddDescriptionToProgramsTable { get; }
+
+        string GetScheduleDetails { get; }
+
+        string GetSetPointDetails { get; }
     }
 }

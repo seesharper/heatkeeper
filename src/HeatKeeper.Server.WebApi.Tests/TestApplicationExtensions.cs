@@ -31,15 +31,15 @@ public static class TestApplicationExtensions
 
         await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, token);
 
-        var normalProgramId = await client.CreateProgram(new CreateProgramCommand("Normal", locationId), token);
+        var normalProgramId = await client.CreateProgram(TestData.Programs.Normal(locationId), token);
 
         await client.ActivateProgram(normalProgramId, token);
 
         var createScheduleCommand = new CreateScheduleCommand(normalProgramId, "DayTime", "0 15,18,21 * * *");
 
-        var scheduleId = await client.CreateSchedule(normalProgramId, createScheduleCommand, token);
+        var scheduleId = await client.CreateSchedule(createScheduleCommand, token);
 
-        await client.UpdateProgram(new UpdateProgramCommand(normalProgramId, "Away", scheduleId), token);
+        await client.UpdateProgram(TestData.Programs.UpdatedTestProgram(normalProgramId, scheduleId), token);
 
         var createSetPointCommand = new CreateSetPointCommand(scheduleId, livingRoomZoneId, 20, 2);
 
