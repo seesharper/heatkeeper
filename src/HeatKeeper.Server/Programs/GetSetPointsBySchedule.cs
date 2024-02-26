@@ -10,11 +10,11 @@ using HeatKeeper.Server.Database;
 namespace HeatKeeper.Server.Programs;
 
 [RequireUserRole]
-public record SetPointsByScheduleQuery(long ScheduleId) : IQuery<SetPoint[]>;
+public record SetPointsByScheduleQuery(long ScheduleId) : IQuery<SetPointInfo[]>;
 
-public record SetPoint(long Id, double Value, double Hysteresis, long ZoneId);
+public record SetPointInfo(long Id, string ZoneName, double Value);
 
-public class GetSetPointsByScheduleQueryHandler : IQueryHandler<SetPointsByScheduleQuery, SetPoint[]>
+public class GetSetPointsByScheduleQueryHandler : IQueryHandler<SetPointsByScheduleQuery, SetPointInfo[]>
 {
     private readonly IDbConnection _dbConnection;
     private readonly ISqlProvider _sqlProvider;
@@ -25,7 +25,7 @@ public class GetSetPointsByScheduleQueryHandler : IQueryHandler<SetPointsBySched
         _sqlProvider = sqlProvider;
     }
 
-    public async Task<SetPoint[]> HandleAsync(SetPointsByScheduleQuery query, CancellationToken cancellationToken = default)
-        => (await _dbConnection.ReadAsync<SetPoint>(_sqlProvider.GetSetPointsBySchedule, query)).ToArray();
+    public async Task<SetPointInfo[]> HandleAsync(SetPointsByScheduleQuery query, CancellationToken cancellationToken = default)
+        => (await _dbConnection.ReadAsync<SetPointInfo>(_sqlProvider.GetSetPointsBySchedule, query)).ToArray();
 }
 

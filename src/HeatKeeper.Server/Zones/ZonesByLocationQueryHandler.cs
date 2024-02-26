@@ -1,15 +1,15 @@
 using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DbReader;
-using HeatKeeper.Server.Database;
-using System.Linq;
 using CQRS.Query.Abstractions;
+using DbReader;
 using HeatKeeper.Server.Authorization;
+using HeatKeeper.Server.Database;
 
 namespace HeatKeeper.Server.Zones
 {
-    public class ZonesByLocationQueryHandler : IQueryHandler<ZonesByLocationQuery, Zone[]>
+    public class ZonesByLocationQueryHandler : IQueryHandler<ZonesByLocationQuery, ZoneInfo[]>
     {
         private readonly IDbConnection dbConnection;
         private readonly ISqlProvider sqlProvider;
@@ -20,15 +20,15 @@ namespace HeatKeeper.Server.Zones
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task<Zone[]> HandleAsync(ZonesByLocationQuery query, CancellationToken cancellationToken = default)
+        public async Task<ZoneInfo[]> HandleAsync(ZonesByLocationQuery query, CancellationToken cancellationToken = default)
         {
-            var result = await dbConnection.ReadAsync<Zone>(sqlProvider.ZonesByLocation, query);
+            var result = await dbConnection.ReadAsync<ZoneInfo>(sqlProvider.ZonesByLocation, query);
             return result.ToArray();
         }
     }
 
     [RequireUserRole]
-    public class ZonesByLocationQuery : IQuery<Zone[]>
+    public class ZonesByLocationQuery : IQuery<ZoneInfo[]>
     {
         public long LocationId { get; set; }
     }

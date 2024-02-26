@@ -9,7 +9,7 @@ using HeatKeeper.Server.Database;
 namespace HeatKeeper.Server.Programs;
 
 [RequireUserRole]
-public record UpdateProgramCommand(long ProgramId, string Name, string Description, long ActiveScheduleId);
+public record UpdateProgramCommand(long ProgramId, string Name, string Description, long? ActiveScheduleId);
 
 public class UpdateProgramCommandHandler : ICommandHandler<UpdateProgramCommand>
 {
