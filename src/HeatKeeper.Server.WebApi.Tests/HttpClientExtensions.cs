@@ -85,6 +85,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<ScheduleDetails> GetScheduleDetails(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ScheduleDetails>(client, $"api/schedules/{scheduleId}", token, success, problem);
 
+        public static async Task<ZoneInfo[]> GetZonesNotAssignedToSchedule(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<ZoneInfo[]>(client, $"api/schedules/{scheduleId}/zones", token, success, problem);
+
         public static async Task<SetPointDetails> GetSetPointDetails(this HttpClient client, long setPointId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<SetPointDetails>(client, $"api/setpoints/{setPointId}", token, success, problem);
 
@@ -256,8 +259,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task DeleteLocation(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/locations/{locationId}", token, success, problem);
 
-        public static async Task<Zone[]> GetZones(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<Zone[]>(client, $"api/locations/{locationId}/zones", token, success, problem);
+        public static async Task<ZoneInfo[]> GetZones(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<ZoneInfo[]>(client, $"api/locations/{locationId}/zones", token, success, problem);
 
         public static async Task<Programs.Program[]> GetPrograms(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<Programs.Program[]>(client, $"api/locations/{locationId}/programs", token, success, problem);
@@ -265,8 +268,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<ScheduleInfo[]> GetSchedules(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ScheduleInfo[]>(client, $"api/programs/{programId}/schedules", token, success, problem);
 
-        public static async Task<SetPoint[]> GetSetPoints(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<SetPoint[]>(client, $"api/schedules/{scheduleId}/setPoints", token, success, problem);
+        public static async Task<SetPointInfo[]> GetSetPoints(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<SetPointInfo[]>(client, $"api/schedules/{scheduleId}/setPoints", token, success, problem);
 
 
         public static async Task<ZoneDetails> GetZoneDetails(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)

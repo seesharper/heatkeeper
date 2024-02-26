@@ -209,5 +209,7 @@ namespace HeatKeeper.Server.Database
         string GetScheduleDetails { get; }
 
         string GetSetPointDetails { get; }
+
+        string GetZonesNotAssignedToSchedule { get; }
     }
 }

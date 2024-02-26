@@ -116,6 +116,20 @@ public class ProgramsTests : TestBase
     }
 
     [Fact]
+    public async Task ShouldGetSetPoints()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+
+        var setPoints = await client.GetSetPoints(testLocation.ScheduleId, testLocation.Token);
+
+        setPoints.Should().HaveCount(1);
+        setPoints.Single().ZoneName.Should().Be(TestData.Zones.LivingRoomName);
+        setPoints.Single().Value.Should().Be(TestData.SetPoints.LivingRoomSetPoint);
+    }
+
+
+    [Fact]
     public async Task ShouldCreateSetPoint()
     {
         var client = Factory.CreateClient();
@@ -130,8 +144,8 @@ public class ProgramsTests : TestBase
         var setPoint = await client.GetSetPointDetails(setPointId, testLocation.Token);
 
         setPoint.Id.Should().Be(setPointId);
-        setPoint.ScheduleId.Should().Be(testLocation.ScheduleId);
-        setPoint.ZoneId.Should().Be(testZoneId);
+        setPoint.ScheduleName.Should().Be(TestData.Schedules.DayTimeScheduleName);
+        setPoint.ZoneName.Should().Be(TestData.Zones.TestZoneName);
         setPoint.Value.Should().Be(TestData.SetPoints.LivingRoomSetPoint);
         setPoint.Hysteresis.Should().Be(TestData.SetPoints.LivingRoomHysteresis);
     }
@@ -168,6 +182,18 @@ public class ProgramsTests : TestBase
         setPoints = await client.GetSetPoints(testLocation.ScheduleId, testLocation.Token);
         setPoints.Should().BeEmpty();
     }
+
+    [Fact]
+    public async Task ShouldGetZonesNotAssignedToSchedule()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+        var zonesNotAssignedToSchedule = await client.GetZonesNotAssignedToSchedule(testLocation.ScheduleId, testLocation.Token);
+        zonesNotAssignedToSchedule.Should().HaveCount(1);
+        zonesNotAssignedToSchedule.Single().Name.Should().Be(TestData.Zones.KitchenName);
+        zonesNotAssignedToSchedule.Single().Id.Should().Be(testLocation.KitchenZoneId);
+    }
+
 
     [Fact]
     public async Task ShouldAddSchedulesToJanitor()

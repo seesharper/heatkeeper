@@ -1,5 +1,7 @@
 using System.Data;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 namespace HeatKeeper.Server.Host
@@ -24,7 +26,15 @@ namespace HeatKeeper.Server.Host
 
             if (bindingContext.Result.Model == null)
             {
-                bindingContext.Result = ModelBindingResult.Success(Activator.CreateInstance(bindingContext.ModelType));
+                if (IsRecordType(bindingContext.ModelType))
+                {
+                    bindingContext.Result = ModelBindingResult.Success(RuntimeHelpers.GetUninitializedObject(bindingContext.ModelType));
+                }
+                else
+                {
+                    bindingContext.Result = ModelBindingResult.Success(Activator.CreateInstance(bindingContext.ModelType));
+                }
+
             }
             foreach (var routeProperty in routeProperties)
             {
@@ -32,6 +42,11 @@ namespace HeatKeeper.Server.Host
                 var convertedValue = Convert.ChangeType(routeValue, routeProperty.UnderlyingOrModelType);
                 routeProperty.PropertySetter(bindingContext.Result.Model, convertedValue);
             }
+        }
+
+        private static bool IsRecordType(Type type)
+        {
+            return type.GetMethods().Any(m => m.Name == "<Clone>$");
         }
     }
 

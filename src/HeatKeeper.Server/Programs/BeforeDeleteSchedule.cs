@@ -20,8 +20,8 @@ public class BeforeDeleteSchedule : ICommandHandler<DeleteScheduleCommand>
 
     public async Task HandleAsync(DeleteScheduleCommand command, CancellationToken cancellationToken = default)
     {
-        SetPoint[] setPoints = await _queryExecutor.ExecuteAsync(new SetPointsByScheduleQuery(command.ScheduleId), cancellationToken);
-        foreach (SetPoint setPoint in setPoints)
+        SetPointInfo[] setPoints = await _queryExecutor.ExecuteAsync(new SetPointsByScheduleQuery(command.ScheduleId), cancellationToken);
+        foreach (SetPointInfo setPoint in setPoints)
         {
             await _commandExecutor.ExecuteAsync(new DeleteSetPointCommand(setPoint.Id), cancellationToken);
         }

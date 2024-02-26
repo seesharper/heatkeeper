@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Programs;
+using HeatKeeper.Server.Zones;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatKeeper.Server.Host.Programs;
@@ -27,7 +28,11 @@ public class SchedulesController : ControllerBase
     }
 
     [HttpGet("{scheduleId}/setPoints")]
-    public async Task<SetPoint[]> SetPoints([FromRoute] SetPointsByScheduleQuery query)
+    public async Task<SetPointInfo[]> SetPoints([FromRoute] SetPointsByScheduleQuery query)
+           => await _queryExecutor.ExecuteAsync(query);
+
+    [HttpGet("{scheduleId}/zones")]
+    public async Task<ZoneInfo[]> Zones([FromRoute] GetZonesNotAssignedToScheduleQuery query)
            => await _queryExecutor.ExecuteAsync(query);
 
     [HttpPatch("{scheduleId}")]

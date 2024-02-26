@@ -32,7 +32,7 @@ namespace HeatKeeper.Server.Locations
             await dbConnection.ExecuteAsync(sqlProvider.DeleteAllUsersFromLocation, command);
 
             // Remove all zones for this location.
-            Zone[] zones = await queryExecutor.ExecuteAsync(new ZonesByLocationQuery() { LocationId = command.LocationId }, cancellationToken);
+            ZoneInfo[] zones = await queryExecutor.ExecuteAsync(new ZonesByLocationQuery() { LocationId = command.LocationId }, cancellationToken);
             foreach (var zone in zones)
             {
                 await commandExecutor.ExecuteAsync(new DeleteZoneCommand() { ZoneId = zone.Id }, cancellationToken);

@@ -12,7 +12,7 @@ namespace HeatKeeper.Server.Programs;
 [RequireAdminRole]
 public record GetSetPointDetailsQuery(long SetPointId) : IQuery<SetPointDetails>;
 
-public record SetPointDetails(long Id, double Value, double Hysteresis, long ZoneId, long ScheduleId);
+public record SetPointDetails(long Id, double Value, double Hysteresis, string ZoneName, string ScheduleName);
 
 
 public class GetSetPointDetails : IQueryHandler<GetSetPointDetailsQuery, SetPointDetails>
