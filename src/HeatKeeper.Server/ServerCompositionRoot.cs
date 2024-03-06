@@ -39,9 +39,7 @@ namespace HeatKeeper.Server
             DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) != 0);
         }
 
-        public void Compose(IServiceRegistry serviceRegistry)
-        {
-            _ = serviceRegistry.RegisterCommandHandlers()
+        public void Compose(IServiceRegistry serviceRegistry) => _ = serviceRegistry.RegisterCommandHandlers()
                 .RegisterQueryHandlers()
                 .Decorate(typeof(ICommandHandler<>), typeof(TransactionalCommandHandler<>), sr =>
                 {
@@ -57,12 +55,12 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<IBootStrapper>(sf => new JanitorBootStrapper(sf), "JanitorBootStrapper")
                 .RegisterSingleton<IBootStrapper, DatabaseBootStrapper>("DatabaseBootStrapper")
                 .RegisterSingleton<IPasswordManager, PasswordManager>()
+                .RegisterSingleton<IManagedMqttClient>(sf => CreateManagedMqttClient(sf.GetInstance<IConfiguration>()))
                 .RegisterSingleton<IPasswordPolicy, PasswordPolicy>()
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
                 .RegisterSingleton<IRefreshTokenProvider, RefreshTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
-                .RegisterSingleton(sf => CreateTasmotaClient(sf.GetInstance<IConfiguration>(), sf.GetInstance<ILogger<TasmotaClient>>()))
                 .RegisterScoped<IInfluxDBClient>(f => CreateInfluxDbClient(f.GetInstance<IConfiguration>()))
                 //.Decorate<ICommandHandler<ExportMeasurementsCommand>, CumulativeMeasurementsExporter>()
                 .Decorate<ICommandHandler<UpdateUserCommand>, ValidatedUpdateUserCommandHandler>()
@@ -85,16 +83,15 @@ namespace HeatKeeper.Server
                 .Decorate<ICommandHandler<UpdateScheduleCommand>, WhenScheduleIsUpdated>()
                 .Decorate<ICommandHandler<DeleteScheduleCommand>, WhenScheduleIsDeleted>()
                 .Decorate<ICommandHandler<SetZoneHeatingStatusCommand>, WhenSettingZoneHeatingStatus>();
-        }
 
         private InfluxDBClient CreateInfluxDbClient(IConfiguration configuration)
             => new InfluxDBClient(configuration.GetInfluxDbUrl(), configuration.GetInfluxDbApiKey());
 
-        private static ITasmotaClient CreateTasmotaClient(IConfiguration configuration, ILogger<TasmotaClient> logger)
+        private static IManagedMqttClient CreateManagedMqttClient(IConfiguration configuration)
         {
-            string mqttBrokerAddress = configuration.GetMqttBrokerAddress();
-            string mqttBrokerUser = configuration.GetMqttBrokerUser();
-            string mqttBrokerPassword = configuration.GetMqttBrokerPassword();
+            var mqttBrokerAddress = configuration.GetMqttBrokerAddress();
+            var mqttBrokerUser = configuration.GetMqttBrokerUser();
+            var mqttBrokerPassword = configuration.GetMqttBrokerPassword();
 
             var options = new ManagedMqttClientOptionsBuilder()
                 .WithAutoReconnectDelay(TimeSpan.FromSeconds(5))
@@ -105,9 +102,9 @@ namespace HeatKeeper.Server
                     .Build())
                 .Build();
 
-            IManagedMqttClient managedClient = new MqttFactory().CreateManagedMqttClient();
+            var managedClient = new MqttFactory().CreateManagedMqttClient();
             managedClient.StartAsync(options).Wait();
-            return new TasmotaClient(managedClient, logger);
+            return managedClient;
         }
 
 

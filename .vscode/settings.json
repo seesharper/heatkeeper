@@ -11,5 +11,14 @@
     "Cronos",
     "setpoint",
     "Tasmota"
+  ],
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "name": "HeatKeeper",
+      "database": "${workspaceFolder:heatkeeper}/../heatKeeper/src/HeatKeeper.Server.Host/heatkeeper.db",
+      "group": "HeatKeeper"
+    }
   ]
 }

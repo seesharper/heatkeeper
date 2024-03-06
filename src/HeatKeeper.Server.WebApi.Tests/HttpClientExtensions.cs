@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Dashboard;
+using HeatKeeper.Server.Heaters;
 using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
+using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Users;
@@ -85,6 +87,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<ScheduleDetails> GetScheduleDetails(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ScheduleDetails>(client, $"api/schedules/{scheduleId}", token, success, problem);
 
+        public static async Task<HeaterDetails> GetHeatersDetails(this HttpClient client, long heaterId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<HeaterDetails>(client, $"api/heaters/{heaterId}", token, success, problem);
+
         public static async Task<ZoneInfo[]> GetZonesNotAssignedToSchedule(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ZoneInfo[]>(client, $"api/schedules/{scheduleId}/zones", token, success, problem);
 
@@ -131,6 +136,9 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task<long> CreateProgram(this HttpClient client, CreateProgramCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/locations/{content.LocationId}/programs", content, token, success, problem);
+
+        public static async Task<long> CreateHeater(this HttpClient client, CreateHeaterCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, $"api/zones/{content.ZoneId}/heaters", content, token, success, problem);
 
         public static async Task<long> CreateProgram(this HttpClient client, CreateLocationCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/programs", content, token, success, problem);
@@ -265,6 +273,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<Programs.Program[]> GetPrograms(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<Programs.Program[]>(client, $"api/locations/{locationId}/programs", token, success, problem);
 
+        public static async Task<HeaterInfo[]> GetHeaters(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Get<HeaterInfo[]>(client, $"api/zones/{zoneId}/heaters", token, success, problem);
+
         public static async Task<ScheduleInfo[]> GetSchedules(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ScheduleInfo[]>(client, $"api/programs/{programId}/schedules", token, success, problem);
 
@@ -284,6 +295,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task UpdateSchedule(this HttpClient client, UpdateScheduleCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Patch(client, $"api/schedules/{command.ScheduleId}", command, token, success, problem);
 
+        public static async Task UpdateHeater(this HttpClient client, UpdateHeaterCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Patch(client, $"api/heaters/{command.HeaterId}", command, token, success, problem);
+
         public static async Task UpdateProgram(this HttpClient client, UpdateProgramCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Patch(client, $"api/programs/{command.ProgramId}", command, token, success, problem);
 
@@ -296,6 +310,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task DeleteSchedule(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/schedules/{scheduleId}", token, success, problem);
 
+        public static async Task DeleteHeater(this HttpClient client, long heaterId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Delete(client, $"api/heaters/{heaterId}", token, success, problem);
+
         public static async Task DeleteProgram(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/programs/{programId}", token, success, problem);
 
@@ -304,6 +321,9 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task CreateMeasurements(this HttpClient client, MeasurementCommand[] requests, string token)
             => await PostWithNoResponse(client, "api/measurements/", requests, token);
+
+        public static async Task PublishMqttMessage(this HttpClient client, PublishMqttMessageCommand command, string token)
+            => await PostWithNoResponse(client, "api/mqtt", command, token);
 
         public static async Task<Measurement[]> GetLatestMeasurements(this HttpClient client, long limit, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<Measurement[]>(client, $"api/measurements/latest?limit={limit}", token, success, problem);
