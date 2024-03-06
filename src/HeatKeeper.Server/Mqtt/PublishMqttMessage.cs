@@ -6,7 +6,7 @@ using MQTTnet.Extensions.ManagedClient;
 
 namespace HeatKeeper.Server.Mqtt;
 
-[RequireAdminRole]
+[RequireBackgroundRole]
 public record PublishMqttMessageCommand(string Topic, string Payload);
 
 public class PublishMqttMessage(IManagedMqttClient managedMqttClient) : ICommandHandler<PublishMqttMessageCommand>
