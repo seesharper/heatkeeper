@@ -1,5 +1,5 @@
 SELECT
-    h.MqttTopic,
+    h.MqttTopic AS Topic,
     h.OnPayload,
     h.OffPayload
 FROM

@@ -45,7 +45,9 @@ public static class TestApplicationExtensions
 
         var scheduleId = await client.CreateSchedule(createScheduleCommand, token);
 
-        await client.UpdateProgram(TestData.Programs.UpdatedTestProgram(normalProgramId, scheduleId), token);
+        await client.ActivateSchedule(scheduleId, token);
+
+        //await client.UpdateProgram(TestData.Programs.UpdatedTestProgram(normalProgramId, scheduleId), token);
 
         var createSetPointCommand = new CreateSetPointCommand(scheduleId, livingRoomZoneId, 20, 2);
 
