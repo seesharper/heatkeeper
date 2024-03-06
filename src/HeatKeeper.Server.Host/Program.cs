@@ -51,8 +51,8 @@ else
 }
 
 app.UseStaticFiles();
-app.UseSpaStaticFiles();
-app.UseSpa(config => config.Options.SourcePath = "wwwroot");
+// app.UseSpaStaticFiles();
+// app.UseSpa(config => config.Options.SourcePath = "wwwroot");
 app.UseAuthorization();
 
 app.UseExceptionHandler(_ => { });

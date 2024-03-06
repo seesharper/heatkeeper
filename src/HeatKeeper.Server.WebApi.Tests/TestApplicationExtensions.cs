@@ -21,6 +21,12 @@ public static class TestApplicationExtensions
         var livingRoomZoneId = await client.CreateZone(locationId, TestData.Zones.LivingRoom, token);
         var kitchenZoneId = await client.CreateZone(locationId, TestData.Zones.Kitchen, token);
 
+        var livingRoomHeaterId1 = await client.CreateHeater(TestData.Heaters.LivingRoomHeater1(livingRoomZoneId), token);
+        var livingRoomHeaterId2 = await client.CreateHeater(TestData.Heaters.LivingRoomHeater1(livingRoomZoneId), token);
+        var kitchenHeaterId = await client.CreateHeater(TestData.Heaters.KitchenHeater(kitchenZoneId), token);
+
+
+
 
         await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, token);
 
@@ -45,11 +51,11 @@ public static class TestApplicationExtensions
 
         var setPointId = await client.CreateSetPoint(scheduleId, createSetPointCommand, token);
 
-        return new TestLocation(client, token, locationId, livingRoomZoneId, livingRoomSensor.Id, kitchenZoneId, normalProgramId, scheduleId, setPointId);
+        return new TestLocation(client, token, locationId, livingRoomZoneId, livingRoomSensor.Id, kitchenZoneId, normalProgramId, scheduleId, setPointId, livingRoomHeaterId1, livingRoomHeaterId2, kitchenHeaterId);
     }
 }
 
-public record TestLocation(HttpClient HttpClient, string Token, long LocationId, long LivingRoomZoneId, long LivingRoomSensorId, long KitchenZoneId, long NormalProgramId, long ScheduleId, long LivingRoomSetPointId)
+public record TestLocation(HttpClient HttpClient, string Token, long LocationId, long LivingRoomZoneId, long LivingRoomSensorId, long KitchenZoneId, long NormalProgramId, long ScheduleId, long LivingRoomSetPointId, long LivingRoomHeaterId1, long LivingRoomHeaterId2, long KitchenHeaterId)
 {
     public async Task AddLivingRoomMeasurement(double temperature)
     {

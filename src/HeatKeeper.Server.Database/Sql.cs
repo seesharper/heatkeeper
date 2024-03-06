@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace HeatKeeper.Server.Database
 {
     public interface ISqlProvider
@@ -211,5 +213,19 @@ namespace HeatKeeper.Server.Database
         string GetSetPointDetails { get; }
 
         string GetZonesNotAssignedToSchedule { get; }
+
+        string CreateHeatersTable { get; }
+
+        string GetHeaters { get; }
+
+        string InsertHeater { get; }
+
+        string DeleteHeater { get; }
+
+        string UpdateHeater { get; }
+
+        string GetHeaterDetails { get; }
+
+        string GetHeatersMqttInfo { get; }
     }
 }

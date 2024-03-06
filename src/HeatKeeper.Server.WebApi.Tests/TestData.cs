@@ -1,7 +1,10 @@
 using System;
+using System.Data;
 using HeatKeeper.Server.Database;
+using HeatKeeper.Server.Heaters;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
+using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
@@ -108,6 +111,57 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         }
 
+        public static class Heaters
+        {
+
+            public const string LivingRoomHeaterName = "LivingRoomHeater";
+            public const string LivingRoomHeaterDescription = "Description of the LivingRoomHeater";
+            public const string LivingRoomHeaterMqttTopic = "LivingRoomHeaterTopic";
+            public const string LivingRoomHeaterOnPayload = "ON";
+            public const string LivingRoomHeaterOffPayload = "OFF";
+
+            public const string UpdatedLivingRoomHeaterName = "UpdatedLivingRoomHeater";
+            public const string UpdatedLivingRoomHeaterDescription = "UpdatedDescription of the LivingRoomHeater";
+            public const string UpdatedLivingRoomHeaterMqttTopic = "UpdatedLivingRoomHeaterTopic";
+            public const string UpdatedLivingRoomHeaterOnPayload = "UPDATEDON";
+            public const string UpdatedLivingRoomHeaterOffPayload = "UPDATEDOFF";
+
+
+            public const string LivingRoomHeater2Name = "LivingRoomHeater2";
+            public const string LivingRoomHeater2Description = "Description of the LivingRoomHeater2";
+            public const string LivingRoomHeater2MqttTopic = "LivingRoomHeater2Topic";
+            public const string LivingRoomHeater2OnPayload = "ON";
+            public const string LivingRoomHeater2OffPayload = "OFF";
+
+            public const string KitchenHeaterName = "KitchenHeater";
+            public const string KitchenHeaterDescription = "Description of the KitchenHeater";
+            public const string KitchenHeaterMqttTopic = "KitchenHeaterTopic";
+            public const string KitchenHeaterOnPayload = "ON";
+            public const string KitchenHeaterOffPayload = "OFF";
+
+            public const string TestHeaterName = "TestHeater";
+            public const string TestHeaterDescription = "Description of the TestHeater";
+            public const string TestHeaterMqttTopic = "TestHeaterTopic";
+            public const string TestHeaterOnPayload = "ON";
+            public const string TestHeaterOffPayload = "OFF";
+
+            public static CreateHeaterCommand LivingRoomHeater1(long livingRoomZoneId) =>
+                new(Name: LivingRoomHeaterName, Description: LivingRoomHeaterDescription, MqttTopic: LivingRoomHeaterMqttTopic, OnPayload: LivingRoomHeaterOnPayload, OffPayload: LivingRoomHeaterOffPayload, ZoneId: livingRoomZoneId);
+
+            public static CreateHeaterCommand LivingRoomHeater2(long livingRoomZoneId) =>
+                new(Name: LivingRoomHeater2Name, Description: LivingRoomHeater2Description, MqttTopic: LivingRoomHeater2MqttTopic, OnPayload: LivingRoomHeater2OnPayload, OffPayload: LivingRoomHeater2OffPayload, ZoneId: livingRoomZoneId);
+
+            public static CreateHeaterCommand KitchenHeater(long kitchenZoneId) =>
+                new(Name: KitchenHeaterName, Description: KitchenHeaterDescription, MqttTopic: KitchenHeaterMqttTopic, OnPayload: KitchenHeaterOnPayload, OffPayload: KitchenHeaterOffPayload, ZoneId: kitchenZoneId);
+
+            public static CreateHeaterCommand TestHeater(long testZoneId) =>
+                new(Name: TestHeaterName, Description: TestHeaterDescription, MqttTopic: TestHeaterMqttTopic, OnPayload: TestHeaterOnPayload, OffPayload: TestHeaterOffPayload, ZoneId: testZoneId);
+
+            public static UpdateHeaterCommand UpdateHeater(long heaterId) =>
+                new(heaterId, UpdatedLivingRoomHeaterName, UpdatedLivingRoomHeaterDescription, UpdatedLivingRoomHeaterMqttTopic, UpdatedLivingRoomHeaterOnPayload, UpdatedLivingRoomHeaterOffPayload);
+        }
+
+
         public static class Users
         {
             public static RegisterUserCommand StandardUser =>
@@ -194,6 +248,17 @@ namespace HeatKeeper.Server.WebApi.Tests
                 new(setPointId, UpdatedLivingRoomSetPoint, UpdatedLivingRoomHysteresis);
         }
 
+
+        public static class Mqtt
+        {
+            public const string OnPayload = "ON";
+            public const string OffPayload = "OFF";
+
+            public const string TestTopic = "TestTopic";
+
+            public static PublishMqttMessageCommand TestPublishMqttMessageCommand(string payload) =>
+                new(TestTopic, payload);
+        }
 
     }
 

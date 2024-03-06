@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Heaters;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Zones;
@@ -37,10 +38,6 @@ namespace HeatKeeper.Server.Host.Zones
         public async Task<Sensor[]> GetSensors([FromRoute] SensorsByZoneQuery query)
             => await _queryExecutor.ExecuteAsync(query);
 
-        [HttpGet("{zoneId}/heatingstatus")]
-        public async Task<HeatingStatusResult> GetHeatingStatus([FromRoute] GetHeatingStatusQuery query)
-            => await _queryExecutor.ExecuteAsync(query);
-
         [HttpPost("{zoneId}/sensors")]
         public async Task AddSensorToZone([FromBodyAndRoute] AddSensorToZoneCommand command)
             => await _commandExecutor.ExecuteAsync(command);
@@ -48,5 +45,16 @@ namespace HeatKeeper.Server.Host.Zones
         [HttpDelete("{zoneId}/sensors")]
         public async Task RemoveSensorFromZone([FromBodyAndRoute] RemoveSensorFromZoneCommand command)
             => await _commandExecutor.ExecuteAsync(command);
+
+        [HttpPost("{zoneId}/heaters")]
+        public async Task<IActionResult> AddHeater([FromBodyAndRoute] CreateHeaterCommand command)
+        {
+            await _commandExecutor.ExecuteAsync(command);
+            return CreatedAtAction(nameof(AddHeater), new ResourceId(command.HeaterId));
+        }
+
+        [HttpGet("{zoneId}/heaters")]
+        public async Task<HeaterInfo[]> GetHeaters([FromRoute] HeatersQuery query)
+            => await _queryExecutor.ExecuteAsync(query);
     }
 }
