@@ -38,14 +38,8 @@ namespace HeatKeeper.Server.Host.Zones
         public async Task<Sensor[]> GetSensors([FromRoute] SensorsByZoneQuery query)
             => await _queryExecutor.ExecuteAsync(query);
 
-        [HttpPost("{zoneId}/sensors")]
-        public async Task AddSensorToZone([FromBodyAndRoute] AddSensorToZoneCommand command)
-            => await _commandExecutor.ExecuteAsync(command);
-
-        [HttpDelete("{zoneId}/sensors")]
-        public async Task RemoveSensorFromZone([FromBodyAndRoute] RemoveSensorFromZoneCommand command)
-            => await _commandExecutor.ExecuteAsync(command);
-
+        
+        
         [HttpPost("{zoneId}/heaters")]
         public async Task<IActionResult> AddHeater([FromBodyAndRoute] CreateHeaterCommand command)
         {

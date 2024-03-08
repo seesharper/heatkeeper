@@ -42,11 +42,11 @@ namespace HeatKeeper.Server.Database
 
         string InsertSensor { get; }
 
-        string GetAllSensors { get; }
+        string GetUnassignedSensors { get; }
 
-        string AddSensorToZone { get; }
+        string AssignZoneToSensor { get; }
 
-        string RemoveSensorFromZone { get; }
+        string RemoveZoneFromSensor { get; }
 
         string GetSensorsByZone { get; }
 
@@ -227,5 +227,7 @@ namespace HeatKeeper.Server.Database
         string GetHeaterDetails { get; }
 
         string GetHeatersMqttInfo { get; }
+
+        string GetSensorDetails { get; }
     }
 }

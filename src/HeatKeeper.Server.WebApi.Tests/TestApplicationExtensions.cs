@@ -25,15 +25,12 @@ public static class TestApplicationExtensions
         var livingRoomHeaterId2 = await client.CreateHeater(TestData.Heaters.LivingRoomHeater1(livingRoomZoneId), token);
         var kitchenHeaterId = await client.CreateHeater(TestData.Heaters.KitchenHeater(kitchenZoneId), token);
 
-
-
-
+        // Create measurements in the living room zone and outside zone
         await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, token);
 
-        var sensors = await client.GetSensors(livingRoomZoneId, token);
-
-        var livingRoomSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
-        await client.UpdateSensor(new UpdateSensorCommand() { SensorId = livingRoomSensor.Id, Name = livingRoomSensor.Name, Description = livingRoomSensor.Description, ZoneId = livingRoomZoneId }, token);
+        var unassignedSensors = await client.GetUnassignedSensors(token);
+        var livingRoomSensor = unassignedSensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
+        await client.AssignZoneToSensor(new AssignZoneToSensorCommand(livingRoomSensor.Id, livingRoomZoneId), token);
 
         await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, token);
 
@@ -46,8 +43,6 @@ public static class TestApplicationExtensions
         var scheduleId = await client.CreateSchedule(createScheduleCommand, token);
 
         await client.ActivateSchedule(scheduleId, token);
-
-        //await client.UpdateProgram(TestData.Programs.UpdatedTestProgram(normalProgramId, scheduleId), token);
 
         var createSetPointCommand = new CreateSetPointCommand(scheduleId, livingRoomZoneId, 20, 2);
 

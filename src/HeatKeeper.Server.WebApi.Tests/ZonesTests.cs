@@ -33,39 +33,38 @@ public class ZonesTests : TestBase
 
         await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, token);
 
-        var sensors = await client.GetSensors(zoneId, token);
+        var sensors = await client.GetUnassignedSensors(token);
 
         sensors.Length.Should().Be(2);
     }
 
     [Fact]
-    public async Task ShouldAssignSensorToZone()
+    public async Task ShouldAssignZoneToSensor()
     {
         var client = Factory.CreateClient();
-        var token = await client.AuthenticateAsAdminUser();
+        var testApplication = await Factory.CreateTestLocation();
 
-        var locationId = await client.CreateLocation(TestData.Locations.Home, token);
+        await client.CreateMeasurements(TestData.KitchenTemperatureMeasurements, testApplication.Token);
 
-        var zoneId = await client.CreateZone(locationId, TestData.Zones.LivingRoom, token);
+        var unassignedSensors = await client.GetUnassignedSensors(testApplication.Token);
+        unassignedSensors.Length.Should().Be(1);
 
-        await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, token);
+        await client.AssignZoneToSensor(new AssignZoneToSensorCommand(unassignedSensors[0].Id, testApplication.KitchenZoneId), testApplication.Token);
 
-        var sensors = await client.GetSensors(zoneId, token);
+        var kitchenSensors = await client.GetSensors(testApplication.KitchenZoneId, testApplication.Token);
+        kitchenSensors.Length.Should().Be(1);        
+    }
 
-        var livingroomSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
+    [Fact]
+    public async Task ShouldRemoveZoneFromSensor()
+    {
+        var client = Factory.CreateClient();
+        var testApplication = await Factory.CreateTestLocation();
 
-        await client.UpdateSensor(new UpdateSensorCommand() { SensorId = livingroomSensor.Id, Name = livingroomSensor.Name, Description = livingroomSensor.Description, ZoneId = zoneId }, token);
+        await client.RemovedZoneFromSensor(new RemoveZoneFromSensorCommand(testApplication.LivingRoomSensorId), testApplication.Token); 
 
-        sensors = await client.GetSensors(zoneId, token);
-        livingroomSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
-        livingroomSensor.ZoneId.Should().Be(zoneId);
-
-        await client.UpdateSensor(new UpdateSensorCommand() { SensorId = livingroomSensor.Id, Name = livingroomSensor.Name, Description = livingroomSensor.Description, ZoneId = null }, token);
-
-        sensors = await client.GetSensors(zoneId, token);
-        livingroomSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.LivingRoomSensor);
-        livingroomSensor.ZoneId.Should().BeNull();
-
+        var unassignedSensors = await client.GetUnassignedSensors(testApplication.Token);
+        unassignedSensors.Length.Should().Be(2);    
     }
 
     [Fact]
@@ -109,6 +108,16 @@ public class ZonesTests : TestBase
         await client.DeleteZone(zoneId, token);
 
         (await client.GetZones(locationId, token)).Should().BeEmpty();
+    }
 
+    [Fact]
+    public async Task ShouldGetSensorDetails()
+    {
+        var client = Factory.CreateClient();
+        var testApplication = await Factory.CreateTestLocation();
+
+        var sensorDetails = await client.GetSensorDetails(testApplication.LivingRoomSensorId, testApplication.Token);   
+
+        sensorDetails.ExternalId.Should().Be(TestData.Sensors.LivingRoomSensor);
     }
 }

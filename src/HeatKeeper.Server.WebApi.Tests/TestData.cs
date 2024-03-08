@@ -29,6 +29,14 @@ namespace HeatKeeper.Server.WebApi.Tests
                     Measurements.OutsideTemperatureMeasurement,
                 };
 
+        public static MeasurementCommand[] KitchenTemperatureMeasurements =>
+            new[]
+                {
+                    Measurements.LivingRoomTemperatureWithHourRetentionPolicy,
+                    Measurements.LivingRoomTemperatureWithDayRetentionPolicy,
+                    Measurements.LivingRoomTemperatureWithWeekRetentionPolicy,
+                };
+
         public static MeasurementCommand[] TemperatureMeasurementRequestsWithRetentionPolicy =>
             new[]
                 {
@@ -49,6 +57,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         {
             public static MeasurementCommand LivingRoomTemperatureMeasurement => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Temperature, RetentionPolicy.None, 23.7, DateTime.UtcNow);
             public static MeasurementCommand LivingRoomHumidityMeasurement => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Humidity, RetentionPolicy.None, 39.3, DateTime.UtcNow);
+
+            public static MeasurementCommand KitchenTemperatureMeasurement => new MeasurementCommand(Sensors.KitchenSensor, MeasurementType.Temperature, RetentionPolicy.None, 23.7, DateTime.UtcNow);
+            public static MeasurementCommand KitchenHumidityMeasurement => new MeasurementCommand(Sensors.KitchenSensor, MeasurementType.Humidity, RetentionPolicy.None, 39.3, DateTime.UtcNow);
             public static MeasurementCommand OutsideTemperatureMeasurement => new MeasurementCommand(Sensors.OutsideSensor, MeasurementType.Temperature, RetentionPolicy.None, 10.2, DateTime.UtcNow);
             public static MeasurementCommand LivingRoomTemperatureWithHourRetentionPolicy => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Temperature, RetentionPolicy.Hour, 23.7, DateTime.UtcNow);
             public static MeasurementCommand LivingRoomTemperatureWithDayRetentionPolicy => new MeasurementCommand(Sensors.LivingRoomSensor, MeasurementType.Temperature, RetentionPolicy.Day, 23.7, DateTime.UtcNow);
@@ -185,6 +196,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             public static string OutsideSensor = "SensorID2";
 
             public static string PowerMeter = "PM1234";
+
+            public static string KitchenSensor = "SensorID3";
         }
 
         public static class Programs

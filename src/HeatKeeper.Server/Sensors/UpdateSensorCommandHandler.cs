@@ -32,7 +32,5 @@ namespace HeatKeeper.Server.Sensors
         public string Name { get; set; }
 
         public string Description { get; set; }
-
-        public long? ZoneId { get; set; }
     }
 }
