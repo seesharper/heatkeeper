@@ -1,7 +1,7 @@
-UPDATE Sensors
+UPDATE
+    Sensors
 SET
-    Name = @Name,
-    Description = @Description,
-    ZoneId = @ZoneId
+    NAME = @Name,
+    Description = @Description
 WHERE
     Id = @SensorId

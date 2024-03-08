@@ -34,18 +34,15 @@ public class CumulativePowerImportMeasurementTests : TestBase
 
         await client.CreateMeasurements(commands.ToArray(), apiKey.Token);
 
-        var sensors = await client.GetSensors(zoneId, token);
+        var sensors = await client.GetUnassignedSensors(token);
 
         var powerMeterSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.PowerMeter);
 
-        await client.UpdateSensor(new UpdateSensorCommand() { SensorId = powerMeterSensor.Id, Name = powerMeterSensor.Name, Description = powerMeterSensor.Description, ZoneId = zoneId }, token);
+        await client.AssignZoneToSensor(new AssignZoneToSensorCommand(powerMeterSensor.Id, zoneId), token);
 
         await client.CreateMeasurements(TestData.CumulativeMeasurementsRequests, apiKey.Token);
 
     }
-
-
-
 
     [Fact]
     public async Task ShouldCreateCumulativeMeasurements()
@@ -58,11 +55,11 @@ public class CumulativePowerImportMeasurementTests : TestBase
         var zoneId = await client.CreateZone(locationId, TestData.Zones.PowerMeter, token);
 
         await client.CreateMeasurements(TestData.CumulativeMeasurementsRequests, apiKey.Token);
-        var sensors = await client.GetSensors(zoneId, token);
+        var sensors = await client.GetUnassignedSensors(token);
 
         var powerMeterSensor = sensors.Single(s => s.ExternalId == TestData.Sensors.PowerMeter);
 
-        await client.UpdateSensor(new UpdateSensorCommand() { SensorId = powerMeterSensor.Id, Name = powerMeterSensor.Name, Description = powerMeterSensor.Description, ZoneId = zoneId }, token);
+        await client.AssignZoneToSensor(new AssignZoneToSensorCommand(powerMeterSensor.Id, zoneId), token);
 
         await client.CreateMeasurements(TestData.CumulativeMeasurementsRequests, apiKey.Token);
     }

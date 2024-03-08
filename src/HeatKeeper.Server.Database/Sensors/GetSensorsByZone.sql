@@ -2,9 +2,9 @@ SELECT
     Id,
     ExternalId,
     ZoneId,
-    Name,
+    NAME,
     Description
 FROM
     Sensors
 WHERE
-    ZoneId = @ZoneId OR ZoneId IS NULL
+    ZoneId = @ZoneId

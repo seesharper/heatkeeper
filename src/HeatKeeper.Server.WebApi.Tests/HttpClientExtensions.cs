@@ -69,6 +69,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<DeadSensor[]> GetDeadSensors(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<DeadSensor[]>(client, "api/sensors/deadsensors", token, success, problem);
 
+        public static async Task<UnassignedSensorInfo[]> GetUnassignedSensors(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Get<UnassignedSensorInfo[]>(client, "api/sensors", token, success, problem);
+
         public static async Task<User[]> GetUsersByLocation(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<User[]>(client, $"api/locations/{locationId}/users", token, success, problem);
 
@@ -89,6 +92,9 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task<HeaterDetails> GetHeatersDetails(this HttpClient client, long heaterId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<HeaterDetails>(client, $"api/heaters/{heaterId}", token, success, problem);
+
+        public static async Task<SensorDetails> GetSensorDetails(this HttpClient client, long sensorId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<SensorDetails>(client, $"api/sensors/{sensorId}", token, success, problem);
 
         public static async Task<ZoneInfo[]> GetZonesNotAssignedToSchedule(this HttpClient client, long scheduleId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ZoneInfo[]>(client, $"api/schedules/{scheduleId}/zones", token, success, problem);
@@ -291,6 +297,16 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task UpdateSensor(this HttpClient client, UpdateSensorCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Patch(client, $"api/sensors/{command.SensorId}", command, token, success, problem);
+
+        public static async Task AssignZoneToSensor(this HttpClient client, AssignZoneToSensorCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Patch(client, $"api/sensors/{command.SensorId}/assignZone", command, token, success, problem);
+
+        public static async Task RemovedZoneFromSensor(this HttpClient client, RemoveZoneFromSensorCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Patch(client, $"api/sensors/{command.SensorId}/removeZone", command, token, success, problem);
+
+        // public static async Task RemoveSensorFromZone(this HttpClient client, AssignSensorToZoneCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        //    => await Delete(client, $"api/zones/{command.ZoneId}/sensors", command, token, success, problem);
+
 
         public static async Task UpdateSchedule(this HttpClient client, UpdateScheduleCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Patch(client, $"api/schedules/{command.ScheduleId}", command, token, success, problem);
