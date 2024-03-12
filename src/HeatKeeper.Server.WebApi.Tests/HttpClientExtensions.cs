@@ -84,6 +84,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<LocationDetails> GetLocationDetails(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<LocationDetails>(client, $"api/locations/{locationId}", token, success, problem);
 
+         public static async Task<LocationTemperature[]> GetLocationTemperatures(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<LocationTemperature[]>(client, $"api/locations/{locationId}/temperatures", token, success, problem);
+
         public static async Task<ProgramDetails> GetProgramDetails(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ProgramDetails>(client, $"api/programs/{programId}", token, success, problem);
 
@@ -101,10 +104,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task<SetPointDetails> GetSetPointDetails(this HttpClient client, long setPointId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<SetPointDetails>(client, $"api/setpoints/{setPointId}", token, success, problem);
-
-        public static async Task<DashboardTemperature[]> GetDashboardTemperatures(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-         => await Get<DashboardTemperature[]>(client, "api/dashboard/temperatures", token, success, problem);
-
+        
         public static async Task AddUserToLocation(this HttpClient client, long locationId, AddUserToLocationCommand addUserLocationRequest, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
             await PostWithNoResponse(client, $"api/locations/{locationId}/users", addUserLocationRequest, token, success, problem);

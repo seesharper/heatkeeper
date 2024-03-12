@@ -89,5 +89,9 @@ namespace HeatKeeper.Server.Host.Locations
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task RemoveUser([FromRoute] DeleteUserLocationCommand command)
             => await commandExecutor.ExecuteAsync(command);
+
+        [HttpGet("{locationId}/temperatures")]
+        public async Task<LocationTemperature[]> GetTemperatures([FromRoute] LocationTemperaturesQuery query)
+            => await queryExecutor.ExecuteAsync(query);            
     }
 }

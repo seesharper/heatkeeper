@@ -232,5 +232,17 @@ namespace HeatKeeper.Server.WebApi.Tests
             locationDetails.Description.Should().Be(TestData.Locations.Home.Description);
             locationDetails.DefaultInsideZoneId.Should().Be(testLocation.LivingRoomZoneId);
         }
+
+        [Fact]
+        public async Task ShouldGetLocationTemperatures()
+        {
+            var testLocation = await Factory.CreateTestLocation();
+            var client = Factory.CreateClient();
+            var locationTemperatures = await client.GetLocationTemperatures(testLocation.LocationId, testLocation.Token);
+            locationTemperatures.Length.Should().Be(1);
+            locationTemperatures[0].Name.Should().Be(TestData.Zones.LivingRoom.Name);
+            locationTemperatures[0].Temperature.Should().Be(TestData.Measurements.LivingRoomTemperatureMeasurement.Value);
+            locationTemperatures[0].Humidity.Should().Be(TestData.Measurements.LivingRoomHumidityMeasurement.Value);
+        }
     }
 }
