@@ -11,6 +11,7 @@ using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
+using HeatKeeper.Server.PushSubscriptions;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Version;
@@ -84,8 +85,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<LocationDetails> GetLocationDetails(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<LocationDetails>(client, $"api/locations/{locationId}", token, success, problem);
 
-         public static async Task<LocationTemperature[]> GetLocationTemperatures(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<LocationTemperature[]>(client, $"api/locations/{locationId}/temperatures", token, success, problem);
+        public static async Task<LocationTemperature[]> GetLocationTemperatures(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Get<LocationTemperature[]>(client, $"api/locations/{locationId}/temperatures", token, success, problem);
 
         public static async Task<ProgramDetails> GetProgramDetails(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ProgramDetails>(client, $"api/programs/{programId}", token, success, problem);
@@ -104,7 +105,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task<SetPointDetails> GetSetPointDetails(this HttpClient client, long setPointId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<SetPointDetails>(client, $"api/setpoints/{setPointId}", token, success, problem);
-        
+
         public static async Task AddUserToLocation(this HttpClient client, long locationId, AddUserToLocationCommand addUserLocationRequest, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
             await PostWithNoResponse(client, $"api/locations/{locationId}/users", addUserLocationRequest, token, success, problem);
@@ -112,6 +113,12 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task RemoveUserFromLocation(this HttpClient client, long locationId, long userID, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/locations/{locationId}/users/{userID}", token, success, problem);
+
+        public static async Task CreatePushSubscription(this HttpClient client, CreatePushSubscriptionCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, "api/pushsubscriptions", command, token, success, problem);
+
+        
+
 
         public static async Task<string> CreateAndAuthenticateStandardUser(this HttpClient client)
         {

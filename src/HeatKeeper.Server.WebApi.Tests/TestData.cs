@@ -1,5 +1,4 @@
 using System;
-using System.Data;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Heaters;
 using HeatKeeper.Server.Locations;
@@ -275,5 +274,9 @@ namespace HeatKeeper.Server.WebApi.Tests
 
     }
 
-
+    public static class PushSubscriptions
+    {
+        public static CreatePushSubscriptionCommand CreatePushSubscriptionCommands(string endpoint, string p256dh, string auth) =>
+            new(endpoint, new(p256dh, auth));
+    }
 }

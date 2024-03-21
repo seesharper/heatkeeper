@@ -229,5 +229,17 @@ namespace HeatKeeper.Server.Database
         string GetHeatersMqttInfo { get; }
 
         string GetSensorDetails { get; }
+
+        string DeleteOldPushSubscriptions { get; }
+
+        string InsertPushSubscription { get; }
+
+        string PushSubscriptionExists { get; }
+
+        string UpdateLastSeenOnPushSubscription { get; }
+
+        string GetPushSubscriptionsByLocation { get; }
+
+        string CreatePushSubscriptionsTable { get; }
     }
 }

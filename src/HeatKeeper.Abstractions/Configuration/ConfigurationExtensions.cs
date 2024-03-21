@@ -32,6 +32,15 @@ public static class ConfigurationExtensions
     public static string GetSecret(this IConfiguration configuration)
         => configuration.GetRequiredValue("SECRET");
 
+    public static string GetVapidSubject(this IConfiguration configuration)
+        => configuration.GetRequiredValue("VAPIDSubject");
+
+    public static string GetVapidPublicKey(this IConfiguration configuration)
+        => configuration.GetRequiredValue("VAPIDPublicKey");
+
+    public static string GetVapidPrivateKey(this IConfiguration configuration)
+        => configuration.GetRequiredValue("VAPIDPrivateKey");
+
     internal static string GetRequiredValue(this IConfiguration configuration, string key)
     {
         if (configuration.GetValue<string>(key) is null)

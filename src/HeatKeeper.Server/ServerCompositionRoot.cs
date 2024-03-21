@@ -82,7 +82,8 @@ namespace HeatKeeper.Server
                 .Decorate<ICommandHandler<CreateScheduleCommand>, WhenScheduleIsCreated>()
                 .Decorate<ICommandHandler<UpdateScheduleCommand>, WhenScheduleIsUpdated>()
                 .Decorate<ICommandHandler<DeleteScheduleCommand>, WhenScheduleIsDeleted>()
-                .Decorate<ICommandHandler<SetZoneHeatingStatusCommand>, WhenSettingZoneHeatingStatus>();
+                .Decorate<ICommandHandler<SetZoneHeatingStatusCommand>, WhenSettingZoneHeatingStatus>()
+                .Decorate<ICommandHandler<ActivateProgramCommand>, WhenActivatingProgram>();
 
         private InfluxDBClient CreateInfluxDbClient(IConfiguration configuration)
             => new InfluxDBClient(configuration.GetInfluxDbUrl(), configuration.GetInfluxDbApiKey());

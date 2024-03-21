@@ -40,7 +40,7 @@ public class ExportAllMarketPrices : ICommandHandler<ExportAllMarketPricesComman
 
     private async Task ExportMarketPrices(DateTime tomorrow, string area, CancellationToken cancellationToken)
     {
-        var hasMarketPrices = await _queryExecutor.ExecuteAsync(new HasElectricalPricesForGivenDateQuery(tomorrow, area));
+        var hasMarketPrices = await _queryExecutor.ExecuteAsync(new HasElectricalPricesForGivenDateQuery(tomorrow, area), cancellationToken);
         if (hasMarketPrices)
         {
             return;

@@ -1,2 +1,4 @@
-DELETE RefreshTokens WHERE Id = @Id
-```
+DELETE
+    RefreshTokens
+WHERE
+    Id = @Id 
