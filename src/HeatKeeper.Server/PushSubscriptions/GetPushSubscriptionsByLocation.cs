@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using System.Linq;
 using System.Threading;
@@ -18,4 +19,4 @@ public class GetAllSubscriptionsQueryHandler(IDbConnection dbConnection, ISqlPro
         => (await dbConnection.ReadAsync<SubscriptionsQueryResult>(sqlProvider.GetPushSubscriptionsByLocation, query)).ToArray();
 }
 
-public record SubscriptionsQueryResult(long Id, string Endpoint, string P256dh, string Auth);
+public record SubscriptionsQueryResult(long Id, string Endpoint, string P256dh, string Auth, DateTime LastSeen);

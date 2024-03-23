@@ -9,10 +9,12 @@
       <IncludeAssets>runtime; build; native; contentfiles;  buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="CQRS.AspNet.Testing" Version="0.0.5" />
+    <PackageReference Include="CQRS.AspNet.Testing" Version="0.0.8" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="8.3.0" />
     <PackageReference Include="xunit" Version="2.7.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
+
       <IncludeAssets>runtime; build; native; contentfiles</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

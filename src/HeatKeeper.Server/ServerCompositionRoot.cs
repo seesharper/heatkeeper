@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Runtime.Intrinsics.Arm;
 using CQRS.Command.Abstractions;
 using CQRS.LightInject;
 using CQRS.Query.Abstractions;
@@ -36,7 +37,7 @@ namespace HeatKeeper.Server
         {
             DbReaderOptions.WhenReading<long>().Use((rd, i) => rd.GetInt32(i));
             DbReaderOptions.WhenReading<string>().Use((rd, i) => (string)rd.GetValue(i));
-            DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) != 0);
+            DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) != 0);                        
         }
 
         public void Compose(IServiceRegistry serviceRegistry) => _ = serviceRegistry.RegisterCommandHandlers()
@@ -61,6 +62,7 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<IRefreshTokenProvider, RefreshTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
+                .RegisterSingleton<ISystemClock, SystemClock>()
                 .RegisterScoped<IInfluxDBClient>(f => CreateInfluxDbClient(f.GetInstance<IConfiguration>()))
                 //.Decorate<ICommandHandler<ExportMeasurementsCommand>, CumulativeMeasurementsExporter>()
                 .Decorate<ICommandHandler<UpdateUserCommand>, ValidatedUpdateUserCommandHandler>()

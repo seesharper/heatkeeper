@@ -6,12 +6,12 @@ namespace HeatKeeper.Server.Host.PushSubscriptions;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PushSubscriptions(ICommandExecutor commandExecutor) : ControllerBase
+public class PushSubscriptionsController(ICommandExecutor commandExecutor) : ControllerBase
 {
     [HttpPost()]
     public async Task<IActionResult> CreatePushSubscription([FromBody] CreatePushSubscriptionCommand command)
     {
         await commandExecutor.ExecuteAsync(command);
-        return CreatedAtAction(nameof(CreatePushSubscription), null);
+        return Ok();
     }
 }

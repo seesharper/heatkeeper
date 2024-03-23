@@ -20,5 +20,11 @@
       "database": "${workspaceFolder:heatkeeper}/../heatKeeper/src/HeatKeeper.Server.Host/heatkeeper.db",
       "group": "HeatKeeper"
     }
-  ]
+  ],
+  "dotnet.unitTestDebuggingOptions": {
+    "logging": {
+      "moduleLoad": false,
+      "exceptions": false
+    }
+  }
 }

@@ -5,6 +5,7 @@ using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
+using HeatKeeper.Server.PushSubscriptions;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
 
@@ -175,18 +176,18 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static class Users
         {
             public static RegisterUserCommand StandardUser =>
-                new RegisterUserCommand() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
+                new() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
             public static RegisterUserCommand AnotherStandardUser =>
-                new RegisterUserCommand() { Email = "AnotherStandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
+                new() { Email = "AnotherStandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
 
             public static RegisterUserCommand StandardUserWithWeakPassord =>
-                new RegisterUserCommand() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = "abc123", ConfirmedPassword = "abc123" };
+                new() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = "abc123", ConfirmedPassword = "abc123" };
 
             public static RegisterUserCommand StandardUserWithGivenPassword(string password) =>
-                new RegisterUserCommand() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = password, ConfirmedPassword = password };
+                new() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = password, ConfirmedPassword = password };
 
             public static RegisterUserCommand StandardUserWithInvalidEmail =>
-                new RegisterUserCommand() { Email = "InvalidMailAddress", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
+                new() { Email = "InvalidMailAddress", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
         }
         public static class Sensors
         {
@@ -272,11 +273,28 @@ namespace HeatKeeper.Server.WebApi.Tests
                 new(TestTopic, payload);
         }
 
+        public static class PushSubscriptions
+        {
+            public static string Endpoint = "https://example.com";
+
+            public static string P256dh = "BOrw9";
+
+            public static string Auth = "BOrw9";
+
+            public static CreatePushSubscriptionCommand TestPushSubscription = new(Endpoint, new(P256dh, Auth));
+
+
+        }
+
+        public static class Clock
+        {
+            public static DateTime Today => new(1972, 1, 21, 14, 15, 36, DateTimeKind.Utc);
+
+            public static DateTime LaterToday => new(1972, 1, 21, 14, 15, 37, DateTimeKind.Utc);
+        }
+
+
     }
 
-    public static class PushSubscriptions
-    {
-        public static CreatePushSubscriptionCommand CreatePushSubscriptionCommands(string endpoint, string p256dh, string auth) =>
-            new(endpoint, new(p256dh, auth));
-    }
+
 }

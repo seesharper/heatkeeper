@@ -2,13 +2,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.PushSubscriptions;
 using WebPush;
 
 namespace HeatKeeper.Server.Programs;
 
-public class WhenActivatingProgram(ICommandHandler<ActivateProgramCommand> handler, IQueryExecutor queryExecutor, ICommandExecutor commandExecutor) : ICommandHandler<ActivateProgramCommand>
+public class WhenActivatingProgram(ICommandHandler<ActivateProgramCommand> handler, IQueryExecutor queryExecutor, ICommandExecutor commandExecutor, IUserContext userContext) : ICommandHandler<ActivateProgramCommand>
 {
     public async Task HandleAsync(ActivateProgramCommand command, CancellationToken cancellationToken = default)
     {
@@ -21,7 +22,7 @@ public class WhenActivatingProgram(ICommandHandler<ActivateProgramCommand> handl
 
         foreach (var subscription in subscriptionsQueryResults)
         {
-            string payLoad = "The program " + programDetails.Name + " has been activated at " + locationDetails.Name + ".";
+            string payLoad = userContext.FirstName + " has activated the program '" + programDetails.Name + "' at '" + locationDetails.Name + "'.";
             var pushSubscription = new PushSubscription(subscription.Endpoint, subscription.P256dh, subscription.Auth);
             await commandExecutor.ExecuteAsync(new SendPushNotificationCommand(pushSubscription, payLoad), cancellationToken);
         }

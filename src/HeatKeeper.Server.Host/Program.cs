@@ -1,6 +1,7 @@
 ﻿using HeatKeeper.Server.Host;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Org.BouncyCastle.Asn1.Cms;
 using WebPush;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,7 @@ builder.Host.UseLightInject(services => services.RegisterFrom<HostCompositionRoo
 builder.Configuration.AddEnvironmentVariables(prefix: "HEATKEEPER_");
 // Add services to the container.
 
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddJanitor();
 builder.Services.AddHttpClient();
 builder.Services.AddCorsPolicy();

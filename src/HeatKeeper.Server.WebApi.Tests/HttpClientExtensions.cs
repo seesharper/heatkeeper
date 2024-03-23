@@ -115,7 +115,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             => await Delete(client, $"api/locations/{locationId}/users/{userID}", token, success, problem);
 
         public static async Task CreatePushSubscription(this HttpClient client, CreatePushSubscriptionCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Post(client, "api/pushsubscriptions", command, token, success, problem);
+            => await PostWithNoResponse(client, "api/pushsubscriptions", command, token, success, problem);
 
         
 

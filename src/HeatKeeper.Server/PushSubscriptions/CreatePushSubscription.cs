@@ -12,7 +12,7 @@ public record Keys(string p256dh, string auth);
 [RequireUserRole]
 public record CreatePushSubscriptionCommand(string Endpoint, Keys Keys);
 
-public class CreatePushSubscriptionCommandHandler(IUserContext userContext, ICommandExecutor commandExecutor, IQueryExecutor queryExecutor) : ICommandHandler<CreatePushSubscriptionCommand>
+public class CreatePushSubscriptionCommandHandler(IUserContext userContext, ICommandExecutor commandExecutor, IQueryExecutor queryExecutor, TimeProvider timeProvider) : ICommandHandler<CreatePushSubscriptionCommand>
 {
     public async Task HandleAsync(CreatePushSubscriptionCommand command, CancellationToken cancellationToken = default)
     {
@@ -21,12 +21,12 @@ public class CreatePushSubscriptionCommandHandler(IUserContext userContext, ICom
 
         if (pushSubscriptionExists)
         {
-            var updateLastSeenOnPushSubscriptionCommand = new UpdateLastSeenOnPushSubscriptionCommand(command.Endpoint, DateTime.UtcNow);
+            var updateLastSeenOnPushSubscriptionCommand = new UpdateLastSeenOnPushSubscriptionCommand(command.Endpoint, timeProvider.GetUtcNow().UtcDateTime);
             await commandExecutor.ExecuteAsync(updateLastSeenOnPushSubscriptionCommand, cancellationToken);
         }
         else
         {
-            var insertPushSubscriptionCommand = new InsertPushSubscriptionCommand(command.Endpoint, command.Keys.p256dh, command.Keys.auth, userContext.Id, DateTime.UtcNow);
+            var insertPushSubscriptionCommand = new InsertPushSubscriptionCommand(command.Endpoint, command.Keys.p256dh, command.Keys.auth, userContext.Id, timeProvider.GetUtcNow().UtcDateTime);
             await commandExecutor.ExecuteAsync(insertPushSubscriptionCommand, cancellationToken);
         }
     }
