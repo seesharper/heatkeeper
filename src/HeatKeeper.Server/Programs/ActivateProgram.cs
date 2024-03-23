@@ -11,17 +11,8 @@ namespace HeatKeeper.Server.Programs;
 [RequireUserRole]
 public record ActivateProgramCommand(long ProgramId);
 
-public class ActivateProgram : ICommandHandler<ActivateProgramCommand>
+public class ActivateProgram(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<ActivateProgramCommand>
 {
-    private readonly IDbConnection _dbConnection;
-    private readonly ISqlProvider _sqlProvider;
-
-    public ActivateProgram(IDbConnection dbConnection, ISqlProvider sqlProvider)
-    {
-        _dbConnection = dbConnection;
-        _sqlProvider = sqlProvider;
-    }
-
     public async Task HandleAsync(ActivateProgramCommand command, CancellationToken cancellationToken = default)
-        => await _dbConnection.ExecuteAsync(_sqlProvider.ActivateProgram, command);
+        => await dbConnection.ExecuteAsync(sqlProvider.ActivateProgram, command);
 }

@@ -24,35 +24,35 @@ namespace HeatKeeper.Server.Authorization
 
     public class RequireAdminRoleAttribute : RequireRoleAttribute
     {
-        public RequireAdminRoleAttribute() : base(new string[] { Roles.AdminRole })
+        public RequireAdminRoleAttribute() : base([Roles.AdminRole])
         {
         }
     }
 
     public class RequireUserRoleAttribute : RequireRoleAttribute
     {
-        public RequireUserRoleAttribute() : base(new string[] { Roles.AdminRole, Roles.UserRole })
+        public RequireUserRoleAttribute() : base([Roles.AdminRole, Roles.UserRole])
         {
         }
     }
 
     public class RequireReporterRoleAttribute : RequireRoleAttribute
     {
-        public RequireReporterRoleAttribute() : base(new string[] { Roles.AdminRole, Roles.UserRole, Roles.ReporterRole })
+        public RequireReporterRoleAttribute() : base([Roles.AdminRole, Roles.UserRole, Roles.ReporterRole])
         {
         }
     }
 
     public class RequireBackgroundRole : RequireRoleAttribute
     {
-        public RequireBackgroundRole() : base(new string[] { Roles.AdminRole, Roles.UserRole, Roles.BackgroundUserRole })
+        public RequireBackgroundRole() : base([Roles.AdminRole, Roles.UserRole, Roles.BackgroundUserRole])
         {
         }
     }
 
     public class RequireAnonymousRoleAttribute : RequireRoleAttribute
     {
-        public RequireAnonymousRoleAttribute() : base(Array.Empty<string>())
+        public RequireAnonymousRoleAttribute() : base([])
         {
         }
 

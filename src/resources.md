@@ -149,3 +149,34 @@ https://duncanlock.net/blog/2023/05/23/using-git-hashes-in-vite-vuejs/
 https://stackoverflow.com/questions/77647463/sveltekit-webapp-to-pwa-progressive-web-app-how-to-do-it-in-the-most-simple-w
 
 https://www.danielzotti.it/blog/notifications-in-browsers
+
+
+
+## Create a certificate
+
+```
+sudo certbot certonly --standalone
+```
+
+
+This outputted 
+
+```
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Please enter the domain name(s) you would like on your certificate (comma and/or
+space separated) (Enter 'c' to cancel): heatkeeper.no
+Requesting a certificate for heatkeeper.no
+
+Successfully received certificate.
+Certificate is saved at: /etc/letsencrypt/live/heatkeeper.no/fullchain.pem
+Key is saved at:         /etc/letsencrypt/live/heatkeeper.no/privkey.pem
+This certificate expires on 2024-06-15.
+These files will be updated when the certificate renews.
+Certbot has set up a scheduled task to automatically renew this certificate in the background.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+If you like Certbot, please consider supporting our work by:
+ * Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+ * Donating to EFF:                    https://eff.org/donate-le
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+```
