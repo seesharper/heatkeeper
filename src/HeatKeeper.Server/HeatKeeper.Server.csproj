@@ -25,4 +25,16 @@
     <ProjectReference Include="..\HeatKeeper.Server.Database\HeatKeeper.Server.Database.csproj" />
     <ProjectReference Include="..\HeatKeeper.Abstractions\HeatKeeper.Abstractions.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Using Include="CQRS.Command.Abstractions" />
+    <Using Include="CQRS.Query.Abstractions" />
+    <Using Include="HeatKeeper.Server.Authorization" />
+    <Using Include="HeatKeeper.Server.Database" />
+    <Using Include="DbReader" />
+    <Using Include="System.Data" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Threading" />
+    <Using Include="System.Threading.Tasks" />
+    <Using Include="System.Text.Json.Serialization" />
+  </ItemGroup>
 </Project>

@@ -9,48 +9,14 @@ using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Users
 {
-    public class GetUserQueryHandler : IQueryHandler<GetUserQuery, GetUserQueryResult>
+    public class GetUserQueryHandler(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<GetUserQuery, GetUserQueryResult>
     {
-        private readonly IDbConnection dbConnection;
-        private readonly ISqlProvider sqlProvider;
-
-        public GetUserQueryHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
-        {
-            this.dbConnection = dbConnection;
-            this.sqlProvider = sqlProvider;
-        }
-
-        public async Task<GetUserQueryResult> HandleAsync(GetUserQuery query, CancellationToken cancellationToken = default)
-        {
-            return (await dbConnection.ReadAsync<GetUserQueryResult>(sqlProvider.GetUser, query)).SingleOrDefault();
-        }
+        public async Task<GetUserQueryResult> HandleAsync(GetUserQuery query, CancellationToken cancellationToken = default) 
+            => (await dbConnection.ReadAsync<GetUserQueryResult>(sqlProvider.GetUser, query)).SingleOrDefault();
     }
 
     [RequireAnonymousRole]
-    public class GetUserQuery : IQuery<GetUserQueryResult>
-    {
-        public GetUserQuery(string email)
-        {
-            Email = email;
-        }
+    public record GetUserQuery(string Email) : IQuery<GetUserQueryResult>;
 
-        public string Email { get; }
-    }
-
-    public class GetUserQueryResult
-    {
-        public long Id { get; set; }
-
-        public string Email { get; set; }
-
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
-
-        public bool IsAdmin { get; set; }
-
-        public string HashedPassword { get; set; }
-    }
-
-
+    public record GetUserQueryResult(long Id, string Email, string FirstName, string LastName, bool IsAdmin, string HashedPassword);
 }

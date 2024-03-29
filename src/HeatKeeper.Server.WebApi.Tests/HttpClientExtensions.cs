@@ -42,6 +42,13 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<long> CreateUser(this HttpClient client, RegisterUserCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/users", content, token, success, problem);
 
+        public static async Task AssignLocationToUser(this HttpClient client, AssignLocationToUserCommand assignLocationToUserCommand, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Patch(client, $"api/users/{assignLocationToUserCommand.UserId}/assignLocation", assignLocationToUserCommand, token, success, problem);
+
+        public static async Task RemoveLocationFromUser(this HttpClient client, RemoveLocationFromUserCommand removeLocationFromUserCommand, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Patch(client, $"api/users/{removeLocationFromUserCommand.UserId}/removeLocation", removeLocationFromUserCommand, token, success, problem);
+
+
         public static async Task DeleteZone(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/zones/{zoneId}", token, success, problem);
 
@@ -64,8 +71,14 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<AuthenticatedUser> GetAuthenticatedUser(this HttpClient client, AuthenticatedUserQuery query, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post<AuthenticatedUserQuery, AuthenticatedUser>(client, "api/users/authenticate", query, string.Empty, success, problem);
 
-        public static async Task<User[]> GetAllUsers(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<User[]>(client, "api/users", token, success, problem);
+        public static async Task<UserInfo[]> GetAllUsers(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<UserInfo[]>(client, "api/users", token, success, problem);
+
+        public static async Task<UserDetails> GetUserDetails(this HttpClient client, long userId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<UserDetails>(client, $"api/users/{userId}", token, success, problem);
+
+        public static async Task<UserLocationAccess[]> GetUserLocationsAccess(this HttpClient client, long userId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<UserLocationAccess[]>(client, $"api/users/{userId}/locations-access", token, success, problem);
 
         public static async Task<DeadSensor[]> GetDeadSensors(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<DeadSensor[]>(client, "api/sensors/deadsensors", token, success, problem);
@@ -73,8 +86,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<UnassignedSensorInfo[]> GetUnassignedSensors(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<UnassignedSensorInfo[]>(client, "api/sensors", token, success, problem);
 
-        public static async Task<User[]> GetUsersByLocation(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<User[]>(client, $"api/locations/{locationId}/users", token, success, problem);
+        public static async Task<UserInfo[]> GetUsersByLocation(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<UserInfo[]>(client, $"api/locations/{locationId}/users", token, success, problem);
 
         public static async Task<AppVersion> GetAppVersion(this HttpClient client)
             => await Get<AppVersion>(client, "api/version", string.Empty);
@@ -117,7 +130,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task CreatePushSubscription(this HttpClient client, CreatePushSubscriptionCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await PostWithNoResponse(client, "api/pushsubscriptions", command, token, success, problem);
 
-        
+
 
 
         public static async Task<string> CreateAndAuthenticateStandardUser(this HttpClient client)

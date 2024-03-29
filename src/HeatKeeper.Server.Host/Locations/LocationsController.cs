@@ -81,7 +81,7 @@ namespace HeatKeeper.Server.Host.Locations
 
 
         [HttpGet("{locationId}/users")]
-        public async Task<User[]> GetUsers([FromRoute] UsersByLocationQuery query) =>
+        public async Task<UserInfo[]> GetUsers([FromRoute] UsersByLocationQuery query) =>
             await queryExecutor.ExecuteAsync(query);
 
 
