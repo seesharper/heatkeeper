@@ -10,7 +10,7 @@ using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Locations
 {
-    public class UsersByLocationQueryHandler : IQueryHandler<UsersByLocationQuery, User[]>
+    public class UsersByLocationQueryHandler : IQueryHandler<UsersByLocationQuery, UserInfo[]>
     {
         private readonly IDbConnection dbConnection;
         private readonly ISqlProvider sqlProvider;
@@ -21,14 +21,14 @@ namespace HeatKeeper.Server.Locations
             this.sqlProvider = sqlProvider;
         }
 
-        public async Task<User[]> HandleAsync(UsersByLocationQuery query, CancellationToken cancellationToken = default)
+        public async Task<UserInfo[]> HandleAsync(UsersByLocationQuery query, CancellationToken cancellationToken = default)
         {
-            return (await dbConnection.ReadAsync<User>(sqlProvider.GetUsersByLocation, query)).ToArray();
+            return (await dbConnection.ReadAsync<UserInfo>(sqlProvider.GetUsersByLocation, query)).ToArray();
         }
     }
 
     [RequireUserRole]
-    public class UsersByLocationQuery : IQuery<User[]>
+    public class UsersByLocationQuery : IQuery<UserInfo[]>
     {
         public long LocationId { get; set; }
     }

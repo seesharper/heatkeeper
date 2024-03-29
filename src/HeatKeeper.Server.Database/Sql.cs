@@ -64,6 +64,8 @@ namespace HeatKeeper.Server.Database
 
         string DeleteUserLocations { get; }
 
+        string DeleteUserLocation { get; }
+
         string InsertUserLocation { get; }
 
         string UpdatePasswordHash { get; }
@@ -79,6 +81,10 @@ namespace HeatKeeper.Server.Database
         string UserExists { get; }
 
         string GetUsersByLocation { get; }
+
+        string GetUserLocationsAccess { get; }
+
+        string GetUserDetails { get; }
 
         string LocationExists { get; }
 

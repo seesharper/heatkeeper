@@ -30,6 +30,71 @@ public class UsersTests : TestBase
     }
 
     [Fact]
+    public async Task ShouldGetUserDetails()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+
+        var users = await client.GetAllUsers(testLocation.Token);
+        var userDetails = await client.GetUserDetails(users.First().Id, testLocation.Token);
+
+        userDetails.Email.Should().Be(users.First().Email);
+        userDetails.FirstName.Should().Be(users.First().FirstName);
+        userDetails.LastName.Should().Be(users.First().LastName);
+        userDetails.IsAdmin.Should().Be(users.First().IsAdmin);
+
+    }
+
+    [Fact]
+    public async Task ShouldGetUserLocationAccess()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+
+        var users = await client.GetAllUsers(testLocation.Token);
+        var userDetails = await client.GetUserDetails(users.First().Id, testLocation.Token);
+
+        var userLocationsAccess = await client.GetUserLocationsAccess(users.First().Id, testLocation.Token);
+        userLocationsAccess.Single().HasAccess.Should().BeTrue();
+        userLocationsAccess.Should().Contain(l => l.LocationId == testLocation.LocationId);
+    }
+
+    [Fact]
+    public async Task ShouldAssignLocationToUser()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+        var testUserId = await client.CreateUser(TestData.Users.StandardUser, testLocation.Token);
+
+        var userLocationsAccess = await client.GetUserLocationsAccess(testUserId, testLocation.Token);
+        userLocationsAccess.Single().HasAccess.Should().BeFalse();
+        await client.AssignLocationToUser(new AssignLocationToUserCommand(testUserId, testLocation.LocationId), testLocation.Token);
+        userLocationsAccess = await client.GetUserLocationsAccess(testUserId, testLocation.Token);
+        userLocationsAccess.Single().HasAccess.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task ShouldRemoveLocationFromUser()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+        var testUserId = await client.CreateUser(TestData.Users.StandardUser, testLocation.Token);
+
+        var userLocationsAccess = await client.GetUserLocationsAccess(testUserId, testLocation.Token);
+        userLocationsAccess.Single().HasAccess.Should().BeFalse();
+        await client.AssignLocationToUser(new AssignLocationToUserCommand(testUserId, testLocation.LocationId), testLocation.Token);
+        userLocationsAccess = await client.GetUserLocationsAccess(testUserId, testLocation.Token);
+        userLocationsAccess.Single().HasAccess.Should().BeTrue();
+
+        await client.RemoveLocationFromUser(new RemoveLocationFromUserCommand(testUserId, testLocation.LocationId), testLocation.Token);
+        userLocationsAccess = await client.GetUserLocationsAccess(testUserId, testLocation.Token);
+        userLocationsAccess.Single().HasAccess.Should().BeFalse();
+    }
+
+
+
+
+    [Fact]
     public async Task ShouldNotAuthenticateAdminUserWithInvalidPassword()
     {
         var client = Factory.CreateClient();

@@ -58,12 +58,28 @@ namespace HeatKeeper.Server.Host.Users
         }
 
         [HttpGet]
-        public async Task<User[]> Get([FromQuery] AllUsersQuery query)
+        public async Task<UserInfo[]> Get([FromQuery] AllUsersQuery query)
+            => await _queryExecutor.ExecuteAsync(query);
+
+        [HttpGet("{userId}")]
+        public async Task<UserDetails> Get([FromRoute] GetUserDetailsQuery query)
+            => await _queryExecutor.ExecuteAsync(query);
+
+        [HttpGet("{userId}/locations-access")]
+        public async Task<UserLocationAccess[]> GetUserLocationsAccess([FromRoute] GetUserLocationsAccessQuery query)
             => await _queryExecutor.ExecuteAsync(query);
 
         [HttpPatch("password")]
         public async Task ChangePassword([FromBody] ChangePasswordCommand command)
             => await _commandExecutor.ExecuteAsync(command);
+
+        [HttpPatch("{userId}/assignLocation")]
+        public async Task AssignLocation([FromBodyAndRoute] AssignLocationToUserCommand command)
+            => await _commandExecutor.ExecuteAsync(command);
+
+        [HttpPatch("{userId}/removeLocation")]
+        public async Task RemoveLocation([FromBodyAndRoute] RemoveLocationFromUserCommand command)
+           => await _commandExecutor.ExecuteAsync(command);
 
         [HttpGet("apikey")]
         public async Task<ApiKey> GetApiKey([FromQuery] ApiKeyQuery query)
