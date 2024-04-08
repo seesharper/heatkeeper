@@ -1,11 +1,17 @@
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CQRS.AspNet.Testing;
+using CQRS.Command.Abstractions;
+using DbReader;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Sensors;
+using InfluxDB.Client.Api.Domain;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HeatKeeper.Server.WebApi.Tests;
 
@@ -48,15 +54,15 @@ public static class TestApplicationExtensions
 
         var setPointId = await client.CreateSetPoint(scheduleId, createSetPointCommand, token);
 
-        return new TestLocation(client, token, locationId, livingRoomZoneId, livingRoomSensor.Id, kitchenZoneId, normalProgramId, scheduleId, setPointId, livingRoomHeaterId1, livingRoomHeaterId2, kitchenHeaterId);
+        return new TestLocation(client, testApplication.Services, token, locationId, livingRoomZoneId, livingRoomSensor.Id, kitchenZoneId, normalProgramId, scheduleId, setPointId, livingRoomHeaterId1, livingRoomHeaterId2, kitchenHeaterId);
     }
 }
 
-public record TestLocation(HttpClient HttpClient, string Token, long LocationId, long LivingRoomZoneId, long LivingRoomSensorId, long KitchenZoneId, long NormalProgramId, long ScheduleId, long LivingRoomSetPointId, long LivingRoomHeaterId1, long LivingRoomHeaterId2, long KitchenHeaterId)
+public record TestLocation(HttpClient HttpClient, IServiceProvider ServiceProvider, string Token, long LocationId, long LivingRoomZoneId, long LivingRoomSensorId, long KitchenZoneId, long NormalProgramId, long ScheduleId, long LivingRoomSetPointId, long LivingRoomHeaterId1, long LivingRoomHeaterId2, long KitchenHeaterId)
 {
-    public async Task AddLivingRoomMeasurement(double temperature)
+    public async Task DeleteAllMeasurements()
     {
-        var measurementCommand = new MeasurementCommand(TestData.Sensors.LivingRoomSensor, MeasurementType.Temperature, RetentionPolicy.Day, temperature, DateTime.UtcNow);
-        await HttpClient.CreateMeasurements(new[] { measurementCommand }, Token);
+        var connection = ServiceProvider.GetRequiredService<IDbConnection>();
+        await connection.ExecuteAsync("DELETE FROM Measurements");
     }
 }

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -7,11 +9,13 @@ using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Dashboard;
 using HeatKeeper.Server.Heaters;
 using HeatKeeper.Server.Host;
+using HeatKeeper.Server.Insights.Zones;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.PushSubscriptions;
+using HeatKeeper.Server.QueryConsole;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Version;
@@ -48,6 +52,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task RemoveLocationFromUser(this HttpClient client, RemoveLocationFromUserCommand removeLocationFromUserCommand, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/users/{removeLocationFromUserCommand.UserId}/removeLocation", removeLocationFromUserCommand, token, success, problem);
 
+        public static async Task<Table> ExecuteDatabaseQuery(this HttpClient client, string sql, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post<DatabaseQuery, Table>(client, $"api/queryconsole", new DatabaseQuery(sql), token, response => response.StatusCode.Should().Be(HttpStatusCode.OK), problem);
 
         public static async Task DeleteZone(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/zones/{zoneId}", token, success, problem);
@@ -312,6 +318,10 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<ZoneDetails> GetZoneDetails(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ZoneDetails>(client, $"api/zones/{zoneId}", token, success, problem);
 
+        public static async Task<ZoneInsights> GetZoneInsights(this HttpClient client, long zoneId, TimeRange range, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<ZoneInsights>(client, $"api/zones/{zoneId}/insights?Range={range}", token, success, problem);
+
+
         public static async Task<Sensor[]> GetSensors(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<Sensor[]>(client, $"api/zones/{zoneId}/sensors", token, success, problem);
 
@@ -361,9 +371,6 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task PublishMqttMessage(this HttpClient client, PublishMqttMessageCommand command, string token)
             => await PostWithNoResponse(client, "api/mqtt", command, token);
 
-        public static async Task<Measurement[]> GetLatestMeasurements(this HttpClient client, long limit, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<Measurement[]>(client, $"api/measurements/latest?limit={limit}", token, success, problem);
-
         public static async Task UpdateUser(this HttpClient client, UpdateUserCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/users/{command.UserId}", command, token, success, problem);
 
@@ -372,5 +379,21 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task ChangePassword(this HttpClient client, ChangePasswordCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null) =>
             await Patch(client, "api/users/password", command, token, success, problem);
+
+
+        public static async Task CreateLivingRoomTemperatureMeasurements(this HttpClient client, int count, TimeSpan interval, RetentionPolicy retentionPolicy, string token)
+        {
+            var created = TestData.Clock.Today;
+            List<MeasurementCommand> commands = new();
+            for (var i = 0; i < count; i++)
+            {
+                double[] temperatures = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
+                var randomTemperatureValue = Random.Shared.GetItems(temperatures, 1).Single();
+                MeasurementCommand command = new MeasurementCommand(TestData.Sensors.LivingRoomSensor, MeasurementType.Temperature, retentionPolicy, randomTemperatureValue, created);
+                commands.Add(command);
+                created = created.Add(interval);
+            }
+            await client.CreateMeasurements(commands.ToArray(), token);
+        }
     }
 }

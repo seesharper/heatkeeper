@@ -1,23 +1,7 @@
 services:
-  influxdb:
-    image: influxdb:2.6.1
-    environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=heatkeeper
-      - DOCKER_INFLUXDB_INIT_PASSWORD=heatkeeper-password
-      - DOCKER_INFLUXDB_INIT_ORG=heatkeeper
-      - DOCKER_INFLUXDB_INIT_BUCKET=default-bucket
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=heatkeeper-admin-token
-    container_name: influxdb
-    ports:
-      - "8086:8086"
-    volumes:
-      - ./db/influxdb/data:/var/lib/influxdb2
-      - ./db/influxdb/config:/etc/influxdb2
+ 
   grafana:
-    image: grafana/grafana:latest
-    depends_on:
-      - influxdb
+    image: grafana/grafana:latest    
     container_name: grafana
     ports:
       - "3000:3000"

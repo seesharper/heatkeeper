@@ -124,15 +124,13 @@ namespace HeatKeeper.Server.Database
 
         string DeleteSensorMeasurements { get; }
 
-        string GetMeasurementsToExport { get; }
-
-        string DeleteExportedMeasurements { get; }
-
-        string UpdateExportedMeasurement { get; }
-
         string MeasurementsValueFieldAsDouble { get; }
 
         string LatestMeasurements { get; }
+
+        string GetMeasurements { get; }
+
+        string DeleteExpiredMeasurements { get; }
 
         string AddRetentionPolicyColumn { get; }
 

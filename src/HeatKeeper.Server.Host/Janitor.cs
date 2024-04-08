@@ -16,21 +16,17 @@ public static class JanitorServiceCollectionExtensions
         {
             var configuration = sp.GetRequiredService<IConfiguration>();
             config
-                             .Schedule(builder => builder
-                                 .WithName("ExportElectricalMarketPrices")
-                                 .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
-                                     => await commandExecutor.ExecuteAsync(new ExportAllMarketPricesCommand(), cancellationToken))
-                                 .WithSchedule(new CronSchedule("0 15,18,21 * * *")))
-                             .Schedule(builder => builder
-                                 .WithName("ExportMeasurements")
-                                 .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
-                                     => await commandExecutor.ExecuteAsync(new ExportMeasurementsCommand(), cancellationToken))
-                                 .WithSchedule(new CronSchedule("* * * * *")))
+
                              .Schedule(builder => builder
                                  .WithName("SetChannelStates")
                                  .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
                                      => await commandExecutor.ExecuteAsync(new SetChannelStatesCommand(), cancellationToken))
-                                 .WithSchedule(new CronSchedule(configuration.GetChannelStateCronExpression())));
+                                 .WithSchedule(new CronSchedule(configuration.GetChannelStateCronExpression())))
+                             .Schedule(builder => builder
+                                 .WithName("DeleteExpiredMeasurements")
+                                 .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
+                                     => await commandExecutor.ExecuteAsync(new DeleteExpiredMeasurementsCommand(), cancellationToken))
+                                 .WithSchedule(new CronSchedule(configuration.GetDeleteExpiredMeasurementsCronExpression())));
         });
 
         services.AddHostedService<JanitorHostedService>();

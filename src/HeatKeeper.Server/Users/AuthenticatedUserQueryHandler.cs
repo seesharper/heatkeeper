@@ -1,12 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
-using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Authentication;
-using HeatKeeper.Server.Authentication.RefreshTokens;
-using HeatKeeper.Server.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -18,15 +12,13 @@ namespace HeatKeeper.Server.Users
         private readonly IPasswordManager _passwordManager;
         private readonly ITokenProvider _tokenProvider;
         private readonly IQueryExecutor _queryExecutor;
-        private readonly IRefreshTokenProvider _refreshTokenProvider;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthenticatedUserQueryHandler(IPasswordManager passwordManager, ITokenProvider tokenProvider, IQueryExecutor queryExecutor, IRefreshTokenProvider refreshTokenProvider, IHttpContextAccessor httpContextAccessor)
+        public AuthenticatedUserQueryHandler(IPasswordManager passwordManager, ITokenProvider tokenProvider, IQueryExecutor queryExecutor, IHttpContextAccessor httpContextAccessor)
         {
             _passwordManager = passwordManager;
             _tokenProvider = tokenProvider;
             _queryExecutor = queryExecutor;
-            _refreshTokenProvider = refreshTokenProvider;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -49,7 +41,7 @@ namespace HeatKeeper.Server.Users
             };
 
             var token = _tokenProvider.CreateToken(claims, DateTime.UtcNow.AddHours(1));
-                        
+
             var authProperties = new AuthenticationProperties
             {
                 AllowRefresh = true,

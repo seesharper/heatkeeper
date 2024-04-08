@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Heaters;
+using HeatKeeper.Server.Insights.Zones;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Zones;
@@ -34,12 +35,16 @@ namespace HeatKeeper.Server.Host.Zones
         public async Task<ZoneDetails> GetZoneDetails([FromRoute] ZoneDetailsQuery query)
             => await _queryExecutor.ExecuteAsync(query);
 
+        [HttpGet("{zoneId}/insights")]
+        public async Task<ZoneInsights> GetZoneInsights([FromQueryAndRoute] GetZoneInsightsQuery query)
+            => await _queryExecutor.ExecuteAsync(query);
+
         [HttpGet("{zoneId}/sensors")]
         public async Task<Sensor[]> GetSensors([FromRoute] SensorsByZoneQuery query)
             => await _queryExecutor.ExecuteAsync(query);
 
-        
-        
+
+
         [HttpPost("{zoneId}/heaters")]
         public async Task<IActionResult> AddHeater([FromBodyAndRoute] CreateHeaterCommand command)
         {

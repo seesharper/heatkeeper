@@ -27,6 +27,10 @@ public static class ConfigurationExtensions
 
     public static string GetChannelStateCronExpression(this IConfiguration configuration)
         => configuration.GetRequiredValue("CHANNELSTATE_CRONEXPRESSION");
+
+    public static string GetDeleteExpiredMeasurementsCronExpression(this IConfiguration configuration)
+    => configuration.GetRequiredValue("DELETE_EXPIRED_MEASUREMENTS_CRONEXPRESSION");
+
     public static string GetConnectionString(this IConfiguration configuration)
         => configuration.GetRequiredValue("CONNECTIONSTRING");
     public static string GetSecret(this IConfiguration configuration)

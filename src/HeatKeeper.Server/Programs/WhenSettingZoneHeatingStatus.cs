@@ -1,9 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using CQRS.Command.Abstractions;
-using HeatKeeper.Server.Export;
-
 namespace HeatKeeper.Server.Programs;
 
 public class WhenSettingZoneHeatingStatus(ICommandHandler<SetZoneHeatingStatusCommand> handler, ICommandExecutor commandExecutor) : ICommandHandler<SetZoneHeatingStatusCommand>
