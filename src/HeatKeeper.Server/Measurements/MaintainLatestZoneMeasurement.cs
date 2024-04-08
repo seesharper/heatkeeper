@@ -37,7 +37,7 @@ public class MaintainLatestZoneMeasurementCommandHandler : ICommandHandler<Maint
                 return;
             }
 
-            var latestZoneMeasurementExists = await _queryExecutor.ExecuteAsync(new LatestZoneMeasurementExistsQuery() { ZoneId = zoneId.Value, MeasurementType = latestMeasurement.MeasurementType }, cancellationToken);
+            var latestZoneMeasurementExists = await _queryExecutor.ExecuteAsync(new LatestZoneMeasurementExistsQuery(zoneId.Value, latestMeasurement.MeasurementType), cancellationToken);
             if (latestZoneMeasurementExists)
             {
                 await _commandExecutor.ExecuteAsync(new UpdateLatestMeasurementCommand() { MeasurementType = latestMeasurement.MeasurementType, ZoneId = zoneId.Value, Value = latestMeasurement.Value, Updated = latestMeasurement.Created }, cancellationToken);

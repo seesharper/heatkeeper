@@ -1,6 +1,8 @@
 using System.Linq;
 using System.Threading.Tasks;
+using CsvHelper;
 using FluentAssertions;
+using HeatKeeper.Server.Insights.Zones;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Zones;
 using Xunit;
@@ -52,7 +54,7 @@ public class ZonesTests : TestBase
         await client.AssignZoneToSensor(new AssignZoneToSensorCommand(unassignedSensors[0].Id, testApplication.KitchenZoneId), testApplication.Token);
 
         var kitchenSensors = await client.GetSensors(testApplication.KitchenZoneId, testApplication.Token);
-        kitchenSensors.Length.Should().Be(1);        
+        kitchenSensors.Length.Should().Be(1);
     }
 
     [Fact]
@@ -61,10 +63,10 @@ public class ZonesTests : TestBase
         var client = Factory.CreateClient();
         var testApplication = await Factory.CreateTestLocation();
 
-        await client.RemovedZoneFromSensor(new RemoveZoneFromSensorCommand(testApplication.LivingRoomSensorId), testApplication.Token); 
+        await client.RemovedZoneFromSensor(new RemoveZoneFromSensorCommand(testApplication.LivingRoomSensorId), testApplication.Token);
 
         var unassignedSensors = await client.GetUnassignedSensors(testApplication.Token);
-        unassignedSensors.Length.Should().Be(2);    
+        unassignedSensors.Length.Should().Be(2);
     }
 
     [Fact]
@@ -116,8 +118,19 @@ public class ZonesTests : TestBase
         var client = Factory.CreateClient();
         var testApplication = await Factory.CreateTestLocation();
 
-        var sensorDetails = await client.GetSensorDetails(testApplication.LivingRoomSensorId, testApplication.Token);   
+        var sensorDetails = await client.GetSensorDetails(testApplication.LivingRoomSensorId, testApplication.Token);
 
         sensorDetails.ExternalId.Should().Be(TestData.Sensors.LivingRoomSensor);
+    }
+
+
+    [Fact]
+    public async Task ShouldGetZoneInsights()
+    {
+        var now = Factory.UseFakeTimeProvider(TestData.Clock.Today);
+        var client = Factory.CreateClient();
+        var testApplication = await Factory.CreateTestLocation();
+
+        var zoneInsights = await client.GetZoneInsights(testApplication.LivingRoomZoneId, TimeRange.Day, testApplication.Token);
     }
 }

@@ -1,11 +1,3 @@
-using System.Data;
-using System.Threading;
-using System.Threading.Tasks;
-using CQRS.Command.Abstractions;
-using DbReader;
-using HeatKeeper.Server.Authorization;
-using HeatKeeper.Server.Database;
-
 namespace HeatKeeper.Server.Programs;
 
 [RequireUserRole]

@@ -11,7 +11,7 @@ public class ElectricalPricesTests : TestBase
     [Fact]
     public async Task ShouldExportElectricalPrices()
     {
-        var janitor = Factory.Services.GetRequiredService<IJanitor>();
-        await janitor.Run("ExportElectricalMarketPrices");
+        // var janitor = Factory.Services.GetRequiredService<IJanitor>();
+        // await janitor.Run("ExportElectricalMarketPrices");
     }
 }

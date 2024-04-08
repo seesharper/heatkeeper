@@ -24,10 +24,10 @@ namespace HeatKeeper.Server.Host.Locations
         }
 
         [HttpPost]
-        public async Task<ActionResult<CreateLocationResponse>> Post([FromBody] CreateLocationCommand command)
+        public async Task<IActionResult> Post([FromBody] CreateLocationCommand command)
         {
             await commandExecutor.ExecuteAsync(command);
-            return CreatedAtAction(nameof(Post), new CreateLocationResponse(command.Id));
+            return CreatedAtAction(nameof(Post), new ResourceId(command.Id));
         }
 
         [HttpDelete("{locationId}")]

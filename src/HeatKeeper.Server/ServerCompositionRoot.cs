@@ -1,30 +1,19 @@
-using System;
-using System.Data;
 using System.Data.Common;
-using System.Linq;
-using System.Runtime.Intrinsics.Arm;
-using CQRS.Command.Abstractions;
 using CQRS.LightInject;
-using CQRS.Query.Abstractions;
 using CQRS.Transactions;
-using DbReader;
 using HeatKeeper.Abstractions;
 using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Authentication;
-using HeatKeeper.Server.Authentication.RefreshTokens;
-using HeatKeeper.Server.Authorization;
-using HeatKeeper.Server.Export;
+
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Measurements;
-using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
-using InfluxDB.Client;
+
 using LightInject;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
@@ -37,7 +26,7 @@ namespace HeatKeeper.Server
         {
             DbReaderOptions.WhenReading<long>().Use((rd, i) => rd.GetInt32(i));
             DbReaderOptions.WhenReading<string>().Use((rd, i) => (string)rd.GetValue(i));
-            DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) != 0);                        
+            DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) != 0);
         }
 
         public void Compose(IServiceRegistry serviceRegistry) => _ = serviceRegistry.RegisterCommandHandlers()
@@ -46,24 +35,16 @@ namespace HeatKeeper.Server
                 {
                     return sr.ServiceType.IsGenericType && sr.ServiceType.GetGenericTypeDefinition() == typeof(ICommandHandler<>) && sr.ImplementingType is not null && sr.ImplementingType.GetConstructors()[0].GetParameters().Any(p => p.ParameterType == typeof(IDbConnection));
                 })
-                // .Decorate<IDbConnection>((sf, c) =>
-                // {
-                //     var logger = sf.GetInstance<LogFactory>().CreateLogger<LoggedDbConnection>();
-                //     return new LoggedDbConnection(c, (message) => logger.Debug(message));
-                // })
                 .Decorate<DbConnection, DbConnectionDecorator>()
-                .RegisterSingleton<IBootStrapper, InfluxDbBootStrapper>("InfluxDbBootStrapper")
                 .RegisterSingleton<IBootStrapper>(sf => new JanitorBootStrapper(sf), "JanitorBootStrapper")
                 .RegisterSingleton<IBootStrapper, DatabaseBootStrapper>("DatabaseBootStrapper")
                 .RegisterSingleton<IPasswordManager, PasswordManager>()
                 .RegisterSingleton<IManagedMqttClient>(sf => CreateManagedMqttClient(sf.GetInstance<IConfiguration>()))
                 .RegisterSingleton<IPasswordPolicy, PasswordPolicy>()
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
-                .RegisterSingleton<IRefreshTokenProvider, RefreshTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
-                .RegisterSingleton<ISystemClock, SystemClock>()
-                .RegisterScoped<IInfluxDBClient>(f => CreateInfluxDbClient(f.GetInstance<IConfiguration>()))
+
                 //.Decorate<ICommandHandler<ExportMeasurementsCommand>, CumulativeMeasurementsExporter>()
                 .Decorate<ICommandHandler<UpdateUserCommand>, ValidatedUpdateUserCommandHandler>()
                 .Decorate<ICommandHandler<RegisterUserCommand>, RegisterUserValidator>()
@@ -78,7 +59,6 @@ namespace HeatKeeper.Server
                 .Decorate(typeof(ICommandHandler<>), typeof(MaintainDefaultZonesCommandHandler<>))
                 .Decorate<ICommandHandler<DeleteScheduleCommand>, BeforeDeleteSchedule>()
                 .Decorate<ICommandHandler<DeleteProgramCommand>, BeforeDeleteProgram>()
-                .Decorate<ICommandHandler<ExportMeasurementsToInfluxDbCommand>, WhenMeasurementAreExported>()
                 .Decorate<ICommandHandler<MeasurementCommand[]>, WhenMeasurementsAreInserted>()
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidateSchedule<>))
                 .Decorate<ICommandHandler<CreateScheduleCommand>, WhenScheduleIsCreated>()
@@ -87,8 +67,6 @@ namespace HeatKeeper.Server
                 .Decorate<ICommandHandler<SetZoneHeatingStatusCommand>, WhenSettingZoneHeatingStatus>()
                 .Decorate<ICommandHandler<ActivateProgramCommand>, WhenActivatingProgram>();
 
-        private InfluxDBClient CreateInfluxDbClient(IConfiguration configuration)
-            => new InfluxDBClient(configuration.GetInfluxDbUrl(), configuration.GetInfluxDbApiKey());
 
         private static IManagedMqttClient CreateManagedMqttClient(IConfiguration configuration)
         {

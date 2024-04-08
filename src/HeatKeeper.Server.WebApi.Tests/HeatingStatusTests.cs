@@ -1,17 +1,4 @@
-using System;
-using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
-using CQRS.AspNet.Testing;
-using CQRS.Command.Abstractions;
-using HeatKeeper.Server.Export;
-using HeatKeeper.Server.Measurements;
-using HeatKeeper.Server.Programs;
-using HeatKeeper.Server.Sensors;
-using Janitor;
-using LightInject;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests;

@@ -10,6 +10,14 @@ var TagVersion = BuildContext.LatestTag;
 [StepDescription("Runs the tests with test coverage")]
 Step testcoverage = () =>
 {
+    if (File.Exists(Path.Combine(BuildContext.RepositoryFolder, "src/HeatKeeper.Server.WebApi.Tests/bin/Debug/net8.0/heatkeeper.db")))
+    {
+        File.Delete(Path.Combine(BuildContext.RepositoryFolder, "src/HeatKeeper.Server.WebApi.Tests/bin/Debug/net8.0/heatkeeper.db"));
+    }
+    if (File.Exists(Path.Combine(BuildContext.RepositoryFolder, "src/HeatKeeper.Server.WebApi.Tests/bin/release/net8.0/heatkeeper.db")))
+    {
+        File.Delete(Path.Combine(BuildContext.RepositoryFolder, "src/HeatKeeper.Server.WebApi.Tests/bin/release/net8.0/heatkeeper.db"));
+    }
     Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" up -d");
     DotNet.TestWithCodeCoverage();
     Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" down");
@@ -49,7 +57,7 @@ AsyncStep BuildContainer = async () =>
 {
     WriteLine($"Building container for version {TagVersion}");
     await Command.ExecuteAsync("docker", $"build --pull --rm --build-arg APP_VERSION={TagVersion} --no-cache -t bernhardrichter/{dockerImageName}:latest .", BuildContext.RepositoryFolder);
-    await Command.ExecuteAsync("docker", $"tag bernhardrichter/{dockerImageName}:latest bernhardrichter/{dockerImageName}:{TagVersion}");    
+    await Command.ExecuteAsync("docker", $"tag bernhardrichter/{dockerImageName}:latest bernhardrichter/{dockerImageName}:{TagVersion}");
 };
 
 AsyncStep PushContainer = async () =>

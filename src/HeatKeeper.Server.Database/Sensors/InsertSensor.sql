@@ -1,2 +1,4 @@
-INSERT INTO Sensors(ExternalId, Name, Description)
-VALUES (@ExternalId, @Name, @Description)
+INSERT INTO
+    Sensors(ExternalId, NAME, Description, LastSeen)
+VALUES
+    (@ExternalId, @Name, @Description, @LastSeen)

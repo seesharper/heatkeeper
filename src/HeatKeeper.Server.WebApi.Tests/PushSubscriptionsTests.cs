@@ -14,7 +14,7 @@ public class PushSubscriptionsTests : TestBase
     [Fact]
     public async Task ShouldCreatePushSubscription()
     {
-        var now = Factory.GetFakeTimeProvider(TestData.Clock.Today);
+        var now = Factory.UseFakeTimeProvider(TestData.Clock.Today);
 
         var client = Factory.CreateClient();
         var testLocation = await Factory.CreateTestLocation();
