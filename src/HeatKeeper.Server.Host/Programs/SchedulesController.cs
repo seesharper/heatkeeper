@@ -31,13 +31,7 @@ public class SchedulesController : ControllerBase
     public async Task<SetPointInfo[]> SetPoints([FromRoute] SetPointsByScheduleQuery query)
            => await _queryExecutor.ExecuteAsync(query);
 
-    [HttpGet("{scheduleId}/zones")]
-    public async Task<ZoneInfo[]> Zones([FromRoute] GetZonesNotAssignedToScheduleQuery query)
-           => await _queryExecutor.ExecuteAsync(query);
 
-    [HttpPatch("{scheduleId}")]
-    public async Task Patch([FromBodyAndRoute] UpdateScheduleCommand command)
-         => await _commandExecutor.ExecuteAsync(command);
 
     [HttpDelete("{scheduleId}")]
     public async Task Delete([FromRoute] DeleteScheduleCommand command)

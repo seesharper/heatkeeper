@@ -23,26 +23,22 @@ namespace HeatKeeper.Server.Host.Locations
             this.commandExecutor = commandExecutor;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CreateLocationCommand command)
-        {
-            await commandExecutor.ExecuteAsync(command);
-            return CreatedAtAction(nameof(Post), new ResourceId(command.Id));
-        }
+        // [HttpPost]
+        // public async Task<IActionResult> Post([FromBody] CreateLocationCommand command)
+        // {
+        //     await commandExecutor.ExecuteAsync(command);
+        //     return CreatedAtAction(nameof(Post), new ResourceId(command.Id));
+        // }
 
-        [HttpDelete("{locationId}")]
-        public async Task Delete([FromRoute] DeleteLocationCommand command)
-            => await commandExecutor.ExecuteAsync(command);
+        // [HttpDelete("{locationId}")]
+        // public async Task Delete([FromRoute] DeleteLocationCommand command)
+        //     => await commandExecutor.ExecuteAsync(command);
 
         [HttpPatch("{locationId}")]
         public async Task Patch([FromBodyAndRoute] UpdateLocationCommand updateLocationCommand)
             => await commandExecutor.ExecuteAsync(updateLocationCommand).ConfigureAwait(false);
 
-        [HttpGet("{locationId}")]
-        public async Task<LocationDetails> GetLocationDetails([FromRoute] GetLocationDetailsQuery query)
-        {
-            return await queryExecutor.ExecuteAsync(query);
-        }
+      
 
         [HttpGet]
         public async Task<Location[]> Get([FromQuery] GetAllLocationsQuery query)
@@ -92,6 +88,6 @@ namespace HeatKeeper.Server.Host.Locations
 
         [HttpGet("{locationId}/temperatures")]
         public async Task<LocationTemperature[]> GetTemperatures([FromRoute] LocationTemperaturesQuery query)
-            => await queryExecutor.ExecuteAsync(query);            
+            => await queryExecutor.ExecuteAsync(query);
     }
 }

@@ -1,4 +1,6 @@
-﻿using HeatKeeper.Server.Host;
+﻿using CQRS.AspNet;
+using HeatKeeper.Server;
+using HeatKeeper.Server.Host;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using WebPush;
@@ -22,6 +24,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddSpaStaticFiles(config => config.RootPath = "wwwroot");
 builder.Services.AddExceptionHandler<ExceptionHandler>();
+
+builder.Services.AddProblemDetails();
 builder.Services.AddMvc(options =>
 {
     options.Filters.Add<DeleteActionFilter>();
@@ -57,8 +61,18 @@ app.UseStaticFiles();
 // app.UseSpaStaticFiles();
 // app.UseSpa(config => config.Options.SourcePath = "wwwroot");
 app.UseAuthorization();
-
 app.UseExceptionHandler(_ => { });
+// app.UseExceptionHandler(exceptionHandlerApp
+//     =>
+// {
+//     exceptionHandlerApp.Run(async context
+//             =>
+//     {
+//         await Results.Problem()
+//                                  .ExecuteAsync(context);
+//     });
+// });
+app.MapCqrsEndpoints(typeof(ServerCompositionRoot).Assembly);
 
 app.MapControllers();
 

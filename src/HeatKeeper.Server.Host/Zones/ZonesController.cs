@@ -1,9 +1,7 @@
-using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Heaters;
 using HeatKeeper.Server.Insights.Zones;
-using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Zones;
 using Microsoft.AspNetCore.Mvc;

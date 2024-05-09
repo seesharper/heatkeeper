@@ -1,11 +1,3 @@
-using System.Data;
-using System.Threading;
-using System.Threading.Tasks;
-using CQRS.Command.Abstractions;
-using DbReader;
-using HeatKeeper.Server.Authorization;
-using HeatKeeper.Server.Database;
-
 namespace HeatKeeper.Server.Locations
 {
     public class UpdateLocationCommandHandler : ICommandHandler<UpdateLocationCommand>
@@ -25,11 +17,7 @@ namespace HeatKeeper.Server.Locations
         }
     }
 
-    /// <summary>
-    /// Updates the name and the description for the given location.
-    /// </summary>
     [RequireAdminRole]
-    public class UpdateLocationCommand : LocationCommand
-    {
-    }
+    public record UpdateLocationCommand(long Id, string Name, string Description, long? DefaultOutsideZoneId, long? DefaultInsideZoneId);
+
 }

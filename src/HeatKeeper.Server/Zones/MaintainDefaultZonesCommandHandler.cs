@@ -21,7 +21,7 @@ namespace HeatKeeper.Server.Zones
             await handler.HandleAsync(command);
             if (command.IsDefaultInsideZone)
             {
-                await commandExecutor.ExecuteAsync(new UpdateDefaultInsideZoneCommand() { LocationId = command.LocationId, ZoneId = command.ZoneId });
+                await commandExecutor.ExecuteAsync(new UpdateDefaultInsideZoneCommand(command.LocationId, command.ZoneId));
             }
             else
             {
@@ -30,7 +30,7 @@ namespace HeatKeeper.Server.Zones
 
             if (command.IsDefaultOutsideZone)
             {
-                await commandExecutor.ExecuteAsync(new UpdateDefaultOutsideZoneCommand() { LocationId = command.LocationId, ZoneId = command.ZoneId });
+                await commandExecutor.ExecuteAsync(new UpdateDefaultOutsideZoneCommand(command.LocationId, command.ZoneId));
             }
             else
             {

@@ -70,11 +70,11 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static class Locations
         {
-            public static CreateLocationCommand Home =>
-                new CreateLocationCommand() { Name = "Home", Description = "Description of the Home location" };
+            public static CreateLocationCommand Home => new("Home", "Description of the Home location");
 
-            public static CreateLocationCommand Cabin =>
-                new CreateLocationCommand() { Name = "Cabin", Description = "Description of the Cabin location" };
+
+            public static CreateLocationCommand Cabin => new("Cabin", "Description of the Cabin location");
+
         }
 
         public static class Zones

@@ -6,18 +6,13 @@ using HeatKeeper.Server.Validation;
 
 namespace HeatKeeper.Server.Programs;
 
-public class ValidateSchedule<TCommand> : ICommandHandler<TCommand> where TCommand : IScheduleCommand
+public class ValidateSchedule<TCommand>(ICommandHandler<TCommand> handler) : ICommandHandler<TCommand> where TCommand : IScheduleCommand
 {
-    private readonly ICommandHandler<TCommand> _handler;
-
-    public ValidateSchedule(ICommandHandler<TCommand> handler)
-        => _handler = handler;
-
     public async Task HandleAsync(TCommand command, CancellationToken cancellationToken = default)
     {
         if (IsValidCronExpression(command.CronExpression))
         {
-            await _handler.HandleAsync(command, cancellationToken);
+            await handler.HandleAsync(command, cancellationToken);
         }
         else
         {

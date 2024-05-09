@@ -245,5 +245,7 @@ namespace HeatKeeper.Server.Database
         string GetPushSubscriptionsByLocation { get; }
 
         string CreatePushSubscriptionsTable { get; }
+
+        string NewLocationExists { get; }
     }
 }

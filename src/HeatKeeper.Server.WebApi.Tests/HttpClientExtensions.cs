@@ -11,6 +11,7 @@ using HeatKeeper.Server.Heaters;
 using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Insights.Zones;
 using HeatKeeper.Server.Locations;
+using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
@@ -175,8 +176,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<long> CreateProgram(this HttpClient client, CreateLocationCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/programs", content, token, success, problem);
 
-        public static async Task UpdateLocation(this HttpClient client, UpdateLocationCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Patch(client, $"api/locations/{content.Id}", content, token, success, problem);
+        public static async Task UpdateLocation(this HttpClient client, UpdateLocationCommand content, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Patch(client, $"api/locations/{locationId}", content, token, success, problem);
 
         public static async Task UpdateZone(this HttpClient client, UpdateZoneCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/zones/{content.ZoneId}", content, token, success, problem);

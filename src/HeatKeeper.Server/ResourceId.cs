@@ -1,4 +1,4 @@
-namespace HeatKeeper.Server.Host
+namespace HeatKeeper.Server
 {
     public class ResourceId
     {
