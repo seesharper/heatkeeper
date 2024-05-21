@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 using CQRS.AspNet.Testing;
 using CQRS.Command.Abstractions;
 using DbReader;
+using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Sensors;
+using HeatKeeper.Server.Users;
 using InfluxDB.Client.Api.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,6 +32,10 @@ public static class TestApplicationExtensions
         var livingRoomHeaterId1 = await client.CreateHeater(TestData.Heaters.LivingRoomHeater1(livingRoomZoneId), token);
         var livingRoomHeaterId2 = await client.CreateHeater(TestData.Heaters.LivingRoomHeater1(livingRoomZoneId), token);
         var kitchenHeaterId = await client.CreateHeater(TestData.Heaters.KitchenHeater(kitchenZoneId), token);
+
+        await client.UpdateLocation(new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, livingRoomZoneId), locationId, token);
+
+        await client.AssignLocationToUser(new AssignLocationToUserCommand(1, locationId), token);
 
         // Create measurements in the living room zone and outside zone
         await client.CreateMeasurements(TestData.TemperatureMeasurementRequests, token);

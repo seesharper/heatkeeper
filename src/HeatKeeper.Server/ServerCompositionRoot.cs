@@ -7,6 +7,7 @@ using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Authentication;
 
 using HeatKeeper.Server.Locations;
+using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Users;
@@ -44,20 +45,17 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
-
-                //.Decorate<ICommandHandler<ExportMeasurementsCommand>, CumulativeMeasurementsExporter>()
                 .Decorate<ICommandHandler<UpdateUserCommand>, ValidatedUpdateUserCommandHandler>()
                 .Decorate<ICommandHandler<RegisterUserCommand>, RegisterUserValidator>()
-                // .Decorate(typeof(ICommandHandler<>), typeof(ValidatedLocationCommandHandler<>))
                 .Decorate<ICommandHandler<ChangePasswordCommand>, ChangePasswordValidator>()
-                .Decorate(typeof(ICommandHandler<>), typeof(ValidatedZoneCommandHandler<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(ValidatedUserCommandHandler<>))
-                .Decorate<ICommandHandler<InsertLocationCommand>, ValidateInsertLocationCommand>()
-                .Decorate<ICommandHandler<UpdateLocationCommand>, ValidateUpdateLocationCommand>()
+                .Decorate<ICommandHandler<CreateLocationCommand>, ValidateCreateLocation>()
+                .Decorate<ICommandHandler<UpdateLocationCommand>, ValidateUpdateLocation>()
+                .Decorate<ICommandHandler<CreateZoneCommand>, ValidateCreateZone>()
+
                 .Decorate(typeof(ICommandHandler<>), typeof(AuthorizedCommandHandler<>))
                 .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>))
                 .Decorate<ICommandHandler<DeleteUserCommand>, ValidatedDeleteUserCommandHandler>()
-                .Decorate(typeof(ICommandHandler<>), typeof(MaintainDefaultZonesCommandHandler<>))
                 .Decorate<ICommandHandler<DeleteScheduleCommand>, BeforeDeleteSchedule>()
                 .Decorate<ICommandHandler<DeleteProgramCommand>, BeforeDeleteProgram>()
                 .Decorate<ICommandHandler<MeasurementCommand[]>, WhenMeasurementsAreInserted>()

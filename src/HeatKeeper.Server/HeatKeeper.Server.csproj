@@ -7,7 +7,7 @@
     <OutputType>library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CQRS.AspNet.Metadata" Version="0.0.2" />
+    <PackageReference Include="CQRS.AspNet.Metadata" Version="0.0.4" />
     <PackageReference Include="janitor" Version="1.2.1" />
     <PackageReference Include="cronos" Version="0.7.1" />
     <PackageReference Include="CQRS.LightInject" Version="1.5.1" />

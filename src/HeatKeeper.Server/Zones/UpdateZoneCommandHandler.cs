@@ -1,24 +1,7 @@
-using System.Data;
-using System.Threading;
-using System.Threading.Tasks;
-using CQRS.Command.Abstractions;
-using DbReader;
-using HeatKeeper.Server.Authorization;
-using HeatKeeper.Server.Database;
-
 namespace HeatKeeper.Server.Zones
 {
-    public class UpdateZoneCommandHandler : ICommandHandler<UpdateZoneCommand>
+    public class UpdateZone(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<UpdateZoneCommand>
     {
-        private readonly IDbConnection dbConnection;
-        private readonly ISqlProvider sqlProvider;
-
-        public UpdateZoneCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
-        {
-            this.dbConnection = dbConnection;
-            this.sqlProvider = sqlProvider;
-        }
-
         public async Task HandleAsync(UpdateZoneCommand command, CancellationToken cancellationToken = default)
             => await dbConnection.ExecuteAsync(sqlProvider.UpdateZone, command).ConfigureAwait(false);
     }
@@ -27,7 +10,5 @@ namespace HeatKeeper.Server.Zones
     /// Updates the name and the description of the given zone.
     /// </summary>
     [RequireAdminRole]
-    public class UpdateZoneCommand : ZoneCommand
-    {
-    }
+    public record UpdateZoneCommand(long ZoneId, long LocationId, string Name, string Description);
 }

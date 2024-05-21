@@ -2,6 +2,7 @@ using System;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Heaters;
 using HeatKeeper.Server.Locations;
+using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
@@ -106,20 +107,19 @@ namespace HeatKeeper.Server.WebApi.Tests
             public const bool TestZoneIsDefaultOutsideZone = false;
 
             public static CreateZoneCommand LivingRoom =>
-                new() { Name = LivingRoomName, Description = LivingRoomDescription, IsDefaultInsideZone = LivingRoomIsDefaultInsideZone, MqttTopic = LivingRoomMqttTopic };
+                new(LocationId: 0, Name: LivingRoomName, Description: LivingRoomDescription);
 
             public static CreateZoneCommand Outside =>
-                new() { Name = OutsideName, Description = OutsideDescription, IsDefaultOutsideZone = OutsideIsDefaultOutsideZone, IsDefaultInsideZone = OutsideIsDefaultInsideZone };
+                new(LocationId: 0, Name: OutsideName, Description: OutsideDescription);
 
             public static CreateZoneCommand Kitchen =>
-                new() { Name = KitchenName, Description = KitchenDescription, MqttTopic = KitchenMqttTopic };
+                new(LocationId: 0, Name: KitchenName, Description: KitchenDescription);
 
             public static CreateZoneCommand PowerMeter =>
-                new() { Name = PowerMeterName, Description = PowerMeterDescription };
+                new(LocationId: 0, Name: PowerMeterName, Description: PowerMeterDescription);
 
             public static CreateZoneCommand TestZone =>
-                new() { Name = TestZoneName, Description = TestZoneDescription, MqttTopic = TestZoneMqttTopic, IsDefaultInsideZone = TestZoneIsDefaultInsideZone, IsDefaultOutsideZone = TestZoneIsDefaultOutsideZone };
-
+                new(LocationId: 0, Name: TestZoneName, Description: TestZoneDescription);
         }
 
         public static class Heaters

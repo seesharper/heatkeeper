@@ -78,14 +78,7 @@ public class ZonesTests : TestBase
         var locationId = await client.CreateLocation(TestData.Locations.Home, token);
         var zoneId = await client.CreateZone(locationId, TestData.Zones.LivingRoom, token);
 
-        var updateZoneCommand = new UpdateZoneCommand()
-        {
-            ZoneId = zoneId,
-            Name = TestData.Zones.Kitchen.Name,
-            MqttTopic = "SomeTopic",
-            Description = TestData.Zones.Kitchen.Description,
-            LocationId = locationId
-        };
+        var updateZoneCommand = new UpdateZoneCommand(zoneId, locationId, TestData.Zones.Kitchen.Name, TestData.Zones.Kitchen.Description);
 
         await client.UpdateZone(updateZoneCommand, token);
 
@@ -93,7 +86,6 @@ public class ZonesTests : TestBase
 
         updatedZone.Name.Should().Be(TestData.Zones.Kitchen.Name);
         updatedZone.Description.Should().Be(TestData.Zones.Kitchen.Description);
-        updatedZone.MqttTopic.Should().Be("SomeTopic");
     }
 
     [Fact]

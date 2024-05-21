@@ -8,7 +8,7 @@ namespace HeatKeeper.Server.Locations.Api;
 [Delete("api/locations/{locationId}")]
 public record DeleteLocationCommand(long LocationId) : Command<NoContent>;
 
-public class DeleteLocationCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider, ICommandExecutor commandExecutor, IQueryExecutor queryExecutor) : ICommandHandler<DeleteLocationCommand>
+public class DeleteLocation(IDbConnection dbConnection, ISqlProvider sqlProvider, ICommandExecutor commandExecutor, IQueryExecutor queryExecutor) : ICommandHandler<DeleteLocationCommand>
 {
     public async Task HandleAsync(DeleteLocationCommand command, CancellationToken cancellationToken = default)
     {
@@ -17,9 +17,9 @@ public class DeleteLocationCommandHandler(IDbConnection dbConnection, ISqlProvid
         await dbConnection.ExecuteAsync(sqlProvider.DeleteAllUsersFromLocation, command);
 
         // await commandExecutor.ExecuteAsync(new RemoveAllZonesFromLocationCommand(command.LocationId), cancellationToken);
-        
+
         // Remove all zones for this location.
-        ZoneInfo[] zones = await queryExecutor.ExecuteAsync(new ZonesByLocationQuery() { LocationId = command.LocationId }, cancellationToken);
+        ZoneInfo[] zones = await queryExecutor.ExecuteAsync(new ZonesByLocationQuery(command.LocationId), cancellationToken);
         foreach (var zone in zones)
         {
             await commandExecutor.ExecuteAsync(new DeleteZoneCommand() { ZoneId = zone.Id }, cancellationToken);

@@ -1,15 +1,17 @@
-using HeatKeeper.Server.Exceptions;
+using HeatKeeper.Server.Locations.Api;
+using Microsoft.AspNetCore.Http;
 
 namespace HeatKeeper.Server.Locations;
 
-public class ValidateUpdateLocationCommand(ICommandHandler<UpdateLocationCommand> handler, IQueryExecutor queryExecutor) : ICommandHandler<UpdateLocationCommand>
+public class ValidateUpdateLocation(ICommandHandler<UpdateLocationCommand> handler, IQueryExecutor queryExecutor) : ICommandHandler<UpdateLocationCommand>
 {
     public async Task HandleAsync(UpdateLocationCommand command, CancellationToken cancellationToken = default)
     {
         var locationExists = await queryExecutor.ExecuteAsync(new LocationExistsQuery(command.Name, command.Id), cancellationToken);
         if (locationExists)
         {
-            throw new HeatKeeperConflictException($"Location {command.Name} already exists");
+            command.SetResult(TypedResults.Problem($"Location {command.Name} already exists", statusCode: StatusCodes.Status409Conflict));
+            return;
         }
         await handler.HandleAsync(command, cancellationToken);
     }

@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using HeatKeeper.Server.Locations;
+using HeatKeeper.Server.Locations.Api;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests
@@ -15,8 +15,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             var token = await client.AuthenticateAsAdminUser();
 
             var locationId = await client.CreateLocation(TestData.Locations.Home, token);
-
-            var createdLocation = (await client.GetLocations(token)).Single();
+            var createdLocation = await client.GetLocationDetails(locationId, token);
 
             createdLocation.Id.Should().Be(locationId);
             createdLocation.Name.Should().Be(TestData.Locations.Home.Name);
@@ -36,7 +35,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             await client.UpdateLocation(updateLocationCommand, locationId, token);
 
-            var updatedLocation = (await client.GetLocations(token)).Single();
+            var updatedLocation = await client.GetLocationDetails(locationId, token);
 
             updatedLocation.Name.Should().Be(TestData.Locations.Cabin.Name);
             updatedLocation.Description.Should().Be(TestData.Locations.Cabin.Description);
@@ -134,22 +133,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             await client.CreateZone(locationId, TestData.Zones.LivingRoom, token, problem: details => details.ShouldHaveConflictStatus());
         }
 
-        [Fact]
-        public async Task ShouldSetZoneAsDefaultOutsideZone()
-        {
-            var client = Factory.CreateClient();
-            var token = await client.AuthenticateAsAdminUser();
 
-            var locationId = await client.CreateLocation(TestData.Locations.Home, token);
-            await client.CreateZone(locationId, TestData.Zones.Outside, token);
-            await client.CreateZone(locationId, TestData.Zones.LivingRoom, token);
-
-            var zones = await client.GetZones(locationId, token);
-            var outsideZone = zones.Single(z => z.Name == TestData.Zones.Outside.Name);
-            var zoneDetail = await client.GetZoneDetails(outsideZone.Id, token);
-
-            zoneDetail.IsDefaultOutsideZone.Should().Be(true);
-        }
 
         // [Fact]
         // public async Task ShouldHandleAddingDuplicateUsersToLocation()

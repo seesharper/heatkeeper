@@ -126,11 +126,6 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<SetPointDetails> GetSetPointDetails(this HttpClient client, long setPointId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<SetPointDetails>(client, $"api/setpoints/{setPointId}", token, success, problem);
 
-        public static async Task AddUserToLocation(this HttpClient client, long locationId, AddUserToLocationCommand addUserLocationRequest, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-        {
-            await PostWithNoResponse(client, $"api/locations/{locationId}/users", addUserLocationRequest, token, success, problem);
-        }
-
         public static async Task RemoveUserFromLocation(this HttpClient client, long locationId, long userID, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/locations/{locationId}/users/{userID}", token, success, problem);
 
@@ -185,8 +180,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task UpdateSetPoint(this HttpClient client, UpdateSetPointCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/setPoints/{content.SetPointId}", content, token, success, problem);
 
-        public static async Task<Location[]> GetLocations(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<Location[]>(client, "api/locations", token, success, problem);
+        public static async Task<LocationInfo[]> GetLocations(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<LocationInfo[]>(client, "api/locations", token, success, problem);
 
         private static async Task<TContent> Get<TContent>(HttpClient client, string uri, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
@@ -260,7 +255,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             }
             else
             {
-                problem.Should().NotBeNull($"There was a problem handling the request and this was not not handled in the calling test method. The status code was ({(int)response.StatusCode}) {response.StatusCode}");
+                problem.Should().NotBeNull($"There was a problem handling the request {response.RequestMessage.RequestUri}and this was not not handled in the calling test method. The status code was ({(int)response.StatusCode}) {response.StatusCode}");
                 var problemDetails = await response.ContentAs<ProblemDetails>();
                 problem(problemDetails);
             }
@@ -303,8 +298,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<ZoneInfo[]> GetZones(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ZoneInfo[]>(client, $"api/locations/{locationId}/zones", token, success, problem);
 
-        public static async Task<Programs.Program[]> GetPrograms(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<Programs.Program[]>(client, $"api/locations/{locationId}/programs", token, success, problem);
+        public static async Task<ProgramInfo[]> GetPrograms(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<ProgramInfo[]>(client, $"api/locations/{locationId}/programs", token, success, problem);
 
         public static async Task<HeaterInfo[]> GetHeaters(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<HeaterInfo[]>(client, $"api/zones/{zoneId}/heaters", token, success, problem);
