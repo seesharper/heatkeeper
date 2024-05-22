@@ -65,6 +65,4 @@ public class HeatersTests : TestBase
         var heaters = await client.GetHeaters(testLocation.LivingRoomZoneId, testLocation.Token);
         heaters.Should().HaveCount(1);
     }
-
-
 }

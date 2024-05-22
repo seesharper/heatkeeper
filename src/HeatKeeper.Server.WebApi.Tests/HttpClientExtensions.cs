@@ -7,10 +7,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Dashboard;
-using HeatKeeper.Server.Heaters;
 using HeatKeeper.Server.Heaters.Api;
-using HeatKeeper.Server.Host;
-using HeatKeeper.Server.Insights.Zones;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
@@ -22,6 +19,7 @@ using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Version;
 using HeatKeeper.Server.Zones;
+using HeatKeeper.Server.Zones.Api;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -319,8 +317,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             => await Get<ZoneInsights>(client, $"api/zones/{zoneId}/insights?Range={range}", token, success, problem);
 
 
-        public static async Task<Sensor[]> GetSensors(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<Sensor[]>(client, $"api/zones/{zoneId}/sensors", token, success, problem);
+        public static async Task<SensorInfo[]> GetSensors(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<SensorInfo[]>(client, $"api/zones/{zoneId}/sensors", token, success, problem);
 
         public static async Task UpdateSensor(this HttpClient client, UpdateSensorCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Patch(client, $"api/sensors/{command.SensorId}", command, token, success, problem);

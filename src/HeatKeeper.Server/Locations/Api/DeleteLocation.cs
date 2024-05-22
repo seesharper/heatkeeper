@@ -22,7 +22,7 @@ public class DeleteLocation(IDbConnection dbConnection, ISqlProvider sqlProvider
         ZoneInfo[] zones = await queryExecutor.ExecuteAsync(new ZonesByLocationQuery(command.LocationId), cancellationToken);
         foreach (var zone in zones)
         {
-            await commandExecutor.ExecuteAsync(new DeleteZoneCommand() { ZoneId = zone.Id }, cancellationToken);
+            await commandExecutor.ExecuteAsync(new DeleteZoneCommand(zone.Id), cancellationToken);
         }
 
         //NOTE: We need to delete all programs 

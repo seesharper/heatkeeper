@@ -1,24 +1,7 @@
-using System.Data;
-using System.Threading;
-using System.Threading.Tasks;
-using CQRS.Command.Abstractions;
-using DbReader;
-using HeatKeeper.Server.Authorization;
-using HeatKeeper.Server.Database;
-
 namespace HeatKeeper.Server.Zones
 {
-    public class DeleteZoneCommandHandler : ICommandHandler<DeleteZoneCommand>
+    public class DeleteZoneCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<DeleteZoneCommand>
     {
-        private readonly IDbConnection dbConnection;
-        private readonly ISqlProvider sqlProvider;
-
-        public DeleteZoneCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
-        {
-            this.dbConnection = dbConnection;
-            this.sqlProvider = sqlProvider;
-        }
-
         public async Task HandleAsync(DeleteZoneCommand command, CancellationToken cancellationToken = default)
         {
             await dbConnection.ExecuteAsync(sqlProvider.ClearZoneFromAllSensors, command);
@@ -28,8 +11,6 @@ namespace HeatKeeper.Server.Zones
     }
 
     [RequireAdminRole]
-    public class DeleteZoneCommand
-    {
-        public long ZoneId { get; set; }
-    }
+    [Delete("/api/zones/{zoneId}")]
+    public record DeleteZoneCommand(long ZoneId) : DeleteCommand;
 }

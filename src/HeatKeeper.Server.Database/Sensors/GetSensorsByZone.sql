@@ -1,9 +1,6 @@
 SELECT
     Id,
-    ExternalId,
-    ZoneId,
-    NAME,
-    Description
+    NAME
 FROM
     Sensors
 WHERE

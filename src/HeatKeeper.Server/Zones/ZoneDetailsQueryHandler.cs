@@ -7,6 +7,7 @@ public class ZoneDetailsQueryHandler(IDbConnection dbConnection, ISqlProvider sq
 }
 
 [RequireAdminRole]
+[Get("/api/zones/{zoneId}")]
 public record ZoneDetailsQuery(long ZoneId) : IQuery<ZoneDetails>;
 
 public record ZoneDetails(long Id, string Name, string Description, long LocationId);

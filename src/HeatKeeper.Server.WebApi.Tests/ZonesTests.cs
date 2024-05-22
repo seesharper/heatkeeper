@@ -1,10 +1,8 @@
-using System.Linq;
 using System.Threading.Tasks;
-using CsvHelper;
 using FluentAssertions;
-using HeatKeeper.Server.Insights.Zones;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Zones;
+using HeatKeeper.Server.Zones.Api;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests;
@@ -22,6 +20,17 @@ public class ZonesTests : TestBase
         var zones = await testLocation.HttpClient.GetZones(testLocation.LocationId, testLocation.Token);
         zones.Length.Should().Be(2);
     }
+
+    [Fact]
+    public async Task ShouldGetZoneDetails()
+    {
+        var testLocation = await Factory.CreateTestLocation();
+        var client = testLocation.HttpClient;
+        var zoneDetails = await client.GetZoneDetails(testLocation.LivingRoomZoneId, testLocation.Token);
+        zoneDetails.Name.Should().Be(TestData.Zones.LivingRoom.Name);
+        zoneDetails.Description.Should().Be(TestData.Zones.LivingRoom.Description);        
+    }
+
 
     [Fact]
     public async Task ShouldGetUnassignedSensorsForZone()
@@ -105,6 +114,15 @@ public class ZonesTests : TestBase
     }
 
     [Fact]
+    public async Task ShouldGetSensors()
+    {
+        var client = Factory.CreateClient();
+        var testApplication = await Factory.CreateTestLocation();
+        var sensors = await client.GetSensors(testApplication.LivingRoomZoneId, testApplication.Token);
+        sensors.Length.Should().Be(1);
+    }
+
+    [Fact]
     public async Task ShouldGetSensorDetails()
     {
         var client = Factory.CreateClient();
@@ -115,7 +133,6 @@ public class ZonesTests : TestBase
         sensorDetails.ExternalId.Should().Be(TestData.Sensors.LivingRoomSensor);
     }
 
-
     [Fact]
     public async Task ShouldGetZoneInsights()
     {
@@ -124,5 +141,7 @@ public class ZonesTests : TestBase
         var testApplication = await Factory.CreateTestLocation();
 
         var zoneInsights = await client.GetZoneInsights(testApplication.LivingRoomZoneId, TimeRange.Day, testApplication.Token);
+        zoneInsights.TemperatureMeasurements.Length.Should().Be(2);
+        zoneInsights.HumidityMeasurements.Length.Should().Be(2);
     }
 }

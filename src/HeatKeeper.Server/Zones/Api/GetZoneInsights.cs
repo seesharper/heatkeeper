@@ -1,12 +1,12 @@
 using HeatKeeper.Server.Measurements;
-using HeatKeeper.Server.Zones;
 
-namespace HeatKeeper.Server.Insights.Zones;
+namespace HeatKeeper.Server.Zones.Api;
 
 [RequireUserRole]
+[Get("/api/zones/{ZoneId}/insights")]
 public record GetZoneInsightsQuery(long ZoneId, TimeRange Range) : IQuery<ZoneInsights>;
 
-public class GetZoneInsightsQueryHandler(IQueryExecutor queryExecutor, TimeProvider timeProvider) : IQueryHandler<GetZoneInsightsQuery, ZoneInsights>
+public class GetZoneInsights(IQueryExecutor queryExecutor, TimeProvider timeProvider) : IQueryHandler<GetZoneInsightsQuery, ZoneInsights>
 {
     public async Task<ZoneInsights> HandleAsync(GetZoneInsightsQuery query, CancellationToken cancellationToken = default)
     {

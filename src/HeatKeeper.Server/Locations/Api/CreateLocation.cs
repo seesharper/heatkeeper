@@ -7,7 +7,7 @@ public record CreateLocationCommand(string Name, string Description) : CreateCom
 public class CreateLocation(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<CreateLocationCommand>
 {
     public async Task HandleAsync(CreateLocationCommand command, CancellationToken cancellationToken = default)
-        => await dbConnection.ExecuteInsertAsync(sqlProvider.InsertLocation, command);
+        => await dbConnection.ExecuteAsync(sqlProvider.InsertLocation, command);
 }
 
 

@@ -10,6 +10,7 @@ using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.PushSubscriptions;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
+using HeatKeeper.Server.Zones.Api;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
