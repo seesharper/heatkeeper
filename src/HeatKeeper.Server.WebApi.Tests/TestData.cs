@@ -1,6 +1,7 @@
 using System;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Heaters;
+using HeatKeeper.Server.Heaters.Api;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;

@@ -8,6 +8,7 @@ using FluentAssertions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Dashboard;
 using HeatKeeper.Server.Heaters;
+using HeatKeeper.Server.Heaters.Api;
 using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Insights.Zones;
 using HeatKeeper.Server.Locations;

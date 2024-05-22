@@ -1,15 +1,7 @@
-using System.Data;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using CQRS.Query.Abstractions;
-using DbReader;
-using HeatKeeper.Server.Authorization;
-using HeatKeeper.Server.Database;
-
-namespace HeatKeeper.Server.Heaters;
+namespace HeatKeeper.Server.Heaters.Api;
 
 [RequireUserRole]
+[Get("api/heaters/{heaterId}")]
 public record HeaterDetailsQuery(long HeaterId) : IQuery<HeaterDetails>;
 
 public record HeaterDetails(long Id, string Name, string ZoneName, string Description, string MqttTopic, string OnPayload, string OffPayload);

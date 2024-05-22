@@ -52,7 +52,7 @@ namespace HeatKeeper.Server
                 .Decorate<ICommandHandler<CreateLocationCommand>, ValidateCreateLocation>()
                 .Decorate<ICommandHandler<UpdateLocationCommand>, ValidateUpdateLocation>()
                 .Decorate<ICommandHandler<CreateZoneCommand>, ValidateCreateZone>()
-
+                .Decorate(typeof(ICommandHandler<>), typeof(SetNoContentResultOnDeleteCommands<>))
                 .Decorate(typeof(ICommandHandler<>), typeof(AuthorizedCommandHandler<>))
                 .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>))
                 .Decorate<ICommandHandler<DeleteUserCommand>, ValidatedDeleteUserCommandHandler>()
