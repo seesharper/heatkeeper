@@ -1,18 +1,12 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using CQRS.Command.Abstractions;
-using CQRS.Query.Abstractions;
-using HeatKeeper.Server.Authorization;
-
-namespace HeatKeeper.Server.PushSubscriptions;
+namespace HeatKeeper.Server.PushSubscriptions.Api;
 
 public record Keys(string p256dh, string auth);
 
 [RequireUserRole]
+[Post("api/pushSubscriptions/")]
 public record CreatePushSubscriptionCommand(string Endpoint, Keys Keys);
 
-public class CreatePushSubscriptionCommandHandler(IUserContext userContext, ICommandExecutor commandExecutor, IQueryExecutor queryExecutor, TimeProvider timeProvider) : ICommandHandler<CreatePushSubscriptionCommand>
+public class CreatePushSubscription(IUserContext userContext, ICommandExecutor commandExecutor, IQueryExecutor queryExecutor, TimeProvider timeProvider) : ICommandHandler<CreatePushSubscriptionCommand>
 {
     public async Task HandleAsync(CreatePushSubscriptionCommand command, CancellationToken cancellationToken = default)
     {

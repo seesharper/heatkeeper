@@ -1,29 +1,12 @@
-using System.Data;
-using System.Threading;
-using System.Threading.Tasks;
-using CQRS.Command.Abstractions;
-using DbReader;
-using HeatKeeper.Server.Database;
+namespace HeatKeeper.Server.Measurements;
 
-namespace HeatKeeper.Server.Measurements
+public class InsertMeasurementsCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<MeasurementCommand[]>
 {
-    public class InsertMeasurementsCommandHandler : ICommandHandler<MeasurementCommand[]>
+    public async Task HandleAsync(MeasurementCommand[] commands, CancellationToken cancellationToken = default)
     {
-        private readonly IDbConnection _dbConnection;
-        private readonly ISqlProvider _sqlProvider;
-
-        public InsertMeasurementsCommandHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
+        foreach (var command in commands)
         {
-            _dbConnection = dbConnection;
-            _sqlProvider = sqlProvider;
-        }
-
-        public async Task HandleAsync(MeasurementCommand[] commands, CancellationToken cancellationToken = default)
-        {
-            foreach (MeasurementCommand command in commands)
-            {
-                await _dbConnection.ExecuteAsync(_sqlProvider.InsertMeasurement, command);
-            }
+            await dbConnection.ExecuteAsync(sqlProvider.InsertMeasurement, command);
         }
     }
 }

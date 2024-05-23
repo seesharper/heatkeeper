@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
 using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,5 @@
 using HeatKeeper.Server.Zones;
+using HeatKeeper.Server.Zones.Api;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 

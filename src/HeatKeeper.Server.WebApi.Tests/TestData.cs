@@ -8,6 +8,7 @@ using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.PushSubscriptions;
+using HeatKeeper.Server.PushSubscriptions.Api;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Zones;
 using HeatKeeper.Server.Zones.Api;
