@@ -4,9 +4,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using CQRS.AspNet.Testing;
 using FluentAssertions;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.Users;
+using HeatKeeper.Server.Users.Api;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Mvc.Testing.Handlers;
 using Microsoft.Net.Http.Headers;
@@ -166,14 +169,8 @@ public class UsersTests : TestBase
         var token = await client.AuthenticateAsAdminUser();
         var userId = await client.CreateUser(TestData.Users.StandardUser, token);
 
-        var updateCommand = new UpdateUserCommand()
-        {
-            UserId = userId,
-            FirstName = TestData.Users.StandardUser.FirstName,
-            LastName = TestData.Users.StandardUser.LastName,
-            Email = TestData.Users.StandardUser.Email,
-            IsAdmin = true
-        };
+        var updateCommand = new UpdateUserCommand(userId, TestData.Users.StandardUser.FirstName, TestData.Users.StandardUser.LastName, TestData.Users.StandardUser.Email, true);
+
 
         await client.UpdateUser(updateCommand, token);
     }
@@ -183,19 +180,13 @@ public class UsersTests : TestBase
     {
         var client = Factory.CreateClient();
         var token = await client.CreateAndAuthenticateStandardUser();
-        var updateCommand = new UpdateCurrentUserCommand()
-        {
-            FirstName = TestData.Users.StandardUser.FirstName,
-            LastName = TestData.Users.StandardUser.LastName,
-            Email = TestData.Users.StandardUser.Email,
-        };
-
+        var updateCommand = new UpdateCurrentUserCommand(Email: TestData.Users.StandardUser.Email, FirstName: TestData.Users.StandardUser.FirstName, LastName: TestData.Users.StandardUser.LastName);
         await client.UpdateCurrentUser(updateCommand, token);
     }
 
     [Theory]
     [InlineData("PASSWORD", "Password should contain at least one lower case letter")]
-    [InlineData("password", "Password should contain at least one upper case letter")]
+    [InlineData("password", "Password should contain at least one upper case letter")]  
     [InlineData("Pwd", "Password should not be less than 8 or greater than 64 characters")]
     [InlineData("Password", "Password should contain at least one numeric value")]
     [InlineData("Password1", "Password should contain at least one special case characters")]
@@ -282,17 +273,22 @@ public class UsersTests : TestBase
 
         var adminUser = allUsers.Single(u => u.Email == AdminUser.DefaultEmail);
 
-        var updateCommand = new UpdateUserCommand()
-        {
-            UserId = adminUser.Id,
-            FirstName = AdminUser.DefaultFirstName,
-            LastName = AdminUser.DefaultLastName,
-            Email = AdminUser.DefaultEmail,
-            IsAdmin = false
-        };
+        var updateCommand = new UpdateUserCommand(adminUser.Id, TestData.Users.StandardUser.FirstName, TestData.Users.StandardUser.LastName, TestData.Users.StandardUser.Email, false);
+
 
         await client.UpdateUser(updateCommand, token, problem: details => details.ShouldHaveBadRequestStatus());
     }
+
+    // public async Task ShouldValidateUserWhenCreatingUser()
+    // {
+    //     var client = Factory.CreateClient();
+    //     Factory.MockService<IUserValidator>
+    //     var testLocation = await Factory.CreateTestLocation();
+    //     var token = await client.AuthenticateAsAdminUser();
+    //     await client.CreateUser(TestData.Users.StandardUser, token);        
+    // }
+
+
 
     [Fact]
     public async Task ShouldRefreshToken()
@@ -317,13 +313,5 @@ public class UsersTests : TestBase
         response = await client.SendAsync(httpRequest2);
 
 
-    }
-
-    public class MyOptions : WebApplicationFactoryClientOptions
-    {
-        internal new DelegatingHandler[] CreateHandlers()
-        {
-            return new DelegatingHandler[] { new RedirectHandler(), new CookieContainerHandler() };
-        }
     }
 }

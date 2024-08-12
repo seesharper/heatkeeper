@@ -19,9 +19,6 @@ public class SetPointsController : ControllerBase
         _queryExecutor = queryExecutor;
     }
 
-    [HttpPatch("{setPointId}")]
-    public async Task Patch([FromBodyAndRoute] UpdateSetPointCommand command)
-          => await _commandExecutor.ExecuteAsync(command);
 
     [HttpDelete("{setPointId}")]
     public async Task Delete([FromRoute] DeleteSetPointCommand command)

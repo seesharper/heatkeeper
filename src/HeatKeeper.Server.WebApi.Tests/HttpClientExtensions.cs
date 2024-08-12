@@ -13,11 +13,15 @@ using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
+using HeatKeeper.Server.Programs.Api;
 using HeatKeeper.Server.PushSubscriptions;
 using HeatKeeper.Server.PushSubscriptions.Api;
 using HeatKeeper.Server.QueryConsole;
+using HeatKeeper.Server.Schedules.Api;
 using HeatKeeper.Server.Sensors;
+using HeatKeeper.Server.Sensors.Api;
 using HeatKeeper.Server.Users;
+using HeatKeeper.Server.Users.Api;
 using HeatKeeper.Server.Version;
 using HeatKeeper.Server.Zones;
 using HeatKeeper.Server.Zones.Api;
@@ -44,7 +48,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             return authenticatedUser.Token;
         }
 
-        public static async Task<long> CreateUser(this HttpClient client, RegisterUserCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        public static async Task<long> CreateUser(this HttpClient client, CreateUserCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/users", content, token, success, problem);
 
         public static async Task AssignLocationToUser(this HttpClient client, AssignLocationToUserCommand assignLocationToUserCommand, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
@@ -141,7 +145,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var registerUserRequest = TestData.Users.StandardUser;
             await client.CreateUser(registerUserRequest, token);
-            var authenticateResponse = await client.PostAuthenticateRequest(registerUserRequest.Email, registerUserRequest.Password);
+            var authenticateResponse = await client.PostAuthenticateRequest(registerUserRequest.Email, registerUserRequest.NewPassword);
             authenticateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var content = await authenticateResponse.ContentAs<AuthenticatedUser>();
@@ -265,7 +269,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         private static async Task Patch<TContent>(HttpClient client, string uri, TContent content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
-            success ??= (response) => response.StatusCode.Should().Be(HttpStatusCode.OK);
+            success ??= (response) => response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
             var httpRequest = new HttpRequestBuilder()
                 .AddBearerToken(token)

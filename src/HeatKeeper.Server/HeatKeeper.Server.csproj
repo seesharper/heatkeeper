@@ -7,7 +7,7 @@
     <OutputType>library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CQRS.AspNet.Metadata" Version="0.0.4" />
+    <PackageReference Include="CQRS.AspNet.Metadata" Version="0.0.5" />
     <PackageReference Include="janitor" Version="1.2.1" />
     <PackageReference Include="cronos" Version="0.7.1" />
     <PackageReference Include="CQRS.LightInject" Version="1.5.1" />
@@ -39,5 +39,8 @@
     <Using Include="System.Threading" />
     <Using Include="System.Threading.Tasks" />
     <Using Include="System.Text.Json.Serialization" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="HeatKeeper.Server.Validation" />
+    <Using Include="Microsoft.AspNetCore.Http" />
   </ItemGroup>
 </Project>

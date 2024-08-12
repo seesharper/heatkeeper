@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using HeatKeeper.Abstractions;
+using HeatKeeper.Server.Schedules;
 using LightInject;
 
 namespace HeatKeeper.Server.Programs;

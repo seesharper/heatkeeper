@@ -1,16 +1,16 @@
 using System;
 using HeatKeeper.Server.Database;
-using HeatKeeper.Server.Heaters;
 using HeatKeeper.Server.Heaters.Api;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
-using HeatKeeper.Server.PushSubscriptions;
+using HeatKeeper.Server.Programs.Api;
 using HeatKeeper.Server.PushSubscriptions.Api;
+using HeatKeeper.Server.Schedules.Api;
 using HeatKeeper.Server.Users;
-using HeatKeeper.Server.Zones;
+using HeatKeeper.Server.Users.Api;
 using HeatKeeper.Server.Zones.Api;
 
 namespace HeatKeeper.Server.WebApi.Tests
@@ -178,19 +178,19 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static class Users
         {
-            public static RegisterUserCommand StandardUser =>
-                new() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
-            public static RegisterUserCommand AnotherStandardUser =>
-                new() { Email = "AnotherStandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
+            public static CreateUserCommand StandardUser =>
+                new(Email: "StandardUser@tempuri.org", FirstName: "FirstName", LastName: "LastName", IsAdmin: false, NewPassword: ValidPassword, ConfirmedPassword: ValidPassword);
+            public static CreateUserCommand AnotherStandardUser =>
+                new(Email: "AnotherStandardUser@tempuri.org", FirstName: "FirstName", LastName: "LastName", IsAdmin: false, NewPassword: ValidPassword, ConfirmedPassword: ValidPassword);
 
-            public static RegisterUserCommand StandardUserWithWeakPassord =>
-                new() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = "abc123", ConfirmedPassword = "abc123" };
+            public static CreateUserCommand StandardUserWithWeakPassword =>
+                new(Email: "StandardUser@tempuri.org", FirstName: "FirstName", LastName: "LastName", IsAdmin: false, NewPassword: "abc123", ConfirmedPassword: "abc123");
 
-            public static RegisterUserCommand StandardUserWithGivenPassword(string password) =>
-                new() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = password, ConfirmedPassword = password };
+            public static CreateUserCommand StandardUserWithGivenPassword(string password) =>
+                new(Email: "StandardUser@tempuri.org", FirstName: "FirstName", LastName: "LastName", IsAdmin: false, NewPassword: password, ConfirmedPassword: password);
 
-            public static RegisterUserCommand StandardUserWithInvalidEmail =>
-                new() { Email = "InvalidMailAddress", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
+            public static CreateUserCommand StandardUserWithInvalidEmail =>
+                new(Email: "InvalidMailAddress", FirstName: "FirstName", LastName: "LastName", IsAdmin: false, NewPassword: ValidPassword, ConfirmedPassword: ValidPassword);
         }
         public static class Sensors
         {

@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Programs;
+using HeatKeeper.Server.Schedules;
 using Janitor;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;

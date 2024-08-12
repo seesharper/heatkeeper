@@ -16,12 +16,12 @@ public class ProgramsController(ICommandExecutor commandExecutor, IQueryExecutor
         return await queryExecutor.ExecuteAsync(query);
     }
 
-    [HttpPost("{programId}/schedules")]
-    public async Task<IActionResult> CreateSchedule([FromBodyAndRoute] CreateScheduleCommand command)
-    {
-        await commandExecutor.ExecuteAsync(command);
-        return CreatedAtAction(nameof(CreateSchedule), new ResourceId(command.ScheduleId));
-    }
+    // [HttpPost("{programId}/schedules")]
+    // public async Task<IActionResult> CreateSchedule([FromBodyAndRoute] CreateScheduleCommand command)
+    // {
+    //     await commandExecutor.ExecuteAsync(command);
+    //     return CreatedAtAction(nameof(CreateSchedule), new ResourceId(command.ScheduleId));
+    // }
 
     [HttpPost("{programId}/activate")]
     public async Task<IActionResult> Activate([FromRoute] ActivateProgramCommand command)
@@ -30,13 +30,13 @@ public class ProgramsController(ICommandExecutor commandExecutor, IQueryExecutor
         return CreatedAtAction(nameof(Activate), null);
     }
 
-    [HttpGet("{programId}/schedules")]
-    public async Task<ScheduleInfo[]> Programs([FromRoute] SchedulesByProgramQuery query)
-            => await queryExecutor.ExecuteAsync(query);
+    // [HttpGet("{programId}/schedules")]
+    // public async Task<ScheduleInfo[]> Programs([FromRoute] SchedulesQuery query)
+    //         => await queryExecutor.ExecuteAsync(query);
 
-    [HttpPatch(template: "{programId}")]
-    public async Task Patch([FromBodyAndRoute] UpdateProgramCommand command)
-        => await commandExecutor.ExecuteAsync(command);
+    // [HttpPatch(template: "{programId}")]
+    // public async Task Patch([FromBodyAndRoute] UpdateProgramCommand command)
+    //     => await commandExecutor.ExecuteAsync(command);
 
     [HttpDelete("{programId}")]
     public async Task Delete([FromRoute] DeleteProgramCommand command)

@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Sensors;
+using HeatKeeper.Server.Sensors.Api;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests;

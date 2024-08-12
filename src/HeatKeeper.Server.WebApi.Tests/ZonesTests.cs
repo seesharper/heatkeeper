@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using FluentAssertions;
-using HeatKeeper.Server.Sensors;
-using HeatKeeper.Server.Zones;
+using HeatKeeper.Server.Sensors.Api;
 using HeatKeeper.Server.Zones.Api;
 using Xunit;
 

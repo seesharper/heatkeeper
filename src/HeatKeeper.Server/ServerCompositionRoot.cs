@@ -10,7 +10,12 @@ using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Programs;
+using HeatKeeper.Server.Programs.Api;
+using HeatKeeper.Server.Schedules;
+using HeatKeeper.Server.Schedules.Api;
 using HeatKeeper.Server.Users;
+using HeatKeeper.Server.Users.Api;
+using HeatKeeper.Server.Validation;
 using HeatKeeper.Server.Zones;
 
 using LightInject;
@@ -32,6 +37,7 @@ namespace HeatKeeper.Server
 
         public void Compose(IServiceRegistry serviceRegistry) => _ = serviceRegistry.RegisterCommandHandlers()
                 .RegisterQueryHandlers()
+                .RegisterValidators()
                 .Decorate(typeof(ICommandHandler<>), typeof(TransactionalCommandHandler<>), sr =>
                 {
                     return sr.ServiceType.IsGenericType && sr.ServiceType.GetGenericTypeDefinition() == typeof(ICommandHandler<>) && sr.ImplementingType is not null && sr.ImplementingType.GetConstructors()[0].GetParameters().Any(p => p.ParameterType == typeof(IDbConnection));
@@ -41,27 +47,24 @@ namespace HeatKeeper.Server
                 .RegisterSingleton<IBootStrapper, DatabaseBootStrapper>("DatabaseBootStrapper")
                 .RegisterSingleton<IPasswordManager, PasswordManager>()
                 .RegisterSingleton<IManagedMqttClient>(sf => CreateManagedMqttClient(sf.GetInstance<IConfiguration>()))
-                .RegisterSingleton<IPasswordPolicy, PasswordPolicy>()
                 .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
                 .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
                 .RegisterSingleton<IEmailValidator, EmailValidator>()
-                .Decorate<ICommandHandler<UpdateUserCommand>, ValidatedUpdateUserCommandHandler>()
-                .Decorate<ICommandHandler<RegisterUserCommand>, RegisterUserValidator>()
-                .Decorate<ICommandHandler<ChangePasswordCommand>, ChangePasswordValidator>()
-                .Decorate(typeof(ICommandHandler<>), typeof(ValidatedUserCommandHandler<>))
+
                 .Decorate<ICommandHandler<CreateLocationCommand>, ValidateCreateLocation>()
                 .Decorate<ICommandHandler<UpdateLocationCommand>, ValidateUpdateLocation>()
                 .Decorate<ICommandHandler<CreateZoneCommand>, ValidateCreateZone>()
-                .Decorate(typeof(ICommandHandler<>), typeof(SetNoContentResultOnDeleteCommands<>))
-                .Decorate(typeof(ICommandHandler<>), typeof(SetCreatedResultOnCreateCommands<>))
+
+                .Decorate(typeof(ICommandHandler<>), typeof(CommandValidator<>))
 
                 .Decorate(typeof(ICommandHandler<>), typeof(AuthorizedCommandHandler<>))
-                .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>))
-                .Decorate<ICommandHandler<DeleteUserCommand>, ValidatedDeleteUserCommandHandler>()
-                .Decorate<ICommandHandler<DeleteScheduleCommand>, BeforeDeleteSchedule>()
-                .Decorate<ICommandHandler<DeleteProgramCommand>, BeforeDeleteProgram>()
-                .Decorate<ICommandHandler<MeasurementCommand[]>, WhenMeasurementsAreInserted>()
-                .Decorate(typeof(ICommandHandler<>), typeof(ValidateSchedule<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(SetNoContentResultOnDeleteCommands<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(SetNoContentResultOnPatchCommands<>))
+                .Decorate(typeof(ICommandHandler<>), typeof(SetCreatedResultOnCreateCommands<>))
+
+                .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>))                
+                .Decorate<ICommandHandler<DeleteProgramCommand>, WhenProgramIsDeleted>()
+                .Decorate<ICommandHandler<MeasurementCommand[]>, WhenMeasurementsAreInserted>()                
                 .Decorate<ICommandHandler<CreateScheduleCommand>, WhenScheduleIsCreated>()
                 .Decorate<ICommandHandler<UpdateScheduleCommand>, WhenScheduleIsUpdated>()
                 .Decorate<ICommandHandler<DeleteScheduleCommand>, WhenScheduleIsDeleted>()

@@ -1,14 +1,23 @@
-using System.Reflection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HeatKeeper.Server;
 
-public record CreateCommand : Command<Results<Created<ResourceId>, ProblemHttpResult>>
+public record PostCommand : ProblemCommand<Created<ResourceId>>
 {
-    public void SetCreatedResult(ResourceId resourceId)
+    public PostCommand()
     {
-        var route = GetType().GetCustomAttribute<PostAttribute>()?.Route;
-        SetResult(TypedResults.Created(route, resourceId));
+        Results<Ok, Created, NoContent, NoContent> g;
     }
+}
+
+public record ProblemCommand<TResult> : Command<Results<TResult, ProblemHttpResult>>, IProblemCommand where TResult : IResult
+{
+    public void SetProblemResult(string detail, int statusCode) => SetResult(TypedResults.Problem(detail, statusCode: statusCode));
+}
+
+
+public interface IProblemCommand
+{
+    void SetProblemResult(string detail, int statusCode);
 }

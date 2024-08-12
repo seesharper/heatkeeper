@@ -154,11 +154,15 @@ namespace HeatKeeper.Server.Database
 
         string UpdateSetPoint { get; }
 
+        string DeleteAllSetPoints { get; }
+
         string UpdateSchedule { get; }
 
         string UpdateProgram { get; }
 
         string DeleteSchedule { get; }
+
+        string DeleteAllSchedules { get; }
 
         string DeleteSetPoint { get; }
 

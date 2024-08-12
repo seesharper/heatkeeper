@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Programs;
+using HeatKeeper.Server.Schedules.Api;
 using HeatKeeper.Server.Zones;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,9 +34,9 @@ public class SchedulesController : ControllerBase
 
 
 
-    [HttpDelete("{scheduleId}")]
-    public async Task Delete([FromRoute] DeleteScheduleCommand command)
-            => await _commandExecutor.ExecuteAsync(command);
+    // [HttpDelete("{scheduleId}")]
+    // public async Task Delete([FromRoute] DeleteScheduleCommand command)
+    //         => await _commandExecutor.ExecuteAsync(command);
 
     [HttpPost("{scheduleId}/activate")]
     public async Task<IActionResult> Activate([FromRoute] SetActiveScheduleCommand command)
@@ -45,7 +46,7 @@ public class SchedulesController : ControllerBase
     }
 
     [HttpGet("{scheduleId}")]
-    public async Task<ScheduleDetails> GetScheduleDetails([FromRoute] GetScheduleDetailsQuery query)
+    public async Task<ScheduleDetails> GetScheduleDetails([FromRoute] ScheduleDetailsQuery query)
     {
         return await _queryExecutor.ExecuteAsync(query);
     }

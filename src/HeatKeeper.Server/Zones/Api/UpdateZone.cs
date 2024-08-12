@@ -2,7 +2,7 @@ namespace HeatKeeper.Server.Zones.Api;
 
 [RequireAdminRole]
 [Patch("/api/zones/{ZoneId}")]
-public record UpdateZoneCommand(long ZoneId, long LocationId, string Name, string Description);
+public record UpdateZoneCommand(long ZoneId, long LocationId, string Name, string Description) : PatchCommand;
 
 public class UpdateZone(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<UpdateZoneCommand>
 {
