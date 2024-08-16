@@ -1,11 +1,14 @@
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using CQRS.AspNet.Testing;
 using FluentAssertions;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Schedules;
+using HeatKeeper.Server.Schedules.Api;
 using Janitor;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests;

@@ -38,12 +38,12 @@ public class SchedulesController : ControllerBase
     // public async Task Delete([FromRoute] DeleteScheduleCommand command)
     //         => await _commandExecutor.ExecuteAsync(command);
 
-    [HttpPost("{scheduleId}/activate")]
-    public async Task<IActionResult> Activate([FromRoute] SetActiveScheduleCommand command)
-    {
-        await _commandExecutor.ExecuteAsync(command);
-        return CreatedAtAction(nameof(Activate), null);
-    }
+    // [HttpPost("{scheduleId}/activate")]
+    // public async Task<IActionResult> Activate([FromRoute] SetActiveScheduleCommand command)
+    // {
+    //     await _commandExecutor.ExecuteAsync(command);
+    //     return CreatedAtAction(nameof(Activate), null);
+    // }
 
     [HttpGet("{scheduleId}")]
     public async Task<ScheduleDetails> GetScheduleDetails([FromRoute] ScheduleDetailsQuery query)

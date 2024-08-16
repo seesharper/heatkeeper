@@ -1,8 +1,9 @@
 namespace HeatKeeper.Server.Schedules.Api;
 
 [RequireBackgroundRole]
-// [Post("api/schedules/{scheduleId}/activate")]
-public record SetActiveScheduleCommand(long ScheduleId);
+[FromParameters]
+[Post("api/schedules/{scheduleId}/activate")]
+public record SetActiveScheduleCommand(long ScheduleId) : PostCommand;
 
 public class SetActiveSchedule(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<SetActiveScheduleCommand>
 {
