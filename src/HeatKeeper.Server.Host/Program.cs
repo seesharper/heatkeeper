@@ -1,6 +1,7 @@
 ﻿using CQRS.AspNet;
 using HeatKeeper.Server;
 using HeatKeeper.Server.Host;
+using HeatKeeper.Server.Measurements;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using WebPush;
@@ -72,6 +73,8 @@ app.UseExceptionHandler(_ => { });
 //                                  .ExecuteAsync(context);
 //     });
 // });
+
+app.MapPost<MeasurementCommand[]>("api/measurements");
 app.MapCqrsEndpoints(typeof(ServerCompositionRoot).Assembly);
 
 app.MapControllers();
