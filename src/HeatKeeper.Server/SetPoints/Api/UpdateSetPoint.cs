@@ -1,4 +1,4 @@
-namespace HeatKeeper.Server.Programs;
+namespace HeatKeeper.Server.SetPoints.Api;
 
 [RequireUserRole]
 [Patch("api/setPoints/{SetPointId}")]

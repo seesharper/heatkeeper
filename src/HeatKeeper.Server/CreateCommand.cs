@@ -3,13 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HeatKeeper.Server;
 
-public record PostCommand : ProblemCommand<Created<ResourceId>>
-{
-    public PostCommand()
-    {
-        Results<Ok, Created, NoContent, NoContent> g;
-    }
-}
+public record PostCommand : ProblemCommand<Created<ResourceId>>;
+
 
 public record ProblemCommand<TResult> : Command<Results<TResult, ProblemHttpResult>>, IProblemCommand where TResult : IResult
 {

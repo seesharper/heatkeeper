@@ -11,6 +11,7 @@ using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Programs.Api;
+using HeatKeeper.Server.Schedules.Api;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Sensors.Api;
 using HeatKeeper.Server.Users;

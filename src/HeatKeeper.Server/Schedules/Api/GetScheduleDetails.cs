@@ -1,6 +1,7 @@
 namespace HeatKeeper.Server.Schedules.Api;
 
 [RequireUserRole]
+[Get("api/schedules/{ScheduleId}")]
 public record ScheduleDetailsQuery(long ScheduleId) : IQuery<ScheduleDetails>;
 
 public record ScheduleDetails(long Id, string Name, string CronExpression);

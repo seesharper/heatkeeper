@@ -20,6 +20,7 @@ using HeatKeeper.Server.QueryConsole;
 using HeatKeeper.Server.Schedules.Api;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Sensors.Api;
+using HeatKeeper.Server.SetPoints.Api;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Users.Api;
 using HeatKeeper.Server.Version;

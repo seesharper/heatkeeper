@@ -9,6 +9,7 @@ using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Programs.Api;
 using HeatKeeper.Server.PushSubscriptions.Api;
 using HeatKeeper.Server.Schedules.Api;
+using HeatKeeper.Server.SetPoints.Api;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Users.Api;
 using HeatKeeper.Server.Zones.Api;
