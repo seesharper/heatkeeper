@@ -4,7 +4,7 @@ using HeatKeeper.Server.Database;
 
 namespace HeatKeeper.Server.Programs;
 
-[Order(2)]
+[Order(1)]
 public class DatabaseBootStrapper : IBootStrapper
 {
     private readonly IDatabaseMigrator _databaseMigrator;

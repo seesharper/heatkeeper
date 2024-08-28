@@ -169,7 +169,7 @@ public class UsersTests : TestBase
         var token = await client.AuthenticateAsAdminUser();
         var userId = await client.CreateUser(TestData.Users.StandardUser, token);
 
-        var updateCommand = new UpdateUserCommand(userId, TestData.Users.StandardUser.FirstName, TestData.Users.StandardUser.LastName, TestData.Users.StandardUser.Email, true);
+        var updateCommand = new UpdateUserCommand(userId, TestData.Users.StandardUser.Email,TestData.Users.StandardUser.FirstName,TestData.Users.StandardUser.LastName,  true);
 
 
         await client.UpdateUser(updateCommand, token);

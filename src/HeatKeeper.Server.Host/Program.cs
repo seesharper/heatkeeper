@@ -27,12 +27,7 @@ builder.Services.AddSpaStaticFiles(config => config.RootPath = "wwwroot");
 builder.Services.AddExceptionHandler<ExceptionHandler>();
 
 builder.Services.AddProblemDetails();
-builder.Services.AddMvc(options =>
-{
-    options.Filters.Add<DeleteActionFilter>();
-    var bodyModelBinderProvider = options.ModelBinderProviders.Single(p => p.GetType() == typeof(BodyModelBinderProvider));
-    options.ModelBinderProviders.Insert(0, new RouteAndBodyBinderProvider(bodyModelBinderProvider));
-});
+
 
 
 var app = builder.Build();

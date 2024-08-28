@@ -239,6 +239,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             public const string TestScheduleUpdatedName = "TestScheduleUpdated";
             public const string TestScheduleUpdatedCronExpression = "0 20,18,21 * * *";
 
+            public const string InvalidCronExpression = "InvalidCronExpression";
+
             public static CreateScheduleCommand DayTime(long programId) =>
                 new(programId, DayTimeScheduleName, DayTimeScheduleCronExpression);
 
@@ -247,6 +249,9 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             public static UpdateScheduleCommand UpdatedSchedule(long scheduleId) =>
                 new(scheduleId, TestScheduleUpdatedName, TestScheduleUpdatedCronExpression);
+
+            public static UpdateScheduleCommand ScheduleWithInvalidCronExpression(long scheduleId) =>
+                new(scheduleId, TestScheduleUpdatedName, InvalidCronExpression);
         }
 
         public static class SetPoints

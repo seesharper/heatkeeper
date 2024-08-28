@@ -4,8 +4,6 @@ namespace HeatKeeper.Server.QueryConsole;
 [Post("api/queryconsole")]
 public record DatabaseQuery(string Sql) : IQuery<Table>;
 
-public record DatabaseQueryResult(Table Table, string message);
-
 public class DatabaseQueryHandler(IDbConnection dbConnection) : IQueryHandler<DatabaseQuery, Table>
 {
     public async Task<Table> HandleAsync(DatabaseQuery query, CancellationToken cancellationToken = default)
