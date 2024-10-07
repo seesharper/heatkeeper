@@ -1,13 +1,18 @@
 using System;
 using HeatKeeper.Server.Database;
-using HeatKeeper.Server.Heaters;
+using HeatKeeper.Server.Heaters.Api;
 using HeatKeeper.Server.Locations;
+using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
-using HeatKeeper.Server.PushSubscriptions;
+using HeatKeeper.Server.Programs.Api;
+using HeatKeeper.Server.PushSubscriptions.Api;
+using HeatKeeper.Server.Schedules.Api;
+using HeatKeeper.Server.SetPoints.Api;
 using HeatKeeper.Server.Users;
-using HeatKeeper.Server.Zones;
+using HeatKeeper.Server.Users.Api;
+using HeatKeeper.Server.Zones.Api;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
@@ -70,11 +75,11 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static class Locations
         {
-            public static CreateLocationCommand Home =>
-                new CreateLocationCommand() { Name = "Home", Description = "Description of the Home location" };
+            public static CreateLocationCommand Home => new("Home", "Description of the Home location");
 
-            public static CreateLocationCommand Cabin =>
-                new CreateLocationCommand() { Name = "Cabin", Description = "Description of the Cabin location" };
+
+            public static CreateLocationCommand Cabin => new("Cabin", "Description of the Cabin location");
+
         }
 
         public static class Zones
@@ -106,20 +111,19 @@ namespace HeatKeeper.Server.WebApi.Tests
             public const bool TestZoneIsDefaultOutsideZone = false;
 
             public static CreateZoneCommand LivingRoom =>
-                new() { Name = LivingRoomName, Description = LivingRoomDescription, IsDefaultInsideZone = LivingRoomIsDefaultInsideZone, MqttTopic = LivingRoomMqttTopic };
+                new(LocationId: 0, Name: LivingRoomName, Description: LivingRoomDescription);
 
             public static CreateZoneCommand Outside =>
-                new() { Name = OutsideName, Description = OutsideDescription, IsDefaultOutsideZone = OutsideIsDefaultOutsideZone, IsDefaultInsideZone = OutsideIsDefaultInsideZone };
+                new(LocationId: 0, Name: OutsideName, Description: OutsideDescription);
 
             public static CreateZoneCommand Kitchen =>
-                new() { Name = KitchenName, Description = KitchenDescription, MqttTopic = KitchenMqttTopic };
+                new(LocationId: 0, Name: KitchenName, Description: KitchenDescription);
 
             public static CreateZoneCommand PowerMeter =>
-                new() { Name = PowerMeterName, Description = PowerMeterDescription };
+                new(LocationId: 0, Name: PowerMeterName, Description: PowerMeterDescription);
 
             public static CreateZoneCommand TestZone =>
-                new() { Name = TestZoneName, Description = TestZoneDescription, MqttTopic = TestZoneMqttTopic, IsDefaultInsideZone = TestZoneIsDefaultInsideZone, IsDefaultOutsideZone = TestZoneIsDefaultOutsideZone };
-
+                new(LocationId: 0, Name: TestZoneName, Description: TestZoneDescription);
         }
 
         public static class Heaters
@@ -175,19 +179,19 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static class Users
         {
-            public static RegisterUserCommand StandardUser =>
-                new() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
-            public static RegisterUserCommand AnotherStandardUser =>
-                new() { Email = "AnotherStandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
+            public static CreateUserCommand StandardUser =>
+                new(Email: "StandardUser@tempuri.org", FirstName: "FirstName", LastName: "LastName", IsAdmin: false, NewPassword: ValidPassword, ConfirmedPassword: ValidPassword);
+            public static CreateUserCommand AnotherStandardUser =>
+                new(Email: "AnotherStandardUser@tempuri.org", FirstName: "FirstName", LastName: "LastName", IsAdmin: false, NewPassword: ValidPassword, ConfirmedPassword: ValidPassword);
 
-            public static RegisterUserCommand StandardUserWithWeakPassord =>
-                new() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = "abc123", ConfirmedPassword = "abc123" };
+            public static CreateUserCommand StandardUserWithWeakPassword =>
+                new(Email: "StandardUser@tempuri.org", FirstName: "FirstName", LastName: "LastName", IsAdmin: false, NewPassword: "abc123", ConfirmedPassword: "abc123");
 
-            public static RegisterUserCommand StandardUserWithGivenPassword(string password) =>
-                new() { Email = "StandardUser@tempuri.org", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = password, ConfirmedPassword = password };
+            public static CreateUserCommand StandardUserWithGivenPassword(string password) =>
+                new(Email: "StandardUser@tempuri.org", FirstName: "FirstName", LastName: "LastName", IsAdmin: false, NewPassword: password, ConfirmedPassword: password);
 
-            public static RegisterUserCommand StandardUserWithInvalidEmail =>
-                new() { Email = "InvalidMailAddress", FirstName = "FirstName", LastName = "LastName", IsAdmin = false, Password = ValidPassword, ConfirmedPassword = ValidPassword };
+            public static CreateUserCommand StandardUserWithInvalidEmail =>
+                new(Email: "InvalidMailAddress", FirstName: "FirstName", LastName: "LastName", IsAdmin: false, NewPassword: ValidPassword, ConfirmedPassword: ValidPassword);
         }
         public static class Sensors
         {
@@ -235,6 +239,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             public const string TestScheduleUpdatedName = "TestScheduleUpdated";
             public const string TestScheduleUpdatedCronExpression = "0 20,18,21 * * *";
 
+            public const string InvalidCronExpression = "InvalidCronExpression";
+
             public static CreateScheduleCommand DayTime(long programId) =>
                 new(programId, DayTimeScheduleName, DayTimeScheduleCronExpression);
 
@@ -243,6 +249,9 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             public static UpdateScheduleCommand UpdatedSchedule(long scheduleId) =>
                 new(scheduleId, TestScheduleUpdatedName, TestScheduleUpdatedCronExpression);
+
+            public static UpdateScheduleCommand ScheduleWithInvalidCronExpression(long scheduleId) =>
+                new(scheduleId, TestScheduleUpdatedName, InvalidCronExpression);
         }
 
         public static class SetPoints

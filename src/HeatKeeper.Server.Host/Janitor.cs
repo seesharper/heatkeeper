@@ -1,9 +1,9 @@
 using CQRS.Command.Abstractions;
 using HeatKeeper.Abstractions.Configuration;
-using HeatKeeper.Server.Electricity;
 using HeatKeeper.Server.Host.BackgroundTasks;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Programs;
+using HeatKeeper.Server.Schedules;
 using Janitor;
 
 namespace HeatKeeper.Server.Host;

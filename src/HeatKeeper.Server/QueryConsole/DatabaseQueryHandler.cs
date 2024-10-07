@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-
 namespace HeatKeeper.Server.QueryConsole;
 
 [RequireAdminRole]
+[Post("api/queryconsole")]
 public record DatabaseQuery(string Sql) : IQuery<Table>;
-
-public record DatabaseQueryResult(Table Table, string message);
 
 public class DatabaseQueryHandler(IDbConnection dbConnection) : IQueryHandler<DatabaseQuery, Table>
 {

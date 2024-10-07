@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Sensors;
+using HeatKeeper.Server.Sensors.Api;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests;

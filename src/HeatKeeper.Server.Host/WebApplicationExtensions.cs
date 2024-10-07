@@ -1,3 +1,4 @@
+using System.Reflection;
 using HeatKeeper.Abstractions;
 using HeatKeeper.Abstractions.Configuration;
 
@@ -7,7 +8,8 @@ public static class WebApplicationExtensions
 {
     public static async Task RunBootStrappers(this IHost webApplication)
     {
-        var bootStrappers = webApplication.Services.GetServices<IBootStrapper>();
+        var bootStrappers = webApplication.Services.GetServices<IBootStrapper>()
+        .OrderBy(bootStrapper => bootStrapper.GetType().GetCustomAttribute<OrderAttribute>()!.Order);
         foreach (var bootStrapper in bootStrappers)
         {
             await bootStrapper.Execute();

@@ -1,11 +1,13 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CQRS.AspNet.Testing;
 using CQRS.Query.Abstractions;
 using FluentAssertions;
 using HeatKeeper.Server.PushSubscriptions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
+using WebPush;
 using Xunit;
 namespace HeatKeeper.Server.WebApi.Tests;
 
@@ -36,5 +38,19 @@ public class PushSubscriptionsTests : TestBase
         pushSubscription.P256dh.Should().Be(TestData.PushSubscriptions.P256dh);
         pushSubscription.Auth.Should().Be(TestData.PushSubscriptions.Auth);
         pushSubscription.LastSeen.Should().Be(TestData.Clock.LaterToday);
+    }
+
+    [Fact]
+    public async Task ShouldSendPushNotificationWhenProgramChanges()
+    {
+        var now = Factory.UseFakeTimeProvider(TestData.Clock.Today);
+
+        var webPushClientMock = Factory.MockService<IWebPushClient>();
+
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+        await client.CreatePushSubscription(TestData.PushSubscriptions.TestPushSubscription, testLocation.Token);
+
+        await client.UpdateProgram(TestData.Programs.UpdatedTestProgram(testLocation.NormalProgramId, testLocation.ScheduleId), testLocation.Token);
     }
 }

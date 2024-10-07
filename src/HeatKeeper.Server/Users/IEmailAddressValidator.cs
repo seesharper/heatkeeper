@@ -1,29 +1,24 @@
-using System;
 using System.Net.Mail;
-using HeatKeeper.Server.Exceptions;
-using HeatKeeper.Server.Validation;
 
-namespace HeatKeeper.Server.Users
+namespace HeatKeeper.Server.Users;
+
+public interface IEmailValidator
 {
-    public interface IEmailValidator
-    {
-        void Validate(string email);
-    }
+    bool Validate(string email);
+}
 
-    public class EmailValidator : IEmailValidator
+public class EmailValidator : IEmailValidator
+{
+    public bool Validate(string email)
     {
-        public void Validate(string email)
+        try
         {
-            try
-            {
-                var mailAddress = new MailAddress(email);
-            }
-            catch (FormatException)
-            {
-                throw new ValidationFailedException($"The mail address '{email}' is not correctly formatted.");
-            }
+            var mailAddress = new MailAddress(email);
         }
+        catch (FormatException)
+        {
+            return false;
+        }
+        return true;
     }
-
-
 }

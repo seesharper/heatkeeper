@@ -4,6 +4,7 @@ using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Locations;
+using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.PushSubscriptions;
 using WebPush;
 
@@ -16,7 +17,7 @@ public class WhenActivatingProgram(ICommandHandler<ActivateProgramCommand> handl
         await handler.HandleAsync(command, cancellationToken);
 
         // Send a notification to all push subscribers that the program has been activated        
-        var programDetails = await queryExecutor.ExecuteAsync(new GetProgramDetailsQuery(command.ProgramId), cancellationToken);
+        var programDetails = await queryExecutor.ExecuteAsync(new ProgramDetailsQuery(command.ProgramId), cancellationToken);
         var locationDetails = await queryExecutor.ExecuteAsync(new GetLocationDetailsQuery(programDetails.LocationId), cancellationToken);
         var subscriptionsQueryResults = await queryExecutor.ExecuteAsync(new GetPushSubscriptionsByLocationQuery(programDetails.LocationId), cancellationToken);
 

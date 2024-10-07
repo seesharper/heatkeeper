@@ -1,10 +1,14 @@
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using CQRS.AspNet.Testing;
 using FluentAssertions;
 using HeatKeeper.Server.Programs;
+using HeatKeeper.Server.Schedules;
+using HeatKeeper.Server.Schedules.Api;
 using Janitor;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests;
@@ -97,6 +101,22 @@ public class ProgramsTests : TestBase
         scheduleDetails.Name.Should().Be(TestData.Schedules.TestScheduleUpdatedName);
         scheduleDetails.CronExpression.Should().Be(TestData.Schedules.TestScheduleUpdatedCronExpression);
     }
+
+    [Fact]
+    public async Task ShouldValidateCronExpression()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+        var scheduleId = await client.CreateSchedule(TestData.Schedules.TestSchedule(testLocation.NormalProgramId), testLocation.Token);
+
+        await client.UpdateSchedule(TestData.Schedules.ScheduleWithInvalidCronExpression(scheduleId), testLocation.Token, problem: details =>
+        {
+            details.ShouldHaveBadRequestStatus();
+            var errorMessage = $"The cron expression {TestData.Schedules.InvalidCronExpression} is not valid for schedule {TestData.Schedules.TestScheduleUpdatedName}";
+            details.Detail.Should().Be(errorMessage);
+        });
+    }
+
 
     [Fact]
     public async Task ShouldDeleteSchedules()

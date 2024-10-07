@@ -1,12 +1,9 @@
-using System.Threading;
-using System.Threading.Tasks;
-using CQRS.Command.Abstractions;
-using HeatKeeper.Server.Authorization;
 using MQTTnet.Extensions.ManagedClient;
 
 namespace HeatKeeper.Server.Mqtt;
 
 [RequireBackgroundRole]
+[Post("api/mqtt")]
 public record PublishMqttMessageCommand(string Topic, string Payload);
 
 public class PublishMqttMessage(IManagedMqttClient managedMqttClient) : ICommandHandler<PublishMqttMessageCommand>

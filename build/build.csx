@@ -18,17 +18,17 @@ Step testcoverage = () =>
     {
         File.Delete(Path.Combine(BuildContext.RepositoryFolder, "src/HeatKeeper.Server.WebApi.Tests/bin/release/net8.0/heatkeeper.db"));
     }
-    Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" up -d");
+    Command.Execute("docker", $"compose -f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" up -d");
     DotNet.TestWithCodeCoverage();
-    Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" down");
+    Command.Execute("docker", $"compose -f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" down");
 };
 
 [StepDescription("Runs all the tests for all target frameworks")]
 Step test = () =>
 {
-    Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" up -d");
+    Command.Execute("docker", $"compose -f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" up -d");
     DotNet.Test();
-    Command.Execute("docker-compose", $"-f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" down");
+    Command.Execute("docker", $"compose -f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" down");
 };
 
 [StepDescription("Creates the Docker image")]

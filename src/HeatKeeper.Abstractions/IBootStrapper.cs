@@ -11,13 +11,8 @@ namespace HeatKeeper.Abstractions
     }
 
     [System.AttributeUsage(System.AttributeTargets.Class)]
-    public class OrderAttribute : System.Attribute
+    public class OrderAttribute(int order) : System.Attribute
     {
-        public OrderAttribute(int order)
-        {
-            Order = order;
-        }
-
-        public int Order { get; }
+        public int Order { get; } = order;
     }
 }

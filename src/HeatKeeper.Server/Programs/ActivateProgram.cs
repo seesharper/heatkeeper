@@ -1,7 +1,9 @@
 namespace HeatKeeper.Server.Programs;
 
 [RequireUserRole]
-public record ActivateProgramCommand(long ProgramId);
+[Post("api/programs/{ProgramId}/activate")]
+[FromParameters]
+public record ActivateProgramCommand(long ProgramId) : PostCommand;
 
 public class ActivateProgram(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<ActivateProgramCommand>
 {

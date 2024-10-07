@@ -1,14 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <noWarn>1591</noWarn>
+    <OutputType>library</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CQRS.AspNet.Metadata" Version="0.0.7" />
     <PackageReference Include="janitor" Version="1.2.1" />
     <PackageReference Include="cronos" Version="0.7.1" />
-    <PackageReference Include="CQRS.LightInject" Version="1.5.0" />
+    <PackageReference Include="CQRS.LightInject" Version="1.5.1" />
     <PackageReference Include="CQRS.Transactions" Version="2.1.0" />
     <PackageReference Include="DbReader" Version="2.5.6" />
     <PackageReference Include="LightInject" Version="6.6.4" />
@@ -27,6 +29,7 @@
   <ItemGroup>
     <Using Include="CQRS.Command.Abstractions" />
     <Using Include="CQRS.Query.Abstractions" />
+    <Using Include="CQRS.AspNet.MetaData" />
     <Using Include="HeatKeeper.Server.Authorization" />
     <Using Include="HeatKeeper.Server.Database" />
     <Using Include="DbReader" />
@@ -36,5 +39,8 @@
     <Using Include="System.Threading" />
     <Using Include="System.Threading.Tasks" />
     <Using Include="System.Text.Json.Serialization" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="HeatKeeper.Server.Validation" />
+    <Using Include="Microsoft.AspNetCore.Http" />
   </ItemGroup>
 </Project>

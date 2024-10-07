@@ -1,2 +1,4 @@
-INSERT INTO Zones(LocationId, Name, Description, MqttTopic)
-VALUES(@LocationId, @Name, @Description, @MqttTopic)
+INSERT INTO
+    Zones(LocationId, NAME, Description)
+VALUES
+(@LocationId, @Name, @Description)

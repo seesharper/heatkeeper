@@ -7,19 +7,25 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Dashboard;
-using HeatKeeper.Server.Heaters;
-using HeatKeeper.Server.Host;
-using HeatKeeper.Server.Insights.Zones;
+using HeatKeeper.Server.Heaters.Api;
 using HeatKeeper.Server.Locations;
+using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Mqtt;
 using HeatKeeper.Server.Programs;
+using HeatKeeper.Server.Programs.Api;
 using HeatKeeper.Server.PushSubscriptions;
+using HeatKeeper.Server.PushSubscriptions.Api;
 using HeatKeeper.Server.QueryConsole;
+using HeatKeeper.Server.Schedules.Api;
 using HeatKeeper.Server.Sensors;
+using HeatKeeper.Server.Sensors.Api;
+using HeatKeeper.Server.SetPoints.Api;
 using HeatKeeper.Server.Users;
+using HeatKeeper.Server.Users.Api;
 using HeatKeeper.Server.Version;
 using HeatKeeper.Server.Zones;
+using HeatKeeper.Server.Zones.Api;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -43,7 +49,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             return authenticatedUser.Token;
         }
 
-        public static async Task<long> CreateUser(this HttpClient client, RegisterUserCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        public static async Task<long> CreateUser(this HttpClient client, CreateUserCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/users", content, token, success, problem);
 
         public static async Task AssignLocationToUser(this HttpClient client, AssignLocationToUserCommand assignLocationToUserCommand, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
@@ -125,11 +131,6 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<SetPointDetails> GetSetPointDetails(this HttpClient client, long setPointId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<SetPointDetails>(client, $"api/setpoints/{setPointId}", token, success, problem);
 
-        public static async Task AddUserToLocation(this HttpClient client, long locationId, AddUserToLocationCommand addUserLocationRequest, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-        {
-            await PostWithNoResponse(client, $"api/locations/{locationId}/users", addUserLocationRequest, token, success, problem);
-        }
-
         public static async Task RemoveUserFromLocation(this HttpClient client, long locationId, long userID, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Delete(client, $"api/locations/{locationId}/users/{userID}", token, success, problem);
 
@@ -145,7 +146,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var registerUserRequest = TestData.Users.StandardUser;
             await client.CreateUser(registerUserRequest, token);
-            var authenticateResponse = await client.PostAuthenticateRequest(registerUserRequest.Email, registerUserRequest.Password);
+            var authenticateResponse = await client.PostAuthenticateRequest(registerUserRequest.Email, registerUserRequest.NewPassword);
             authenticateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var content = await authenticateResponse.ContentAs<AuthenticatedUser>();
@@ -175,8 +176,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<long> CreateProgram(this HttpClient client, CreateLocationCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/programs", content, token, success, problem);
 
-        public static async Task UpdateLocation(this HttpClient client, UpdateLocationCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Patch(client, $"api/locations/{content.Id}", content, token, success, problem);
+        public static async Task UpdateLocation(this HttpClient client, UpdateLocationCommand content, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Patch(client, $"api/locations/{locationId}", content, token, success, problem);
 
         public static async Task UpdateZone(this HttpClient client, UpdateZoneCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/zones/{content.ZoneId}", content, token, success, problem);
@@ -184,8 +185,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task UpdateSetPoint(this HttpClient client, UpdateSetPointCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/setPoints/{content.SetPointId}", content, token, success, problem);
 
-        public static async Task<Location[]> GetLocations(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<Location[]>(client, "api/locations", token, success, problem);
+        public static async Task<LocationInfo[]> GetLocations(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<LocationInfo[]>(client, "api/locations", token, success, problem);
 
         private static async Task<TContent> Get<TContent>(HttpClient client, string uri, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
@@ -259,7 +260,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             }
             else
             {
-                problem.Should().NotBeNull($"There was a problem handling the request and this was not not handled in the calling test method. The status code was ({(int)response.StatusCode}) {response.StatusCode}");
+                problem.Should().NotBeNull($"There was a problem handling the request {response.RequestMessage.RequestUri}and this was not not handled in the calling test method. The status code was ({(int)response.StatusCode}) {response.StatusCode}");
                 var problemDetails = await response.ContentAs<ProblemDetails>();
                 problem(problemDetails);
             }
@@ -269,7 +270,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         private static async Task Patch<TContent>(HttpClient client, string uri, TContent content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
-            success ??= (response) => response.StatusCode.Should().Be(HttpStatusCode.OK);
+            success ??= (response) => response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
             var httpRequest = new HttpRequestBuilder()
                 .AddBearerToken(token)
@@ -302,8 +303,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<ZoneInfo[]> GetZones(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ZoneInfo[]>(client, $"api/locations/{locationId}/zones", token, success, problem);
 
-        public static async Task<Programs.Program[]> GetPrograms(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<Programs.Program[]>(client, $"api/locations/{locationId}/programs", token, success, problem);
+        public static async Task<ProgramInfo[]> GetPrograms(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<ProgramInfo[]>(client, $"api/locations/{locationId}/programs", token, success, problem);
 
         public static async Task<HeaterInfo[]> GetHeaters(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<HeaterInfo[]>(client, $"api/zones/{zoneId}/heaters", token, success, problem);
@@ -322,8 +323,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             => await Get<ZoneInsights>(client, $"api/zones/{zoneId}/insights?Range={range}", token, success, problem);
 
 
-        public static async Task<Sensor[]> GetSensors(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<Sensor[]>(client, $"api/zones/{zoneId}/sensors", token, success, problem);
+        public static async Task<SensorInfo[]> GetSensors(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<SensorInfo[]>(client, $"api/zones/{zoneId}/sensors", token, success, problem);
 
         public static async Task UpdateSensor(this HttpClient client, UpdateSensorCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Patch(client, $"api/sensors/{command.SensorId}", command, token, success, problem);

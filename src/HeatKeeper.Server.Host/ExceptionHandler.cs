@@ -50,20 +50,7 @@ public class ExceptionHandler : IExceptionHandler
             return true;
         }
 
-        if (exception is ValidationFailedException validationFailedException)
-        {
-            var validationProblemDetails = new ProblemDetails()
-            {
-                Title = "Request Validation Error",
-                Detail = validationFailedException.ValidationErrors.First().ErrorMessage,
-                Status = (int?)HttpStatusCode.BadRequest,
-                Instance = httpContext.TraceIdentifier
-            };
 
-            httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-            await httpContext.Response.WriteAsJsonAsync(validationProblemDetails, cancellationToken);
-            return true;
-        }
 
         return false;
     }
