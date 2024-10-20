@@ -251,5 +251,7 @@ namespace HeatKeeper.Server.Database
         string CreatePushSubscriptionsTable { get; }
 
         string NewLocationExists { get; }
+
+        string AddDeadSensorColumnsToSensorsTable { get; }
     }
 }

@@ -35,11 +35,13 @@ public class DeadSensorsTests : TestBase
 
         var sensorDetails = await client.GetSensorDetails(testApplication.LivingRoomSensorId, testApplication.Token);
 
-        await client.UpdateSensor(new UpdateSensorCommand(testApplication.LivingRoomSensorId, "New name", "New description"), testApplication.Token);
+        await client.UpdateSensor(new UpdateSensorCommand(testApplication.LivingRoomSensorId, "New name", "New description", true, 30), testApplication.Token);
 
         var updatedSensorDetails = await client.GetSensorDetails(testApplication.LivingRoomSensorId, testApplication.Token);
 
         updatedSensorDetails.Name.Should().Be("New name");
         updatedSensorDetails.Description.Should().Be("New description");
+        updatedSensorDetails.EnableDeadSensorNotification.Should().BeTrue();
+        updatedSensorDetails.MinutesBeforeSensorIsConsideredDead.Should().Be(30);
     }
 }

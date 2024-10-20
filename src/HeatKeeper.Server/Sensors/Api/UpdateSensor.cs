@@ -2,7 +2,7 @@ namespace HeatKeeper.Server.Sensors.Api;
 
 [RequireAdminRole]
 [Patch("/api/sensors/{sensorId}")]
-public record UpdateSensorCommand(long SensorId, string Name, string Description) : PatchCommand;
+public record UpdateSensorCommand(long SensorId, string Name, string Description, bool EnableDeadSensorNotification, int MinutesBeforeSensorIsConsideredDead) : PatchCommand;
 
 public class UpdateSensor(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<UpdateSensorCommand>
 {

@@ -2,6 +2,8 @@ UPDATE
     Sensors
 SET
     NAME = @Name,
-    Description = @Description
+    Description = @Description,
+    EnableDeadSensorNotification = @EnableDeadSensorNotification,
+    MinutesBeforeSensorIsConsideredDead = @MinutesBeforeSensorIsConsideredDead
 WHERE
     Id = @SensorId

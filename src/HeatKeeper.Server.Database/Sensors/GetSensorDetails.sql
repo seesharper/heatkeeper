@@ -2,8 +2,10 @@ SELECT
     s.Id,
     s.Name,
     s.Description,
-    s.ExternalId,
+    s.ExternalId,    
     s.LastSeen,
+    s.EnableDeadSensorNotification,
+    s.MinutesBeforeSensorIsConsideredDead,
     z.Name AS ZoneName
 FROM
     Sensors s
