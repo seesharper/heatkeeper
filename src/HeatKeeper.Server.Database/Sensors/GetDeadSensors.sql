@@ -1,5 +1,6 @@
 SELECT 
     s.Id,
+    s.Name,
     s.ExternalId,
     z.Name AS Zone,
     l.Name as Location,
