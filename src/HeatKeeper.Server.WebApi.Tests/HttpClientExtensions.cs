@@ -23,11 +23,13 @@ using HeatKeeper.Server.Sensors.Api;
 using HeatKeeper.Server.SetPoints.Api;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Users.Api;
+using HeatKeeper.Server.VATRates;
 using HeatKeeper.Server.Version;
 using HeatKeeper.Server.Zones;
 using HeatKeeper.Server.Zones.Api;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Asn1.Mozilla;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
@@ -51,6 +53,21 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task<long> CreateUser(this HttpClient client, CreateUserCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/users", content, token, success, problem);
+
+        public static async Task<long> CreateVATRate(this HttpClient client, PostVATRateCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, $"api/vat-rates", content, token, success, problem);
+
+        public static async Task UpdateVATRate(this HttpClient client, PatchVATRateCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Patch(client, $"api/vat-rates/{content.Id}", content, token, success, problem);
+
+        public static async Task DeleteVATRate(this HttpClient client, long vatRateId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Delete(client, $"api/vat-rates/{vatRateId}", token, success, problem);
+
+        public static async Task<VATRateInfo[]> GetVATRates(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<VATRateInfo[]>(client, "api/vat-rates", token, success, problem);
+
+        public static async Task<VATRateDetails> GetVATRateDetails(this HttpClient client, long vatRateId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<VATRateDetails>(client, $"api/vat-rates/{vatRateId}", token, success, problem);
 
         public static async Task AssignLocationToUser(this HttpClient client, AssignLocationToUserCommand assignLocationToUserCommand, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/users/{assignLocationToUserCommand.UserId}/assignLocation", assignLocationToUserCommand, token, success, problem);
