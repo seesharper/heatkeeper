@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Dashboard;
+using HeatKeeper.Server.EnergyPriceAreas;
 using HeatKeeper.Server.Heaters.Api;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
@@ -68,6 +69,21 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task<VATRateDetails> GetVATRateDetails(this HttpClient client, long vatRateId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<VATRateDetails>(client, $"api/vat-rates/{vatRateId}", token, success, problem);
+
+        public static async Task<long> CreateEnergyPriceArea(this HttpClient client, PostEnergyPriceAreaCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, $"api/energy-price-areas", content, token, success, problem);
+
+        public static async Task UpdateEnergyPriceArea(this HttpClient client, PatchEnergyPriceAreaCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Patch(client, $"api/energy-price-areas/{content.Id}", content, token, success, problem);
+
+        public static async Task DeleteEnergyPriceArea(this HttpClient client, long energyPriceAreaId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Delete(client, $"api/energy-price-areas/{energyPriceAreaId}", token, success, problem);
+
+        public static async Task<EnergyPriceAreaInfo[]> GetEnergyPriceAreas(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<EnergyPriceAreaInfo[]>(client, "api/energy-price-areas", token, success, problem);
+
+        public static async Task<EnergyPriceAreaDetails> GetEnergyPriceAreaDetails(this HttpClient client, long energyPriceAreaId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<EnergyPriceAreaDetails>(client, $"api/energy-price-areas/{energyPriceAreaId}", token, success, problem);
 
         public static async Task AssignLocationToUser(this HttpClient client, AssignLocationToUserCommand assignLocationToUserCommand, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/users/{assignLocationToUserCommand.UserId}/assignLocation", assignLocationToUserCommand, token, success, problem);
