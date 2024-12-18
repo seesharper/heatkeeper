@@ -1,0 +1,1 @@
+Schemas located at https://gitlab.entsoe.eu/transparency/xsd 

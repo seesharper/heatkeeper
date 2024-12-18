@@ -1,4 +1,4 @@
-namespace HeatKeeper.Server.EnergyPriceAreas;
+namespace HeatKeeper.Server.EnergyPriceAreas.Api;
 
 [RequireAdminRole]
 [Patch("api/energy-price-areas/{Id}")]

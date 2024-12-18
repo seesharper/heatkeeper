@@ -1,4 +1,5 @@
-using HeatKeeper.Server.EnergyPriceAreas;
+
+using HeatKeeper.Server.EnergyPriceAreas.Api;
 
 namespace HeatKeeper.Server.WebApi.Tests;
 
@@ -10,7 +11,7 @@ public class EnergyPriceAreasTests : TestBase
     {
         var client = Factory.CreateClient();
         var testLocation = await Factory.CreateTestLocation();
-        var id = await client.CreateEnergyPriceArea(new PostEnergyPriceAreaCommand("EIC_Code", "Name", "Description", testLocation.VATRateId), testLocation.Token);
+        var id = await client.CreateEnergyPriceArea(new PostEnergyPriceAreaCommand("EIC_Codse", "Name", "Description", testLocation.VATRateId), testLocation.Token);        
         id.Should().BeGreaterThan(0);
     }
 

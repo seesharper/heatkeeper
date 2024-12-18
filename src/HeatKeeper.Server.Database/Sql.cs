@@ -277,5 +277,13 @@ namespace HeatKeeper.Server.Database
         string DeleteEnergyPriceArea { get; }
 
         string GetEnergyPriceAreas { get; }
+
+        string InsertEnergyPrice { get; }
+
+        string GetConfiguredPriceAreas { get; }
+
+        string GetEnergyPrices { get; }
+
+        string EnergyPricesExists { get; }
     }
 }

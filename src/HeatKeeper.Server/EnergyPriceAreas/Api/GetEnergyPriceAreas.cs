@@ -1,4 +1,4 @@
-namespace HeatKeeper.Server.EnergyPriceAreas;
+namespace HeatKeeper.Server.EnergyPriceAreas.Api;
 
 [RequireAdminRole]
 [Get("api/energy-price-areas")]

@@ -8,6 +8,8 @@ using FluentAssertions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Dashboard;
 using HeatKeeper.Server.EnergyPriceAreas;
+using HeatKeeper.Server.EnergyPriceAreas.Api;
+using HeatKeeper.Server.EnergyPrices.Api;
 using HeatKeeper.Server.Heaters.Api;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
@@ -31,6 +33,7 @@ using HeatKeeper.Server.Zones.Api;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1.Mozilla;
+using Xunit.Sdk;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
@@ -84,6 +87,12 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task<EnergyPriceAreaDetails> GetEnergyPriceAreaDetails(this HttpClient client, long energyPriceAreaId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<EnergyPriceAreaDetails>(client, $"api/energy-price-areas/{energyPriceAreaId}", token, success, problem);
+
+        public static async Task ImportEnergyPrices(this HttpClient client, ImportEnergyPricesCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, "api/energy-prices/import", command, token, success, problem);
+
+        public static async Task<EnergyPrice[]> GetEnergyPrices(this HttpClient client, string dateToImport, long energyPriceAreaId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<EnergyPrice[]>(client, $"api/energy-prices?date={dateToImport}&energyPriceAreaId={energyPriceAreaId}", token, success, problem);
 
         public static async Task AssignLocationToUser(this HttpClient client, AssignLocationToUserCommand assignLocationToUserCommand, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Patch(client, $"api/users/{assignLocationToUserCommand.UserId}/assignLocation", assignLocationToUserCommand, token, success, problem);

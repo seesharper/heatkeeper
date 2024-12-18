@@ -1,5 +1,6 @@
 using System;
 using HeatKeeper.Server.Database;
+using HeatKeeper.Server.EnergyPriceAreas.Api;
 using HeatKeeper.Server.Heaters.Api;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
@@ -90,6 +91,10 @@ namespace HeatKeeper.Server.WebApi.Tests
             public static PostVATRateCommand Vat25 = new("TestVatRate", 25);
         }
 
+        public static class EnergyPriceAreas
+        {
+            public static PostEnergyPriceAreaCommand Norway3 = new("10YNO-2--------T", "NO2", "Description", 1);
+        }
 
         public static class Zones
         {
