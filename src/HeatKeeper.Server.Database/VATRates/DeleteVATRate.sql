@@ -1,0 +1,2 @@
+DELETE FROM VATRates
+WHERE Id = @Id

@@ -251,5 +251,39 @@ namespace HeatKeeper.Server.Database
         string CreatePushSubscriptionsTable { get; }
 
         string NewLocationExists { get; }
+
+        string CreateVATRatesTable { get; }
+
+        string CreateEnergyPricesTable { get; }
+
+        string CreateEnergyPriceAreasTable { get; }
+
+        string InsertVATRate { get; }
+
+        string GetVATRateDetails { get; }
+
+        string UpdateVATRate { get; }
+
+        string DeleteVATRate { get; }
+
+        string GetVATRates { get; }
+
+        string InsertEnergyPriceArea { get; }
+
+        string GetEnergyPriceAreaDetails { get; }
+
+        string UpdateEnergyPriceArea { get; }
+
+        string DeleteEnergyPriceArea { get; }
+
+        string GetEnergyPriceAreas { get; }
+
+        string InsertEnergyPrice { get; }
+
+        string GetConfiguredPriceAreas { get; }
+
+        string GetEnergyPrices { get; }
+
+        string EnergyPricesExists { get; }
     }
 }

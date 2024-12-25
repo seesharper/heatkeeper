@@ -1,4 +1,4 @@
-POST https://heatkeeper.no/api/users/authenticate
+POST https://localhost:7167/api/users/authenticate
 content-type: application/json
 
 {
@@ -10,6 +10,13 @@ content-type: application/json
 ###
 GET https://heatkeeper.no/api/locations
 
+###
+POST https://localhost:7167/api/energy-prices/import
+content-type: application/json
+
+{
+    "DateToImport": "2024-12-26"
+}
 
 ###
 POST http://localhost:5000/api/measurements

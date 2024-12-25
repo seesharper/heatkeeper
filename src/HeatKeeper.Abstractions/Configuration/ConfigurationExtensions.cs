@@ -14,6 +14,9 @@ public static class ConfigurationExtensions
     public static string GetInfluxDbApiKey(this IConfiguration configuration)
         => configuration.GetRequiredValue("INFLUXDB_API_KEY");
 
+    public static string GetEntsoeApiKey(this IConfiguration configuration)
+        => configuration.GetRequiredValue("ENTSOE_SECURITY_TOKEN");
+
     public static string GetInfluxDbOrganization(this IConfiguration configuration)
         => configuration.GetRequiredValue("INFLUXDB_ORGANIZATION");
 
@@ -27,6 +30,9 @@ public static class ConfigurationExtensions
 
     public static string GetChannelStateCronExpression(this IConfiguration configuration)
         => configuration.GetRequiredValue("CHANNELSTATE_CRONEXPRESSION");
+
+    public static string GetImportEnergyPricesCronExpression(this IConfiguration configuration)
+        => configuration.GetRequiredValue("IMPORT_ENERGY_PRICES_CRONEXPRESSION");
 
     public static string GetDeleteExpiredMeasurementsCronExpression(this IConfiguration configuration)
     => configuration.GetRequiredValue("DELETE_EXPIRED_MEASUREMENTS_CRONEXPRESSION");

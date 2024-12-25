@@ -1,5 +1,6 @@
 using System;
 using HeatKeeper.Server.Database;
+using HeatKeeper.Server.EnergyPriceAreas.Api;
 using HeatKeeper.Server.Heaters.Api;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
@@ -12,6 +13,7 @@ using HeatKeeper.Server.Schedules.Api;
 using HeatKeeper.Server.SetPoints.Api;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Users.Api;
+using HeatKeeper.Server.VATRates;
 using HeatKeeper.Server.Zones.Api;
 
 namespace HeatKeeper.Server.WebApi.Tests
@@ -19,6 +21,8 @@ namespace HeatKeeper.Server.WebApi.Tests
     public static class TestData
     {
         public static string ValidPassword => "aVe78!*PZ9&Lnqh1E4pG";
+
+
 
         public static AuthenticatedUserQuery InvalidAuthenticateAdminUserRequest =>
             new AuthenticatedUserQuery(AdminUser.DefaultEmail, "InvalidPassword");
@@ -80,6 +84,16 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             public static CreateLocationCommand Cabin => new("Cabin", "Description of the Cabin location");
 
+        }
+
+        public static class VatRates
+        {
+            public static PostVATRateCommand Vat25 = new("TestVatRate", 25);
+        }
+
+        public static class EnergyPriceAreas
+        {
+            public static PostEnergyPriceAreaCommand Norway3 = new("10YNO-2--------T", "NO2", "Description", 1, 1);
         }
 
         public static class Zones

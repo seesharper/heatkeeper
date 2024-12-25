@@ -1,5 +1,7 @@
 ﻿using CQRS.AspNet;
 using HeatKeeper.Server;
+using HeatKeeper.Server.EnergyPrices;
+using HeatKeeper.Server.ExchangeRates;
 using HeatKeeper.Server.Host;
 using HeatKeeper.Server.Measurements;
 using Microsoft.AspNetCore.CookiePolicy;
@@ -25,9 +27,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddSpaStaticFiles(config => config.RootPath = "wwwroot");
 builder.Services.AddExceptionHandler<ExceptionHandler>();
-
 builder.Services.AddProblemDetails();
 
+builder.Services.AddHttpClient<NorwegianBankClient>(client => client.BaseAddress = new Uri("https://data.norges-bank.no/api/data/"));
+builder.Services.AddHttpClient<EntsoeClient>(client => client.BaseAddress = new Uri("https://web-api.tp.entsoe.eu/api"));
 
 
 var app = builder.Build();
@@ -54,20 +57,9 @@ else
 }
 
 app.UseStaticFiles();
-// app.UseSpaStaticFiles();
-// app.UseSpa(config => config.Options.SourcePath = "wwwroot");
 app.UseAuthorization();
 app.UseExceptionHandler(_ => { });
-// app.UseExceptionHandler(exceptionHandlerApp
-//     =>
-// {
-//     exceptionHandlerApp.Run(async context
-//             =>
-//     {
-//         await Results.Problem()
-//                                  .ExecuteAsync(context);
-//     });
-// });
+
 
 app.MapPost<MeasurementCommand[]>("api/measurements");
 app.MapCqrsEndpoints(typeof(ServerCompositionRoot).Assembly);

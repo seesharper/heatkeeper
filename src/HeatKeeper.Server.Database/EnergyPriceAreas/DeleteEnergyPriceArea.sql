@@ -1,0 +1,1 @@
+DELETE FROM EnergyPriceAreas WHERE Id = @Id;

@@ -26,4 +26,10 @@
     <ProjectReference Include="..\HeatKeeper.Abstractions\HeatKeeper.Abstractions.csproj" />
     <ProjectReference Include="..\HeatKeeper.Server.Database\HeatKeeper.Server.Database.csproj" />
   </ItemGroup>
+  <ItemGroup>
+
+    <Using Include="System.Threading.Tasks" />
+    <Using Include="FluentAssertions" />
+    <Using Include="Xunit" />
+  </ItemGroup>
 </Project>
