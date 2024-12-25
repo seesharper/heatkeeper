@@ -42,8 +42,10 @@ public class ImportEnergyPricesCommandHandler(EntsoeClient entsoeClient, IQueryE
                         priceInLocalCurrencyAfterSubsidy = priceAfterSubsidy;
                     }
                 }
+                var priceInLocalCurrencyIncludingVAT = priceInLocalCurrency * (1 + priceArea.VATRate / 100);
+                var priceInLocalCurrencyAfterSubsidyIncludingVAT = priceInLocalCurrencyAfterSubsidy * (1 + priceArea.VATRate / 100);
 
-                var insertEnergyPriceCommand = new InsertEnergyPriceCommand(priceInLocalCurrency, priceInLocalCurrencyAfterSubsidy, priceInEuro, startTime, stopTime, "NOK", exchangeRate, priceArea.VATRate, priceArea.EnergyPriceAreaId);
+                var insertEnergyPriceCommand = new InsertEnergyPriceCommand(priceInLocalCurrencyIncludingVAT, priceInLocalCurrencyAfterSubsidyIncludingVAT, priceInEuro, startTime, stopTime, "NOK", exchangeRate, priceArea.VATRate, priceArea.EnergyPriceAreaId);
                 await commandExecutor.ExecuteAsync(insertEnergyPriceCommand, cancellationToken);
             }
         }

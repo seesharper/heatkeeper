@@ -93,7 +93,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static class EnergyPriceAreas
         {
-            public static PostEnergyPriceAreaCommand Norway3 = new("10YNO-2--------T", "NO2", "Description", 1);
+            public static PostEnergyPriceAreaCommand Norway3 = new("10YNO-2--------T", "NO2", "Description", 1, 1);
         }
 
         public static class Zones

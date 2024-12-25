@@ -4,7 +4,7 @@ namespace HeatKeeper.Server.EnergyPriceAreas.Api;
 [Get("api/energy-price-areas/{Id}")]
 public record GetEnergyPriceAreaDetailsQuery(long Id) : IQuery<EnergyPriceAreaDetails>;
 
-public record EnergyPriceAreaDetails(long Id, string EIC_Code, string Name, string Description, long VATRateId);
+public record EnergyPriceAreaDetails(long Id, string EIC_Code, string Name, string Description, long DisplayOrder, long VATRateId);
 
 public class GetEnergyPriceAreaDetails(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<GetEnergyPriceAreaDetailsQuery, EnergyPriceAreaDetails>
 {

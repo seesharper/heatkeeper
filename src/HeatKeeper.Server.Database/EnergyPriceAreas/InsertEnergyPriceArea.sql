@@ -1,2 +1,2 @@
-insert into EnergyPriceAreas (EIC_Code, Name, Description, VATRateId)
-values (@EIC_Code, @Name, @Description, @VATRateId)
+insert into EnergyPriceAreas (EIC_Code, Name, Description, DisplayOrder, VATRateId)
+values (@EIC_Code, @Name, @Description, @DisplayOrder, @VATRateId)

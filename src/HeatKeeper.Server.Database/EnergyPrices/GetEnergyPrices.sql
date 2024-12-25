@@ -1,6 +1,6 @@
 SELECT
-    ep.PriceInLocalCurrency,
-    ep.PriceInLocalCurrencyAfterSubsidy,
+    ep.PriceInLocalCurrency AS Price,
+    ep.PriceInLocalCurrencyAfterSubsidy AS PriceAfterSubsidy,
     ep.TimeStart,
     ep.TimeEnd
 FROM EnergyPrices ep

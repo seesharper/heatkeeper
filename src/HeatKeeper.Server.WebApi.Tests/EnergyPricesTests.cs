@@ -36,8 +36,9 @@ public class EnergyPricesTests : TestBase
         var testLocation = await Factory.CreateTestLocation();
         var client = Factory.CreateClient();
         await client.ImportEnergyPrices(new ImportEnergyPricesCommand(DateTime.UtcNow), testLocation.Token);
-        await client.ImportEnergyPrices(new ImportEnergyPricesCommand(DateTime.UtcNow), testLocation.Token);
-        var energyPrices = await client.GetEnergyPrices(DateTime.UtcNow.ToString("yyyy-MM-dd"),testLocation.PriceAreaId, testLocation.Token);
+        var energyPrices = await client.GetEnergyPrices(DateTime.UtcNow.ToString("yyyy-MM-dd"), testLocation.PriceAreaId, testLocation.Token);
         energyPrices.Length.Should().Be(24);
+        energyPrices.All(x => x.Price > 0).Should().BeTrue();
+        energyPrices.All(x => x.PriceAfterSubsidy > 0).Should().BeTrue();
     }
 }

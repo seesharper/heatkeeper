@@ -7,6 +7,7 @@ create table EnergyPriceAreas
     EIC_Code    TEXT    not null,
     Name        TEXT    not null,
     Description TEXT    not null,
+    DisplayOrder INTEGER default 0 not null,
     VATRateId   INTEGER
         constraint EnergyPriceArea_VATRates_Id_fk
             references VATRates

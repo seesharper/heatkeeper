@@ -4,7 +4,7 @@ namespace HeatKeeper.Server.EnergyPrices.Api;
 [Get("api/energy-prices")]
 public record GetEnergyPricesQuery(long EnergyPriceAreaId, string Date) : IQuery<EnergyPrice[]>;
 
-public record EnergyPrice(DateTime Date, decimal Price, decimal PriceAfterSubsidy);
+public record EnergyPrice(DateTime TimeStart, DateTime TimeEnd, decimal Price, decimal PriceAfterSubsidy);
 
 public class EnergyPricesQueryHandler(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<GetEnergyPricesQuery, EnergyPrice[]>
 {

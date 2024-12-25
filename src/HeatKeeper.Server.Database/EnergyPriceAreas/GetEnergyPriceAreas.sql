@@ -1,1 +1,1 @@
-SELECT Id, Name FROM EnergyPriceAreas
+SELECT Id, Name FROM EnergyPriceAreas ORDER BY DisplayOrder;
