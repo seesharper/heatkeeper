@@ -3,12 +3,13 @@ using System.Xml.Serialization;
 using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Server.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace HeatKeeper.Server.EnergyPrices;
 
-public class EntsoeClient(HttpClient httpClient, IConfiguration configuration)
+public class EntsoeClient(HttpClient httpClient, IConfiguration configuration, ILogger<EntsoeClient> logger)
 {
-    public async Task<Publication_MarketDocument> GetMarketDocument(DateTime date, string area)
+    public async Task<MarketPrice[]> GetMarketDocument(DateTime date, string area)
     {
         var token = configuration.GetEntsoeApiKey();
         var httpRequest = new HttpRequestBuilder()
@@ -23,9 +24,17 @@ public class EntsoeClient(HttpClient httpClient, IConfiguration configuration)
             .Build();
 
         var response = await httpClient.SendAndHandleRequest(httpRequest);
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            logger.LogError("Failed to get market document from ENTSOE. Status code: {StatusCode}", response.StatusCode);
+            return Array.Empty<MarketPrice>();
+        }
+
         var result = await response.Content.ReadAsStreamAsync();
         XmlSerializer serializer = new(typeof(Publication_MarketDocument));
-        return (Publication_MarketDocument)serializer.Deserialize(result);
+        var marketDocument = (Publication_MarketDocument)serializer.Deserialize(result);
+        return marketDocument.TimeSeries.First().Period.First().Point.Select(p => new MarketPrice(p.priceamount, int.Parse(p.position))).ToArray();
     }
 }
+
+public record MarketPrice(decimal Price, int Position);

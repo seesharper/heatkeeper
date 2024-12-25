@@ -17,7 +17,6 @@ public class ImportEnergyPricesCommandHandler(EntsoeClient entsoeClient, IQueryE
         var exchangeRate = (await queryExecutor.ExecuteAsync(new GetExchangeRateQuery("EUR"), cancellationToken)).Rate;
         var dateToImport = DateOnly.FromDateTime(command.DateToImport).ToDateTime(new TimeOnly(0, 0, 0));
 
-
         foreach (var priceArea in configuredPriceAreas)
         {
             var energyPricesExists = await queryExecutor.ExecuteAsync(new EnergyPricesExistsQuery(priceArea.EnergyPriceAreaId, command.DateToImport), cancellationToken);
@@ -25,14 +24,30 @@ public class ImportEnergyPricesCommandHandler(EntsoeClient entsoeClient, IQueryE
             {
                 continue;
             }
-            var marketDocument = await entsoeClient.GetMarketDocument(command.DateToImport, priceArea.EIC_Code);
-            var prices = marketDocument.TimeSeries.First().Period.First().Point.Select(p => p.priceamount).ToArray();
+            var markedPrices = await entsoeClient.GetMarketDocument(command.DateToImport, priceArea.EIC_Code);
+
+
+            var prices = new decimal?[24];
+            for (var i = 0; i < markedPrices.Length; i++)
+            {
+                prices[markedPrices[i].Position - 1] = markedPrices[i].Price;
+            }
+
             for (var i = 0; i < prices.Length; i++)
+            {
+                if (prices[i] == null)
+                {
+                    prices[i] = prices[i - 1];
+                }
+            }
+
+            for (var i = 0; i < 24; i++)
             {
                 var startTime = dateToImport.AddHours(i);
                 var stopTime = startTime.AddHours(1);
-                var priceInLocalCurrency = prices[i] * exchangeRate / 1000;
-                var priceInEuro = prices[i] / 1000;
+
+                var priceInLocalCurrency = prices[i].Value * exchangeRate / 1000;
+                var priceInEuro = prices[i].Value / 1000;
                 var priceInLocalCurrencyAfterSubsidy = priceInLocalCurrency;
                 if (IsNorwegianPriceArea(priceArea.EIC_Code))
                 {
