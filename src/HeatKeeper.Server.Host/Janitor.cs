@@ -31,7 +31,7 @@ public static class JanitorServiceCollectionExtensions
                 .Schedule(builder => builder
                     .WithName("ImportEnergyPrices")
                     .WithScheduledTask(async (ICommandExecutor commandExecutor, TimeProvider timeProvider, CancellationToken cancellationToken)
-                        => await commandExecutor.ExecuteAsync(new ImportEnergyPricesCommand(timeProvider.GetUtcNow().DateTime), cancellationToken))
+                        => await commandExecutor.ExecuteAsync(new ImportEnergyPricesCommand(timeProvider.GetUtcNow().DateTime.AddDays(1)), cancellationToken))
                     .WithSchedule(new CronSchedule(configuration.GetImportEnergyPricesCronExpression())));
         });
 
