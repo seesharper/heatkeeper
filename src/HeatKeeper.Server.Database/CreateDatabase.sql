@@ -4,7 +4,7 @@
 -- Text encoding used: UTF-8
 --
 PRAGMA foreign_keys = off;
-BEGIN TRANSACTION;
+--BEGIN TRANSACTION;
 
 -- Table: Locations
 DROP TABLE IF EXISTS Locations;
@@ -62,5 +62,5 @@ CREATE UNIQUE INDEX IX_Sensors_ExternalId ON Sensors ("ExternalId" ASC);
 DROP INDEX IF EXISTS UC_Version;
 CREATE UNIQUE INDEX "UC_Version" ON "VersionInfo" ("Version" ASC);
 
-COMMIT TRANSACTION;
+--COMMIT TRANSACTION;
 PRAGMA foreign_keys = on;

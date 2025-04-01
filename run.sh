@@ -1,0 +1,1 @@
+docker run --device /dev/bus/usb/001/005 --device /dev/ttyUSB0 -v /home/heatkeeper/reporter.csx:/reporter.csx --restart=always -d=true --log-driver json-file --log-opt max-size=10m --name heatkeeper heatkeeper.reporter:latest /reporter.csx

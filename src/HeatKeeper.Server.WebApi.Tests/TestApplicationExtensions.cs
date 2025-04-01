@@ -23,6 +23,13 @@ namespace HeatKeeper.Server.WebApi.Tests;
 
 public static class TestApplicationExtensions
 {
+    public static async Task<HttpClient> CreateAuthenticatedClient<TEntryPoint>(this TestApplication<TEntryPoint> testApplication) where TEntryPoint : class
+    {
+        var client = testApplication.CreateClient();
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await client.AuthenticateAsAdminUser()}");
+        return client;
+    }
+
     public static async Task<TestLocation> CreateTestLocation<TEntryPoint>(this TestApplication<TEntryPoint> testApplication) where TEntryPoint : class
     {
         var client = testApplication.CreateClient();

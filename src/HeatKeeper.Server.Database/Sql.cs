@@ -285,5 +285,27 @@ namespace HeatKeeper.Server.Database
         string GetEnergyPrices { get; }
 
         string EnergyPricesExists { get; }
+
+        string AddMinutesBeforeConsideredDeadToSensorsTable { get; }
+
+        string InsertNotification { get; }
+
+        string UpdateNotification { get; }
+
+        string CreateNotificationsTable { get; }
+
+        string GetNotifications { get; }
+
+        string GetNotificationDetails { get; }
+
+        string CreateNotificationConditionsTable { get; }
+
+        string GetUsersSubscribedToNotification { get; }
+
+        string GetPushSubscriptionByUser { get; }
+
+        string GetAllScheduledNotifications { get; }
+
+        string GetNotificationSendingDetails { get; }
     }
 }

@@ -15,7 +15,7 @@ public class EnergyPricesTests : TestBase
     public async Task ShouldImportElectricalPricesUsingJanitor()
     {
         Factory.UseFakeTimeProvider(TestData.Clock.Today);
-        Factory.WithConfiguration("ENTSOE_SECURITY_TOKEN", "f7e3c0e2-9e71-4225-97d6-91b69be1acd4");
+        Factory.WithConfiguration("ENTSOE_SECURITY_TOKEN", "d8e25188-7571-47c5-90b0-ec7b1b150e06");
         var janitor = Factory.Services.GetService<IJanitor>();
         await janitor.Run("ImportEnergyPrices");
     }
@@ -23,6 +23,7 @@ public class EnergyPricesTests : TestBase
     [Fact]
     public async Task ShouldImportEnergyPrices()
     {
+        Factory.WithConfiguration("ENTSOE_SECURITY_TOKEN", "d8e25188-7571-47c5-90b0-ec7b1b150e06");
         var testLocation = await Factory.CreateTestLocation();
         var client = Factory.CreateClient();
         var dateToImport = new DateTime(2024, 12, 14);

@@ -15,6 +15,8 @@ using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Mqtt;
+using HeatKeeper.Server.Notifications;
+using HeatKeeper.Server.Notifications.Api;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Programs.Api;
 using HeatKeeper.Server.PushSubscriptions;
@@ -37,7 +39,7 @@ using Xunit.Sdk;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
-    public static class HttpClientExtensions
+    public static partial class HttpClientExtensions
     {
         public static async Task<T> ContentAs<T>(this HttpResponseMessage response)
         {
@@ -90,6 +92,16 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task ImportEnergyPrices(this HttpClient client, ImportEnergyPricesCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, "api/energy-prices/import", command, token, success, problem);
+
+        public static async Task CreateNotification(this HttpClient client, PostNotificationCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, $"api/users/{command.UserId}/notifications", command, token, success, problem);
+
+        public static async Task<NotificationInfo[]> GetNotifications(this HttpClient client, long userId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<NotificationInfo[]>(client, $"api/users/{userId}/notifications", token, success, problem);
+
+        public static async Task<NotificationDetails> GetNotificationDetails(this HttpClient client, long notificationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<NotificationDetails>(client, $"api/notifications/{notificationId}", token, success, problem);
+
 
         public static async Task<EnergyPrice[]> GetEnergyPrices(this HttpClient client, string dateToImport, long energyPriceAreaId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<EnergyPrice[]>(client, $"api/energy-prices?date={dateToImport}&energyPriceAreaId={energyPriceAreaId}", token, success, problem);
@@ -243,7 +255,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             return await response.ContentAs<TContent>();
         }
 
-        private static async Task<long> Post<TContent>(HttpClient client, string uri, TContent content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        public static async Task<long> Post<TContent>(HttpClient client, string uri, TContent content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
             var resourceId = await Post<TContent, ResourceId>(client, uri, content, token, success, problem);
             return resourceId.Id;

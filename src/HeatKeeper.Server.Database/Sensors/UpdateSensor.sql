@@ -2,6 +2,8 @@ UPDATE
     Sensors
 SET
     NAME = @Name,
-    Description = @Description
+    Description = @Description,
+    ExternalId = @ExternalId,
+    MinutesBeforeConsideredDead = @MinutesBeforeConsideredDead
 WHERE
     Id = @SensorId

@@ -35,36 +35,44 @@ namespace HeatKeeper.Server.Database
             {
                 _logger.LogDebug("Open database connection using connection string: {_configuration.ConnectionString}", _configuration.GetConnectionString());
                 connection.Open();
-                var appliedVersions = GetDatabaseVersion(connection);
-                var databaseVersion = appliedVersions.OrderBy(vi => vi.Version).LastOrDefault()?.Version ?? 0;
-                _logger.LogInformation("Database is at version {databaseVersion}", databaseVersion);
-
-                var migrationsGroupedByVersion = GetMigrationsGroupedByVersion(databaseVersion);
-
-                foreach (var migrations in migrationsGroupedByVersion)
+                using var transaction = connection.BeginTransaction();
+                try
                 {
-                    var appliedMigrationsDescription = string.Empty;
-                    _logger.LogInformation("Applying {migrations.Count()} migration(s) to be applied for version {migrations.Key}", migrations.Count(), migrations.Key);
-                    foreach (var migration in migrations.OrderBy(m => m.Order))
+                    var appliedVersions = GetDatabaseVersion(connection);
+                    var databaseVersion = appliedVersions.OrderBy(vi => vi.Version).LastOrDefault()?.Version ?? 0;
+                    _logger.LogInformation("Database is at version {databaseVersion}", databaseVersion);
+
+                    var migrationsGroupedByVersion = GetMigrationsGroupedByVersion(databaseVersion);
+
+                    foreach (var migrations in migrationsGroupedByVersion)
                     {
-                        _logger.LogInformation("Applying migration {migration.MigrationType.Name}", migration.MigrationType.Name);
-                        var migrationInstance = (IMigration)Activator.CreateInstance(migration.MigrationType, _sqlProvider);
-                        migrationInstance.Migrate(connection);
-                        if (string.IsNullOrWhiteSpace(appliedMigrationsDescription))
+                        var appliedMigrationsDescription = string.Empty;
+                        _logger.LogInformation("Applying {migrations.Count()} migration(s) to be applied for version {migrations.Key}", migrations.Count(), migrations.Key);
+                        foreach (var migration in migrations.OrderBy(m => m.Order))
                         {
-                            appliedMigrationsDescription = migration.MigrationType.Name;
+                            _logger.LogInformation("Applying migration {migration.MigrationType.Name}", migration.MigrationType.Name);
+                            var migrationInstance = (IMigration)Activator.CreateInstance(migration.MigrationType, _sqlProvider);
+                            migrationInstance.Migrate(connection);
+                            if (string.IsNullOrWhiteSpace(appliedMigrationsDescription))
+                            {
+                                appliedMigrationsDescription = migration.MigrationType.Name;
+                            }
+                            else
+                            {
+                                appliedMigrationsDescription = $"{appliedMigrationsDescription}, {migration.MigrationType.Name}";
+                            }
                         }
-                        else
-                        {
-                            appliedMigrationsDescription = $"{appliedMigrationsDescription}, {migration.MigrationType.Name}";
-                        }
+                        connection.Execute(_sqlProvider.InsertVersionInfo, new VersionInfo() { Version = migrations.Key, AppliedOn = DateTime.UtcNow, Description = appliedMigrationsDescription });
+                        _logger.LogInformation("Database is now at version {migrations.Key}", migrations.Key);
+
                     }
-                    connection.Execute(_sqlProvider.InsertVersionInfo, new VersionInfo() { Version = migrations.Key, AppliedOn = DateTime.UtcNow, Description = appliedMigrationsDescription });
-                    _logger.LogInformation("Database is now at version {migrations.Key}", migrations.Key);
-
                 }
-
-                connection.Close();
+                catch (System.Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+                transaction.Commit();
             }
         }
 
