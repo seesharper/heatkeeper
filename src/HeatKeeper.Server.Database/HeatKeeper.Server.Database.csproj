@@ -5,13 +5,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CQRS.Command.Abstractions" Version="1.2.0" />
-    <PackageReference Include="DbReader" Version="2.5.6" />
+    <PackageReference Include="DbReader" Version="3.0.0" />
     <PackageReference Include="ResourceReader" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.3" />
   </ItemGroup>
   <ItemGroup Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' != 'Arm64' ">
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.117" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="**/*.sql" />
@@ -27,5 +27,4 @@
   <!-- <ItemGroup>
     <Content Include="SQLite119\*.*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup> -->
-  
 </Project>

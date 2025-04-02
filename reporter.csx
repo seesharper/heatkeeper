@@ -1,6 +1,6 @@
 #! /usr/bin/env dotnet-script
 
-#r "nuget:HeatKeeper.Reporter.Sdk, 0.6.0"
+#r "nuget:HeatKeeper.Reporter.Sdk, 0.15.0"
 
 using HeatKeeper.Reporter.Sdk;
 
