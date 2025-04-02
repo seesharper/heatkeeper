@@ -27,9 +27,15 @@
     <ProjectReference Include="..\HeatKeeper.Server.Database\HeatKeeper.Server.Database.csproj" />
   </ItemGroup>
   <ItemGroup>
-
     <Using Include="System.Threading.Tasks" />
     <Using Include="FluentAssertions" />
     <Using Include="Xunit" />
   </ItemGroup>
+
+  <!-- <Target Name="CopySQLiteFiles" AfterTargets="Build">
+    <ItemGroup>
+      <SQLiteFiles Include="../HeatKeeper.Server.Database/SQLite119/*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SQLiteFiles)" DestinationFolder="$(OutputPath)" />
+  </Target> -->
 </Project>

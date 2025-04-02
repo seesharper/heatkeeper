@@ -3,17 +3,9 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
-using CQRS.AspNet.Testing;
-using FluentAssertions;
 using HeatKeeper.Server.Database;
-using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Users.Api;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.Mvc.Testing.Handlers;
 using Microsoft.Net.Http.Headers;
-using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests;
 
@@ -169,7 +161,7 @@ public class UsersTests : TestBase
         var token = await client.AuthenticateAsAdminUser();
         var userId = await client.CreateUser(TestData.Users.StandardUser, token);
 
-        var updateCommand = new UpdateUserCommand(userId, TestData.Users.StandardUser.Email,TestData.Users.StandardUser.FirstName,TestData.Users.StandardUser.LastName,  true);
+        var updateCommand = new UpdateUserCommand(userId, TestData.Users.StandardUser.Email, TestData.Users.StandardUser.FirstName, TestData.Users.StandardUser.LastName, true);
 
 
         await client.UpdateUser(updateCommand, token);
@@ -186,7 +178,7 @@ public class UsersTests : TestBase
 
     [Theory]
     [InlineData("PASSWORD", "Password should contain at least one lower case letter")]
-    [InlineData("password", "Password should contain at least one upper case letter")]  
+    [InlineData("password", "Password should contain at least one upper case letter")]
     [InlineData("Pwd", "Password should not be less than 8 or greater than 64 characters")]
     [InlineData("Password", "Password should contain at least one numeric value")]
     [InlineData("Password1", "Password should contain at least one special case characters")]
