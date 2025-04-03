@@ -1,4 +1,5 @@
 using HeatKeeper.Abstractions;
+using HeatKeeper.Server.Notifications;
 using HeatKeeper.Server.Schedules;
 using LightInject;
 
@@ -13,6 +14,7 @@ public class JanitorBootStrapper(IServiceFactory serviceFactory) : IBootStrapper
         {
             var commandExecutor = scope.GetInstance<ICommandExecutor>();
             await commandExecutor.ExecuteAsync(new AddAllSchedulesToJanitorCommand());
+            await commandExecutor.ExecuteAsync(new AddAllScheduledNotificationsToJanitorCommand());
         }
     }
 }

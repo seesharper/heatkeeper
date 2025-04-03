@@ -93,7 +93,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task ImportEnergyPrices(this HttpClient client, ImportEnergyPricesCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, "api/energy-prices/import", command, token, success, problem);
 
-        public static async Task CreateNotification(this HttpClient client, PostNotificationCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        public static async Task<long> CreateNotification(this HttpClient client, PostNotificationCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/users/{command.UserId}/notifications", command, token, success, problem);
 
         public static async Task<NotificationInfo[]> GetNotifications(this HttpClient client, long userId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)

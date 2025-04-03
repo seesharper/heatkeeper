@@ -1,6 +1,8 @@
 using System.Linq;
 using HeatKeeper.Server.Notifications;
 using HeatKeeper.Server.Users.Api;
+using Janitor;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HeatKeeper.Server.WebApi.Tests;
 
@@ -20,6 +22,19 @@ public class NotificationsTests : TestBase
         notificationSubscriptionDetails.HoursToSnooze.Should().Be(12);
         notificationSubscriptionDetails.Name.Should().Be("Test Notification");
         notificationSubscriptionDetails.Description.Should().Be("Test Notification Description");
+    }
+
+    [Fact]
+    public async Task ShouldSendDeadSensorNotification()
+    {
+        var now = Factory.UseFakeTimeProvider(TestData.Clock.Today);
+        var client = Factory.CreateClient();
+        var janitor = Factory.Services.GetRequiredService<IJanitor>();
+        var testLocation = await Factory.CreateTestLocation();
+        var testUserId = await client.CreateUser(TestData.Users.StandardUser, testLocation.Token);
+        var postNotificationCommand = new PostNotificationCommand(testUserId, NotificationType.DeadSensors, "0 0 * * *", 12, "Test Notification", "Test Notification Description");
+        var notificationId = await client.CreateNotification(postNotificationCommand, testLocation.Token);
+        await janitor.Run("ScheduledNotification_" + notificationId);
     }
 }
 
