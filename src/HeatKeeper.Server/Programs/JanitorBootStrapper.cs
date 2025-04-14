@@ -14,7 +14,7 @@ public class JanitorBootStrapper(IServiceFactory serviceFactory) : IBootStrapper
         {
             var commandExecutor = scope.GetInstance<ICommandExecutor>();
             await commandExecutor.ExecuteAsync(new AddAllSchedulesToJanitorCommand());
-            await commandExecutor.ExecuteAsync(new AddAllScheduledNotificationsToJanitorCommand());
+            await commandExecutor.ExecuteAsync(new AddAllNotificationsToJanitorCommand());
         }
     }
 }

@@ -18,11 +18,11 @@ using HeatKeeper.Server.Zones.Api;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
-    public static class TestData
+    public static partial class TestData
     {
         public static string ValidPassword => "aVe78!*PZ9&Lnqh1E4pG";
 
-
+        public const string InvalidCronExpression = "InvalidCronExpression";
 
         public static AuthenticatedUserQuery InvalidAuthenticateAdminUserRequest =>
             new AuthenticatedUserQuery(AdminUser.DefaultEmail, "InvalidPassword");
@@ -253,7 +253,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             public const string TestScheduleUpdatedName = "TestScheduleUpdated";
             public const string TestScheduleUpdatedCronExpression = "0 20,18,21 * * *";
 
-            public const string InvalidCronExpression = "InvalidCronExpression";
+
 
             public static CreateScheduleCommand DayTime(long programId) =>
                 new(programId, DayTimeScheduleName, DayTimeScheduleCronExpression);

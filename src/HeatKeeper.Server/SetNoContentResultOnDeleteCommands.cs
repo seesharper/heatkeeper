@@ -1,7 +1,3 @@
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-
 namespace HeatKeeper.Server;
 
 public class SetNoContentResultOnDeleteCommands<TCommand>(ICommandHandler<TCommand> handler) : ICommandHandler<TCommand> where TCommand : DeleteCommand

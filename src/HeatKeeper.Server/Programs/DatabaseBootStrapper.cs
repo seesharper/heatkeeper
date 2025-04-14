@@ -5,17 +5,7 @@ using HeatKeeper.Server.Database;
 namespace HeatKeeper.Server.Programs;
 
 [Order(1)]
-public class DatabaseBootStrapper : IBootStrapper
+public class DatabaseBootStrapper(IDatabaseMigrator databaseMigrator) : IBootStrapper
 {
-    private readonly IDatabaseMigrator _databaseMigrator;
-
-    public DatabaseBootStrapper(IDatabaseMigrator databaseMigrator)
-    {
-        _databaseMigrator = databaseMigrator;
-    }
-
-    public async Task Execute()
-    {
-        _databaseMigrator.Migrate();
-    }
+    public async Task Execute() => databaseMigrator.Migrate();
 }

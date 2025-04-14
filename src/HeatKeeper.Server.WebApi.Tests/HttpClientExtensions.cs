@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Castle.Core.Internal;
+using CQRS.AspNet.MetaData;
+using CQRS.Query.Abstractions;
 using FluentAssertions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Dashboard;
@@ -39,6 +44,34 @@ using Xunit.Sdk;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
+    public static partial class PlaceholderReplacer
+    {
+        public static string ReplacePlaceholders(string template, object values)
+        {
+            ArgumentNullException.ThrowIfNull(template);
+            ArgumentNullException.ThrowIfNull(values);
+
+            var type = values.GetType();
+            return MyRegex().Replace(template, match =>
+            {
+                var propertyName = match.Groups[1].Value;
+                var property = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public);
+                if (property == null)
+                {
+                    throw new InvalidOperationException($"Property '{propertyName}' not found on object of type '{type.Name}'.");
+                }
+
+                var value = property.GetValue(values);
+                return value?.ToString() ?? string.Empty;
+            });
+        }
+
+        [GeneratedRegex(@"\{([^}]+)\}")]
+        private static partial Regex MyRegex();
+    }
+
+
+
     public static partial class HttpClientExtensions
     {
         public static async Task<T> ContentAs<T>(this HttpResponseMessage response)
@@ -94,13 +127,19 @@ namespace HeatKeeper.Server.WebApi.Tests
             => await Post(client, "api/energy-prices/import", command, token, success, problem);
 
         public static async Task<long> CreateNotification(this HttpClient client, PostNotificationCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Post(client, $"api/users/{command.UserId}/notifications", command, token, success, problem);
+            => await Post(client, $"api/notifications", command, token, success, problem);
 
-        public static async Task<NotificationInfo[]> GetNotifications(this HttpClient client, long userId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<NotificationInfo[]>(client, $"api/users/{userId}/notifications", token, success, problem);
+        public static async Task UpdateNotification(this HttpClient client, PatchNotificationCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Patch(client, $"api/notifications/{command.Id}", command, token, success, problem);
+
+        public static async Task<NotificationInfo[]> GetNotifications(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<NotificationInfo[]>(client, $"api/notifications", token, success, problem);
 
         public static async Task<NotificationDetails> GetNotificationDetails(this HttpClient client, long notificationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<NotificationDetails>(client, $"api/notifications/{notificationId}", token, success, problem);
+
+        public static async Task DeleteNotification(this HttpClient client, long notificationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Delete(client, $"api/notifications/{notificationId}", token, success, problem);
 
 
         public static async Task<EnergyPrice[]> GetEnergyPrices(this HttpClient client, string dateToImport, long energyPriceAreaId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
@@ -260,6 +299,51 @@ namespace HeatKeeper.Server.WebApi.Tests
             var resourceId = await Post<TContent, ResourceId>(client, uri, content, token, success, problem);
             return resourceId.Id;
         }
+
+
+
+
+        public static async Task<long> Post<TCommand>(this HttpClient client, TCommand command, string token = null, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        {
+            // Get the uri from the PostAttribute found on TCommand
+
+            var route = typeof(TCommand).GetAttribute<PostAttribute>().Route;
+            var uri = PlaceholderReplacer.ReplacePlaceholders(route, command);
+            var resourceId = await Post<TCommand, ResourceId>(client, uri, command, token, success, problem);
+            return resourceId.Id;
+        }
+
+        // same as above but with delete instead of post
+
+
+
+
+        public static async Task Patch<TCommand>(this HttpClient client, TCommand command, string token = null, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        {
+            // Get the uri from the PostAttribute found on TCommand
+            var route = typeof(TCommand).GetAttribute<PatchAttribute>().Route;
+            var uri = PlaceholderReplacer.ReplacePlaceholders(route, command);
+            await Patch(client, uri, command, token, success, problem);
+        }
+
+        public static async Task Delete<TCommand>(this HttpClient client, TCommand command, string token = null, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        {
+            // Get the uri from the PostAttribute found on TCommand
+            var route = typeof(TCommand).GetAttribute<DeleteAttribute>().Route;
+            var uri = PlaceholderReplacer.ReplacePlaceholders(route, command);
+            await Delete(client, uri, token, success, problem);
+        }
+
+
+        public static async Task<TResult> Get<TResult>(this HttpClient client, IQuery<TResult> query, string token = null, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        {
+            // Get the uri from the PostAttribute found on TCommand
+            var route = query.GetType().GetAttribute<GetAttribute>().Route;
+            var uri = PlaceholderReplacer.ReplacePlaceholders(route, query);
+            var resourceId = await Get<TResult>(client, uri, token, success, problem);
+            return resourceId;
+        }
+
 
         private static async Task<TResponse> Post<TContent, TResponse>(HttpClient client, string uri, TContent content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {

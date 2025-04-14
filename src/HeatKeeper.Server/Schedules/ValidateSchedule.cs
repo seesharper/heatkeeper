@@ -11,8 +11,8 @@ public class ValidateSchedule : IValidator<IScheduleCommand>
         {
             command.SetProblemResult($"The cron expression {command.CronExpression} is not valid for schedule {command.Name}", StatusCodes.Status400BadRequest);
         }
-        
-        return Task.CompletedTask;        
+
+        return Task.CompletedTask;
     }
 
     private static bool IsValidCronExpression(string expression)

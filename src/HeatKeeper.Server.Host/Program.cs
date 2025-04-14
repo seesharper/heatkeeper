@@ -1,4 +1,5 @@
 ﻿using CQRS.AspNet;
+using HeatKeeper.Abstractions;
 using HeatKeeper.Server;
 using HeatKeeper.Server.EnergyPrices;
 using HeatKeeper.Server.ExchangeRates;
@@ -33,9 +34,12 @@ builder.Services.AddHttpClient<NorwegianBankClient>(client => client.BaseAddress
 builder.Services.AddHttpClient<EntsoeClient>(client => client.BaseAddress = new Uri("https://web-api.tp.entsoe.eu/api"));
 
 
+
 var app = builder.Build();
 
 await app.RunBootStrappers();
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -27,6 +27,7 @@ public static class TestApplicationExtensions
     {
         var client = testApplication.CreateClient();
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await client.AuthenticateAsAdminUser()}");
+        // new AuthenticationHeaderValue("Bearer", this.bearerToken);
         return client;
     }
 
@@ -74,6 +75,8 @@ public static class TestApplicationExtensions
         var createSetPointCommand = new CreateSetPointCommand(scheduleId, livingRoomZoneId, 20, 2);
 
         var setPointId = await client.CreateSetPoint(scheduleId, createSetPointCommand, token);
+
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
         return new TestLocation(client, testApplication.Services, token, locationId, livingRoomZoneId, livingRoomSensor.Id, kitchenZoneId, normalProgramId, scheduleId, setPointId, livingRoomHeaterId1, livingRoomHeaterId2, kitchenHeaterId, vatRateId, priceAreaId);
     }

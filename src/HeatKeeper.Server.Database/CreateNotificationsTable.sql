@@ -3,15 +3,12 @@ create table Notifications
 (
     Id               INTEGER not null
         constraint NotificationSubscriptions_pk
-            primary key,
-    UserId           INTEGER not null
-        references Users,
+            primary key,    
     NotificationType INTEGER not null,
-    LastSent         datetime,
-    Enabled          INTEGER default 1 not null,
+    LastSent         datetime,    
     CronExpression   TEXT,
     HoursToSnooze    INTEGER default 0 not null,
-    Name             TEXT    default 'dsfd' not null,
+    Name             TEXT not null,
     Description      TEXT
 );
 

@@ -1,0 +1,1 @@
+DELETE FROM Notifications WHERE Id = @Id;

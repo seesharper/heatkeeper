@@ -5,7 +5,6 @@ SELECT
     n.CronExpression,
     n.HoursToSnooze,
     n.LastSent,
-    n.NotificationType,
-    n.Enabled
+    n.NotificationType
 FROM Notifications n
 WHERE n.Id = @NotificationId

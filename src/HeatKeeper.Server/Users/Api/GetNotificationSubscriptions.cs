@@ -2,12 +2,12 @@ namespace HeatKeeper.Server.Users.Api;
 
 [Get("/api/users/{userId}/notifications")]
 [RequireUserRole]
-public record GetNotificationsQuery(long UserId) : IQuery<NotificationInfo[]>;
+public record GetNotificationSubscriptionsQuery(long UserId) : IQuery<NotificationSubscriptionInfo[]>;
 
-public record NotificationInfo(long Id, string Name, bool Enabled);
+public record NotificationSubscriptionInfo(long Id, string Name, bool IsSubscribed);
 
-public class GetNotifications(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<GetNotificationsQuery, NotificationInfo[]>
+public class GetNotificationSubscriptions(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<GetNotificationSubscriptionsQuery, NotificationSubscriptionInfo[]>
 {
-    public async Task<NotificationInfo[]> HandleAsync(GetNotificationsQuery query, CancellationToken cancellationToken = default)
-        => (await dbConnection.ReadAsync<NotificationInfo>(sqlProvider.GetNotifications, query)).ToArray();
+    public async Task<NotificationSubscriptionInfo[]> HandleAsync(GetNotificationSubscriptionsQuery query, CancellationToken cancellationToken = default)
+        => (await dbConnection.ReadAsync<NotificationSubscriptionInfo>(sqlProvider.GetNotificationSubscriptions, query)).ToArray();
 }

@@ -1,7 +1,7 @@
 using System.Data;
 using DbReader;
 
-namespace HeatKeeper.Server.Database.Migrations;
+namespace HeatKeeper.Server.Database.Migrations.Version13;
 
 [AppliesToVersion(13, Order = 2)]
 public class CreateNotificationConditionsTable(ISqlProvider sqlProvider) : IMigration

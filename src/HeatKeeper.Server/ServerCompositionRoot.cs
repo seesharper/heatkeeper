@@ -1,4 +1,5 @@
 using System.Data.Common;
+using System.Runtime.CompilerServices;
 using CQRS.LightInject;
 using CQRS.Transactions;
 using HeatKeeper.Abstractions;
@@ -9,6 +10,8 @@ using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
+using HeatKeeper.Server.Notifications;
+using HeatKeeper.Server.Notifications.Api;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Programs.Api;
 using HeatKeeper.Server.Schedules;
@@ -47,6 +50,7 @@ public class ServerCompositionRoot : ICompositionRoot
             .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
             .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
             .RegisterSingleton<IEmailValidator, EmailValidator>()
+            .RegisterSingleton<ICronExpressionValidator, CronExpressionValidator>()
 
             .Decorate<ICommandHandler<CreateLocationCommand>, ValidateCreateLocation>()
             .Decorate<ICommandHandler<UpdateLocationCommand>, ValidateUpdateLocation>()
@@ -65,6 +69,9 @@ public class ServerCompositionRoot : ICompositionRoot
             .Decorate<ICommandHandler<CreateScheduleCommand>, WhenScheduleIsCreated>()
             .Decorate<ICommandHandler<UpdateScheduleCommand>, WhenScheduleIsUpdated>()
             .Decorate<ICommandHandler<DeleteScheduleCommand>, WhenScheduleIsDeleted>()
+            .Decorate<ICommandHandler<DeleteNotificationCommand>, WhenNotificationIsDeleted>()
+            .Decorate<ICommandHandler<PostNotificationCommand>, WhenNotificationIsPosted>()
+            .Decorate<ICommandHandler<PatchNotificationCommand>, WhenNotificationIsPatched>()
             .Decorate<ICommandHandler<SetZoneHeatingStatusCommand>, WhenSettingZoneHeatingStatus>()
             .Decorate<ICommandHandler<ActivateProgramCommand>, WhenActivatingProgram>()
 
