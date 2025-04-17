@@ -1,12 +1,10 @@
 using System.Data;
 using System.Data.Common;
-using System.Data.SQLite;
-using DbReader;
-using HeatKeeper.Server.Database.Migrations;
 using LightInject;
 using Microsoft.Extensions.Configuration;
 using HeatKeeper.Abstractions.Configuration;
 using ResourceReader;
+using Microsoft.Data.Sqlite;
 
 namespace HeatKeeper.Server.Database
 {
@@ -31,7 +29,8 @@ namespace HeatKeeper.Server.Database
         private static DbConnection CreateConnection(IServiceFactory serviceFactory)
         {
             var configuration = serviceFactory.GetInstance<IConfiguration>();
-            var connection = new SQLiteConnection(configuration.GetConnectionString());
+            // var connection = new SqliteConnection()
+            var connection = new SqliteConnection(configuration.GetConnectionString());
             connection.Open();
             return connection;
         }

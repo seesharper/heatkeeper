@@ -36,6 +36,8 @@ public class ServerCompositionRoot : ICompositionRoot
         DbReaderOptions.WhenReading<long>().Use((rd, i) => rd.GetInt32(i));
         DbReaderOptions.WhenReading<string>().Use((rd, i) => (string)rd.GetValue(i));
         DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) != 0);
+        DbReaderOptions.WhenReading<DateTime>().Use((rd, i) => rd.GetDateTime(i));
+        DbReaderOptions.WhenReading<decimal>().Use((rd, i) => rd.GetDecimal(i));
     }
 
     public void Compose(IServiceRegistry serviceRegistry) => _ = serviceRegistry.RegisterCommandHandlers()

@@ -1,2 +1,2 @@
-DELETE FROM UsersNotificationSubscriptions
+DELETE FROM NotificationSubscriptions
 WHERE Id = @Id;

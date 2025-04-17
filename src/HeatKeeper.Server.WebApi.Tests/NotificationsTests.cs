@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using HeatKeeper.Server.Notifications;
 using HeatKeeper.Server.Notifications.Api;
 using HeatKeeper.Server.Users.Api;
@@ -154,15 +152,29 @@ public class NotificationsTests : TestBase
     {
         var testLocation = await Factory.CreateTestLocation();
         var client = testLocation.HttpClient;
-        // var testUserId = await client.Post(TestData.Users.StandardUser);
-        // var notificationId = await client.Post(DeadSensorNotification);
-        // await client.Post(new PostNotificationSubscriptionCommand(testUserId, notificationId));
+        var testUserId = await client.Post(TestData.Users.StandardUser);
+        var notificationId = await client.Post(DeadSensorNotification);
 
         var notificationSubscriptions = await client.Get(new GetNotificationSubscriptionsQuery(1));
 
         notificationSubscriptions.Length.Should().Be(1);
         notificationSubscriptions.First().IsSubscribed.Should().BeFalse();
     }
+
+    [Fact]
+    public async Task ShouldDeleteNotificationSubscription()
+    {
+        var testLocation = await Factory.CreateTestLocation();
+        var client = testLocation.HttpClient;
+        var testUserId = await client.Post(TestData.Users.StandardUser);
+        var notificationId = await client.Post(DeadSensorNotification);
+        var notificationSubscriptionId = await client.Post(new PostNotificationSubscriptionCommand(testUserId, notificationId));
+        await client.Delete(new DeleteNotificationSubscription(notificationSubscriptionId));
+        var notificationSubscriptions = await client.Get(new GetNotificationSubscriptionsQuery(testUserId));
+        notificationSubscriptions.Length.Should().Be(1);
+        notificationSubscriptions.First().IsSubscribed.Should().BeFalse();
+    }
+
 
 
     [Fact]

@@ -1,10 +1,10 @@
 using System;
 using System.Data;
-using System.Data.SQLite;
 using System.Linq;
 using DbReader;
 using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Server.Database.Migrations;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -31,7 +31,7 @@ namespace HeatKeeper.Server.Database
 
         public void Migrate()
         {
-            using (var connection = new SQLiteConnection(_configuration.GetConnectionString()))
+            using (var connection = new SqliteConnection(_configuration.GetConnectionString()))
             {
                 _logger.LogDebug("Open database connection using connection string: {_configuration.ConnectionString}", _configuration.GetConnectionString());
                 connection.Open();

@@ -9,7 +9,7 @@ namespace HeatKeeper.Server.EnergyPrices;
 
 public class EntsoeClient(HttpClient httpClient, IConfiguration configuration, ILogger<EntsoeClient> logger)
 {
-    public async Task<MarketPrice[]> GetMarketDocument(DateTime date, string area)
+    public async Task<MarketDocument> GetMarketDocument(DateTime date, string area)
     {
         var token = configuration.GetEntsoeApiKey();
         var httpRequest = new HttpRequestBuilder()
@@ -27,14 +27,24 @@ public class EntsoeClient(HttpClient httpClient, IConfiguration configuration, I
         if (!response.IsSuccessStatusCode)
         {
             logger.LogError("Failed to get market document from ENTSOE. Status code: {StatusCode}", response.StatusCode);
-            return Array.Empty<MarketPrice>();
+            return new MarketDocument(Array.Empty<MarketPrice>(), 60);
         }
 
         var result = await response.Content.ReadAsStreamAsync();
         XmlSerializer serializer = new(typeof(Publication_MarketDocument));
         var marketDocument = (Publication_MarketDocument)serializer.Deserialize(result);
-        return marketDocument.TimeSeries.First().Period.First().Point.Select(p => new MarketPrice(p.priceamount, int.Parse(p.position))).ToArray();
+        var resolutionCode = marketDocument.TimeSeries.First().Period.First().resolution;
+        int resolution = resolutionCode switch
+        {
+            "PT15M" => 15,
+            "PT30M" => 30,
+            "PT60M" => 60,
+            _ => throw new NotSupportedException($"Resolution code {resolutionCode} is not supported.")
+        };
+        return new MarketDocument(marketDocument.TimeSeries.First().Period.First().Point.Select(p => new MarketPrice(p.priceamount, int.Parse(p.position))).ToArray(), resolution);
     }
 }
+
+public record MarketDocument(MarketPrice[] Prices, int Resolution);
 
 public record MarketPrice(decimal Price, int Position);
