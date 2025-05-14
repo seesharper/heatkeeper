@@ -1,4 +1,5 @@
 using System.Data.Common;
+using System.Runtime.CompilerServices;
 using CQRS.LightInject;
 using CQRS.Transactions;
 using HeatKeeper.Abstractions;
@@ -9,6 +10,9 @@ using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
+using HeatKeeper.Server.Messaging;
+using HeatKeeper.Server.Notifications;
+using HeatKeeper.Server.Notifications.Api;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Programs.Api;
 using HeatKeeper.Server.Schedules;
@@ -33,6 +37,8 @@ public class ServerCompositionRoot : ICompositionRoot
         DbReaderOptions.WhenReading<long>().Use((rd, i) => rd.GetInt32(i));
         DbReaderOptions.WhenReading<string>().Use((rd, i) => (string)rd.GetValue(i));
         DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) != 0);
+        DbReaderOptions.WhenReading<DateTime>().Use((rd, i) => rd.GetDateTime(i));
+        DbReaderOptions.WhenReading<decimal>().Use((rd, i) => rd.GetDecimal(i));
     }
 
     public void Compose(IServiceRegistry serviceRegistry) => _ = serviceRegistry.RegisterCommandHandlers()
@@ -47,6 +53,8 @@ public class ServerCompositionRoot : ICompositionRoot
             .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
             .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
             .RegisterSingleton<IEmailValidator, EmailValidator>()
+            .RegisterSingleton<ICronExpressionValidator, CronExpressionValidator>()
+            .RegisterSingleton<IMessageBus, MessageBus>()
 
             .Decorate<ICommandHandler<CreateLocationCommand>, ValidateCreateLocation>()
             .Decorate<ICommandHandler<UpdateLocationCommand>, ValidateUpdateLocation>()
@@ -65,6 +73,9 @@ public class ServerCompositionRoot : ICompositionRoot
             .Decorate<ICommandHandler<CreateScheduleCommand>, WhenScheduleIsCreated>()
             .Decorate<ICommandHandler<UpdateScheduleCommand>, WhenScheduleIsUpdated>()
             .Decorate<ICommandHandler<DeleteScheduleCommand>, WhenScheduleIsDeleted>()
+            .Decorate<ICommandHandler<DeleteNotificationCommand>, WhenNotificationIsDeleted>()
+            .Decorate<ICommandHandler<PostNotificationCommand>, WhenNotificationIsPosted>()
+            .Decorate<ICommandHandler<PatchNotificationCommand>, WhenNotificationIsPatched>()
             .Decorate<ICommandHandler<SetZoneHeatingStatusCommand>, WhenSettingZoneHeatingStatus>()
             .Decorate<ICommandHandler<ActivateProgramCommand>, WhenActivatingProgram>()
 

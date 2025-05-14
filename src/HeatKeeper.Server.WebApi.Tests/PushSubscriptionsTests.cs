@@ -18,9 +18,11 @@ public class PushSubscriptionsTests : TestBase
     {
         var now = Factory.UseFakeTimeProvider(TestData.Clock.Today);
 
-        var client = Factory.CreateClient();
+        
         var testLocation = await Factory.CreateTestLocation();
-        await client.CreatePushSubscription(TestData.PushSubscriptions.TestPushSubscription, testLocation.Token);
+        var client = testLocation.HttpClient;
+
+        await client.Post(TestData.PushSubscriptions.TestPushSubscription);
 
         var queryExecutor = Factory.Services.GetRequiredService<IQueryExecutor>();
         var pushSubscription = (await queryExecutor.ExecuteAsync(new GetPushSubscriptionsByLocationQuery(testLocation.LocationId))).Single();
@@ -31,7 +33,7 @@ public class PushSubscriptionsTests : TestBase
 
         now.SetUtcNow(TestData.Clock.LaterToday);
 
-        await client.CreatePushSubscription(TestData.PushSubscriptions.TestPushSubscription, testLocation.Token);
+        await client.Post(TestData.PushSubscriptions.TestPushSubscription);
 
         pushSubscription = (await queryExecutor.ExecuteAsync(new GetPushSubscriptionsByLocationQuery(testLocation.LocationId))).Single();
         pushSubscription.Endpoint.Should().Be(TestData.PushSubscriptions.Endpoint);
@@ -46,10 +48,11 @@ public class PushSubscriptionsTests : TestBase
         var now = Factory.UseFakeTimeProvider(TestData.Clock.Today);
 
         var webPushClientMock = Factory.MockService<IWebPushClient>();
-
-        var client = Factory.CreateClient();
+        
         var testLocation = await Factory.CreateTestLocation();
-        await client.CreatePushSubscription(TestData.PushSubscriptions.TestPushSubscription, testLocation.Token);
+        var client = testLocation.HttpClient;
+
+        await client.Post(TestData.PushSubscriptions.TestPushSubscription);
 
         await client.UpdateProgram(TestData.Programs.UpdatedTestProgram(testLocation.NormalProgramId, testLocation.ScheduleId), testLocation.Token);
     }

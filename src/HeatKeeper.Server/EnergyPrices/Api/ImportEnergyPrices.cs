@@ -24,13 +24,15 @@ public class ImportEnergyPricesCommandHandler(EntsoeClient entsoeClient, IQueryE
             {
                 continue;
             }
-            var markedPrices = await entsoeClient.GetMarketDocument(command.DateToImport, priceArea.EIC_Code);
+            var marketDocument = await entsoeClient.GetMarketDocument(command.DateToImport, priceArea.EIC_Code);
+
+            var resolution = marketDocument.Resolution;
 
 
-            var prices = new decimal?[24];
-            for (var i = 0; i < markedPrices.Length; i++)
+            var prices = new decimal?[24 * (60 / resolution)];
+            for (var i = 0; i < marketDocument.Prices.Length; i++)
             {
-                prices[markedPrices[i].Position - 1] = markedPrices[i].Price;
+                prices[marketDocument.Prices[i].Position - 1] = marketDocument.Prices[i].Price;
             }
 
             for (var i = 0; i < prices.Length; i++)

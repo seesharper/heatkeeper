@@ -11,7 +11,7 @@ INNER JOIN
     Zones z  
 ON 
     s.ZoneId = z.Id AND
-    s.LastSeen < @LastExpectedReading
+    DateTime(s.LastSeen, '+' || s.MinutesBeforeConsideredDead || ' minutes') < @Now
 INNER JOIN 
     Locations l 
 ON 

@@ -1,5 +1,3 @@
-using Microsoft.IdentityModel.Tokens;
-
 namespace HeatKeeper.Server.Users;
 
 public class UserValidator(IEmailValidator emailValidator) : IValidator<IUserCommand>

@@ -1,8 +1,4 @@
-using System.Threading;
-using System.Threading.Tasks;
-using CQRS.Command.Abstractions;
 using HeatKeeper.Abstractions.Configuration;
-using HeatKeeper.Server.Authorization;
 using Microsoft.Extensions.Configuration;
 using WebPush;
 

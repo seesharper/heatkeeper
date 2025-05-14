@@ -4,7 +4,7 @@ namespace HeatKeeper.Server.Sensors.Api;
 [Get("/api/sensors/{sensorId}")]
 public record SensorDetailsQuery(long SensorId) : IQuery<SensorDetails>;
 
-public record SensorDetails(long Id, string Name, string Description, string ExternalId, DateTime LastSeen, string ZoneName);
+public record SensorDetails(long Id, string Name, string Description, string ExternalId, long MinutesBeforeConsideredDead, DateTime LastSeen, string ZoneName);
 
 public class GetSensorDetails(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<SensorDetailsQuery, SensorDetails>
 {

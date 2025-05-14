@@ -46,7 +46,7 @@ https://jeroenhildering.com/2016/11/24/mapping-exceptions-to-http-responses-with
 https://docs.influxdata.com/influxdb/cloud/query-data/common-queries/compare-values/
 
 
-
+https://stackoverflow.com/questions/70650711/libsqlite-interop-not-found-mac-os-m1
 
 
 ```

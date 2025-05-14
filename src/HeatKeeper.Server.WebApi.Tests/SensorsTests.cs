@@ -1,9 +1,5 @@
 using System;
-using System.Threading.Tasks;
-using FluentAssertions;
-using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.Sensors.Api;
-using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests;
 
@@ -35,11 +31,14 @@ public class DeadSensorsTests : TestBase
 
         var sensorDetails = await client.GetSensorDetails(testApplication.LivingRoomSensorId, testApplication.Token);
 
-        await client.UpdateSensor(new UpdateSensorCommand(testApplication.LivingRoomSensorId, "New name", "New description"), testApplication.Token);
+        await client.UpdateSensor(new UpdateSensorCommand(testApplication.LivingRoomSensorId, "New name", "New description", "New ExternalId", 5), testApplication.Token);
 
         var updatedSensorDetails = await client.GetSensorDetails(testApplication.LivingRoomSensorId, testApplication.Token);
 
         updatedSensorDetails.Name.Should().Be("New name");
         updatedSensorDetails.Description.Should().Be("New description");
+        updatedSensorDetails.ExternalId.Should().Be("New ExternalId");
+        updatedSensorDetails.MinutesBeforeConsideredDead.Should().Be(5);
+
     }
 }

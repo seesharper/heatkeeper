@@ -1,9 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
-using CQRS.Command.Abstractions;
-using CQRS.Query.Abstractions;
-using HeatKeeper.Server.Authorization;
-using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.PushSubscriptions;
 using WebPush;

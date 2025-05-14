@@ -3,6 +3,7 @@ SELECT
     s.Name,
     s.Description,
     s.ExternalId,
+    s.MinutesBeforeConsideredDead,
     s.LastSeen,
     z.Name AS ZoneName
 FROM

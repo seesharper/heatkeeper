@@ -23,6 +23,14 @@ namespace HeatKeeper.Server.WebApi.Tests;
 
 public static class TestApplicationExtensions
 {
+    public static async Task<HttpClient> CreateAuthenticatedClient<TEntryPoint>(this TestApplication<TEntryPoint> testApplication) where TEntryPoint : class
+    {
+        var client = testApplication.CreateClient();
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {await client.AuthenticateAsAdminUser()}");
+        // new AuthenticationHeaderValue("Bearer", this.bearerToken);
+        return client;
+    }
+
     public static async Task<TestLocation> CreateTestLocation<TEntryPoint>(this TestApplication<TEntryPoint> testApplication) where TEntryPoint : class
     {
         var client = testApplication.CreateClient();
@@ -67,6 +75,8 @@ public static class TestApplicationExtensions
         var createSetPointCommand = new CreateSetPointCommand(scheduleId, livingRoomZoneId, 20, 2);
 
         var setPointId = await client.CreateSetPoint(scheduleId, createSetPointCommand, token);
+
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
         return new TestLocation(client, testApplication.Services, token, locationId, livingRoomZoneId, livingRoomSensor.Id, kitchenZoneId, normalProgramId, scheduleId, setPointId, livingRoomHeaterId1, livingRoomHeaterId2, kitchenHeaterId, vatRateId, priceAreaId);
     }

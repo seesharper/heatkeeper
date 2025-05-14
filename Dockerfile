@@ -17,7 +17,7 @@ RUN npm run build
 
 
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-stage
 ARG APP_VERSION
 COPY src /src
 
@@ -27,7 +27,7 @@ RUN echo "Building version " $APP_VERSION
 RUN dotnet publish -c release -o /heatkeeper/app /property:Version=$APP_VERSION
 
 # Runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 
 VOLUME [ "/db" ]
 

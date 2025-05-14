@@ -1,4 +1,4 @@
-#load "nuget:Dotnet.Build, 0.22.0"
+#load "nuget:Dotnet.Build, 0.24.0"
 #load "nuget:dotnet-steps, 0.0.2"
 
 BuildContext.CodeCoverageThreshold = 30;
@@ -10,13 +10,13 @@ var TagVersion = BuildContext.LatestTag;
 [StepDescription("Runs the tests with test coverage")]
 Step testcoverage = () =>
 {
-    if (File.Exists(Path.Combine(BuildContext.RepositoryFolder, "src/HeatKeeper.Server.WebApi.Tests/bin/Debug/net8.0/heatkeeper.db")))
+    if (File.Exists(Path.Combine(BuildContext.RepositoryFolder, "src/HeatKeeper.Server.WebApi.Tests/bin/Debug/net9.0/heatkeeper.db")))
     {
-        File.Delete(Path.Combine(BuildContext.RepositoryFolder, "src/HeatKeeper.Server.WebApi.Tests/bin/Debug/net8.0/heatkeeper.db"));
+        File.Delete(Path.Combine(BuildContext.RepositoryFolder, "src/HeatKeeper.Server.WebApi.Tests/bin/Debug/net9.0/heatkeeper.db"));
     }
-    if (File.Exists(Path.Combine(BuildContext.RepositoryFolder, "src/HeatKeeper.Server.WebApi.Tests/bin/release/net8.0/heatkeeper.db")))
+    if (File.Exists(Path.Combine(BuildContext.RepositoryFolder, "src/HeatKeeper.Server.WebApi.Tests/bin/release/net9.0/heatkeeper.db")))
     {
-        File.Delete(Path.Combine(BuildContext.RepositoryFolder, "src/HeatKeeper.Server.WebApi.Tests/bin/release/net8.0/heatkeeper.db"));
+        File.Delete(Path.Combine(BuildContext.RepositoryFolder, "src/HeatKeeper.Server.WebApi.Tests/bin/release/net9.0/heatkeeper.db"));
     }
     Command.Execute("docker", $"compose -f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" up -d");
     DotNet.TestWithCodeCoverage();

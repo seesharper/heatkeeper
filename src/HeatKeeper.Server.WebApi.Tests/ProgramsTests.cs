@@ -112,7 +112,7 @@ public class ProgramsTests : TestBase
         await client.UpdateSchedule(TestData.Schedules.ScheduleWithInvalidCronExpression(scheduleId), testLocation.Token, problem: details =>
         {
             details.ShouldHaveBadRequestStatus();
-            var errorMessage = $"The cron expression {TestData.Schedules.InvalidCronExpression} is not valid for schedule {TestData.Schedules.TestScheduleUpdatedName}";
+            var errorMessage = $"The cron expression {TestData.InvalidCronExpression} is not valid for schedule {TestData.Schedules.TestScheduleUpdatedName}";
             details.Detail.Should().Be(errorMessage);
         });
     }

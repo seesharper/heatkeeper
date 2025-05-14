@@ -4,7 +4,7 @@
 -- Text encoding used: UTF-8
 --
 PRAGMA foreign_keys = off;
-BEGIN TRANSACTION;
+--BEGIN TRANSACTION;
 
 -- Table: LatestZoneMeasurements
 DROP TABLE IF EXISTS LatestZoneMeasurements;
@@ -14,5 +14,5 @@ CREATE TABLE LatestZoneMeasurements (ZoneId INTEGER REFERENCES Zones (Id), Measu
 DROP INDEX IF EXISTS IDX_ZoneId_MeasurementType;
 CREATE UNIQUE INDEX IDX_ZoneId_MeasurementType ON LatestZoneMeasurements (ZoneId, MeasurementType);
 
-COMMIT TRANSACTION;
+--COMMIT TRANSACTION;
 PRAGMA foreign_keys = on;
