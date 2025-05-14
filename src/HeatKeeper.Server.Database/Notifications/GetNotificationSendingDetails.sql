@@ -1,5 +1,4 @@
-SELECT 
-    n.Enabled,
+SELECT     
     n.HoursToSnooze,
     n.LastSent
 FROM Notifications n

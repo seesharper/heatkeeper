@@ -4,6 +4,7 @@ using HeatKeeper.Server;
 using HeatKeeper.Server.EnergyPrices;
 using HeatKeeper.Server.ExchangeRates;
 using HeatKeeper.Server.Host;
+using HeatKeeper.Server.Host.BackgroundTasks;
 using HeatKeeper.Server.Measurements;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
@@ -16,6 +17,7 @@ builder.Configuration.AddEnvironmentVariables(prefix: "HEATKEEPER_");
 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddJanitor();
+builder.Services.AddHostedService<MessageBusHostedService>();
 builder.Services.AddHttpClient();
 builder.Services.AddCorsPolicy();
 builder.Services.AddHttpClient<IWebPushClient, WebPushClient>();

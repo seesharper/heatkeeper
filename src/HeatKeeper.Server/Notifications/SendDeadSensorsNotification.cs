@@ -21,13 +21,13 @@ public class SendDeadSensorsNotification(IQueryExecutor queryExecutor, ICommandE
         }
 
         var payLoad = CreateNotificationPayload(deadSensors);
-        var notificationSendingDetails = queryExecutor.ExecuteAsync(new GetNotificationSendingDetailsQuery(command.NotificationId), cancellationToken);
+        var notificationSendingDetails = await queryExecutor.ExecuteAsync(new GetNotificationSendingDetailsQuery(command.NotificationId), cancellationToken);
 
 
-        var usersSubscribedToNotification = await queryExecutor.ExecuteAsync(new GetSubscribedUsersQuery(NotificationType.DeadSensors), cancellationToken);
+        var usersSubscribedToNotification = await queryExecutor.ExecuteAsync(new GetSubscribedUsersQuery(command.NotificationId), cancellationToken);
         foreach (var userSubscribedToNotification in usersSubscribedToNotification)
         {
-            if (userSubscribedToNotification.LastSent.AddHours(userSubscribedToNotification.HoursToSnooze) > DateTime.UtcNow)
+            if (notificationSendingDetails.LastSent.AddHours(notificationSendingDetails.HoursToSnooze) > DateTime.UtcNow)
             {
                 continue;
             }

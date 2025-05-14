@@ -1,7 +1,17 @@
+using System;
 using System.Linq;
+using System.Threading;
+using CQRS.AspNet.Testing;
+using CsvHelper;
+using HeatKeeper.Server.Messaging;
 using HeatKeeper.Server.Notifications;
 using HeatKeeper.Server.Notifications.Api;
+using HeatKeeper.Server.PushSubscriptions;
 using HeatKeeper.Server.Users.Api;
+using Janitor;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using WebPush;
 
 namespace HeatKeeper.Server.WebApi.Tests;
 
@@ -34,7 +44,6 @@ public static partial class TestData
         public static PatchNotificationCommand UpdatedDeadSensorNotification => new(0, "Updated Test Notification", "Updated Test Notification Description", NotificationType.DeadSensors, "* * * * *", 24);
     }
 }
-
 public class NotificationsTests : TestBase
 {
     private static PostNotificationCommand DeadSensorNotification => new("Test Notification",
@@ -137,11 +146,10 @@ public class NotificationsTests : TestBase
     {
         var testLocation = await Factory.CreateTestLocation();
         var client = testLocation.HttpClient;
-        var testUserId = await client.Post(TestData.Users.StandardUser);
         var notificationId = await client.Post(DeadSensorNotification);
-        await client.Post(new PostNotificationSubscriptionCommand(testUserId, notificationId));
+        await client.Post(new PostNotificationSubscriptionCommand(notificationId));
 
-        var notificationSubscriptions = await client.Get(new GetNotificationSubscriptionsQuery(testUserId));
+        var notificationSubscriptions = await client.Get(new GetNotificationSubscriptionsQuery());
 
         notificationSubscriptions.Length.Should().Be(1);
         notificationSubscriptions.First().IsSubscribed.Should().BeTrue();
@@ -152,10 +160,10 @@ public class NotificationsTests : TestBase
     {
         var testLocation = await Factory.CreateTestLocation();
         var client = testLocation.HttpClient;
-        var testUserId = await client.Post(TestData.Users.StandardUser);
+
         var notificationId = await client.Post(DeadSensorNotification);
 
-        var notificationSubscriptions = await client.Get(new GetNotificationSubscriptionsQuery(1));
+        var notificationSubscriptions = await client.Get(new GetNotificationSubscriptionsQuery());
 
         notificationSubscriptions.Length.Should().Be(1);
         notificationSubscriptions.First().IsSubscribed.Should().BeFalse();
@@ -166,20 +174,52 @@ public class NotificationsTests : TestBase
     {
         var testLocation = await Factory.CreateTestLocation();
         var client = testLocation.HttpClient;
-        var testUserId = await client.Post(TestData.Users.StandardUser);
+
         var notificationId = await client.Post(DeadSensorNotification);
-        var notificationSubscriptionId = await client.Post(new PostNotificationSubscriptionCommand(testUserId, notificationId));
+       
+       
+       
+       var notificationSubscriptionId = await client.Post(new PostNotificationSubscriptionCommand(notificationId));
         await client.Delete(new DeleteNotificationSubscription(notificationSubscriptionId));
-        var notificationSubscriptions = await client.Get(new GetNotificationSubscriptionsQuery(testUserId));
+        var notificationSubscriptions = await client.Get(new GetNotificationSubscriptionsQuery());
         notificationSubscriptions.Length.Should().Be(1);
         notificationSubscriptions.First().IsSubscribed.Should().BeFalse();
     }
 
+    [Fact]
+    public async Task ShouldGetNotificationTypes()
+    {
+        var testLocation = await Factory.CreateTestLocation();
+        var client = testLocation.HttpClient;
+
+        var notificationTypes = await client.Get(new GetNotificationTypesQuery());
+
+        notificationTypes.Should().NotBeEmpty();
+        notificationTypes.Should().HaveCount(4);        
+    }
 
 
     [Fact]
     public async Task ShouldSendDeadSensorNotification()
     {
+        var now = Factory.UseFakeTimeProvider(TestData.Clock.Today);
+        var webPushClientMock = Factory.MockService<IWebPushClient>();
+        var testLocation = await Factory.CreateTestLocation();
+        var client = testLocation.HttpClient;
+        var janitor = Factory.Services.GetRequiredService<IJanitor>();
+        var testUserId = await client.Post(TestData.Users.StandardUser);
+        var notificationId = await client.Post(DeadSensorNotification);
+        await client.Post(new PostNotificationSubscriptionCommand(notificationId));
+        await client.Post(TestData.PushSubscriptions.TestPushSubscription);
+
+        now.Advance(TimeSpan.FromHours(14));
+
+        await janitor.Run($"ScheduledNotification_{notificationId}");
+        var messageBus = Factory.Services.GetRequiredService<IMessageBus>();
+        await messageBus.ConsumeAllMessages<SendPushNotificationCommand>();
+
+
+        webPushClientMock.Verify(m => m.SendNotificationAsync(It.IsAny<PushSubscription>(), It.IsAny<string>(), It.IsAny<VapidDetails>(), It.IsAny<CancellationToken>()), Times.Once);
 
     }
 

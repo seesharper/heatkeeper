@@ -11,6 +11,8 @@ public interface IMessageBus
     void Publish<T>(T message);
     void Subscribe<T>(Delegate handler);
     Task Start();
+
+    Task ConsumeAllMessages<TMessage>();
 }
 
 public class MessageBus(IServiceProvider serviceProvider, ILogger<MessageBus> logger) : IMessageBus
@@ -48,14 +50,22 @@ public class MessageBus(IServiceProvider serviceProvider, ILogger<MessageBus> lo
 
             var result = (Task)typeof(MessageBus).GetMethod(nameof(ConsumeMessages), BindingFlags.NonPublic | BindingFlags.Instance)
             .MakeGenericMethod(type)
-            .Invoke(this, [channel]);
+            .Invoke(this, [channel, false]);
             tasks.Add(result);
         }
 
         await Task.WhenAll(tasks);
     }
 
-    private async Task ConsumeMessages<TMessage>(Channel<TMessage> channel)
+    public async Task ConsumeAllMessages<TMessage>()
+    {
+        if (_channels.TryGetValue(typeof(TMessage), out var channel))
+        {
+            await ConsumeMessages((Channel<TMessage>)channel, true);
+        }
+    }
+
+    private async Task ConsumeMessages<TMessage>(Channel<TMessage> channel, bool complete)
     {
         await foreach (var message in channel.Reader.ReadAllAsync())
         {
@@ -87,6 +97,10 @@ public class MessageBus(IServiceProvider serviceProvider, ILogger<MessageBus> lo
                             logger.LogError(ex, "Error invoking handler");
                         }
                     }
+                }
+                if (complete)
+                {
+                    channel.Writer.TryComplete();
                 }
             }
         }

@@ -4,7 +4,7 @@ public record Keys(string p256dh, string auth);
 
 [RequireUserRole]
 [Post("api/pushSubscriptions/")]
-public record CreatePushSubscriptionCommand(string Endpoint, Keys Keys);
+public record CreatePushSubscriptionCommand(string Endpoint, Keys Keys) : PostCommand;
 
 public class CreatePushSubscription(IUserContext userContext, ICommandExecutor commandExecutor, IQueryExecutor queryExecutor, TimeProvider timeProvider) : ICommandHandler<CreatePushSubscriptionCommand>
 {

@@ -1,5 +1,6 @@
 namespace HeatKeeper.Server.Measurements;
 
+
 [RequireReporterRole]
 public record MeasurementCommand(
     string SensorId,

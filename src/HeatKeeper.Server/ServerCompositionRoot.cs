@@ -10,6 +10,7 @@ using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
+using HeatKeeper.Server.Messaging;
 using HeatKeeper.Server.Notifications;
 using HeatKeeper.Server.Notifications.Api;
 using HeatKeeper.Server.Programs;
@@ -53,6 +54,7 @@ public class ServerCompositionRoot : ICompositionRoot
             .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
             .RegisterSingleton<IEmailValidator, EmailValidator>()
             .RegisterSingleton<ICronExpressionValidator, CronExpressionValidator>()
+            .RegisterSingleton<IMessageBus, MessageBus>()
 
             .Decorate<ICommandHandler<CreateLocationCommand>, ValidateCreateLocation>()
             .Decorate<ICommandHandler<UpdateLocationCommand>, ValidateUpdateLocation>()

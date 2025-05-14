@@ -10,13 +10,13 @@ public class MessageBusHostedService(IMessageBus messageBus) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        if (!AppEnvironment.IsRunningFromTests)
-        {
-            messageBus.Subscribe<SendPushNotificationCommand>(async (SendPushNotificationCommand command, ICommandExecutor commandExecutor) =>
+        messageBus.Subscribe<SendPushNotificationCommand>(async (SendPushNotificationCommand command, ICommandExecutor commandExecutor) =>
             {
                 await commandExecutor.ExecuteAsync(command);
             });
 
+        if (!AppEnvironment.IsRunningFromTests)
+        {
             await messageBus.Start();
         }
     }

@@ -1,10 +1,16 @@
+using System.ComponentModel;
+
 namespace HeatKeeper.Server.Notifications;
 
 public enum NotificationType
 {
+    [Description("Dead sensors")]
     DeadSensors = 1,
+    [Description("Program changed")]
     ProgramChanged = 2,
+    [Description("Energy Price")]
     EnergyPrice = 3,
+    [Description("Sensor measurement")]
     Measurement = 4
 }
 
