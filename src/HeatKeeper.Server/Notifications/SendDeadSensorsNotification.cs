@@ -39,7 +39,7 @@ public class SendDeadSensorsNotification(IQueryExecutor queryExecutor, ICommandE
                 continue;
             }
             var pushSubscription = new PushSubscription(pushSubscriptionDetails.Endpoint, pushSubscriptionDetails.P256dh, pushSubscriptionDetails.Auth);
-            messageBus.Publish(new SendPushNotificationCommand(pushSubscription, payLoad.ToString()));
+            await messageBus.Publish(new SendPushNotificationCommand(pushSubscription, payLoad.ToString()));
         }
     }
 

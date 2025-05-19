@@ -8,7 +8,7 @@ namespace HeatKeeper.Server.Messaging;
 
 public interface IMessageBus
 {
-    void Publish<T>(T message);
+    Task Publish<T>(T message);
     void Subscribe<T>(Delegate handler);
     Task Start();
 
@@ -20,11 +20,12 @@ public class MessageBus(IServiceProvider serviceProvider, ILogger<MessageBus> lo
     private readonly ConcurrentDictionary<Type, ConcurrentBag<Delegate>> _handlers = new();
     private readonly ConcurrentDictionary<Type, object> _channels = new();
 
-    public void Publish<T>(T message)
+    public async Task Publish<T>(T message)
     {
         if (_channels.TryGetValue(typeof(T), out var channel))
         {
-            ((Channel<T>)channel).Writer.WriteAsync(message);
+            logger.LogInformation("Publishing message of type {MessageType}", typeof(T));
+            await ((Channel<T>)channel).Writer.WriteAsync(message);
         }
     }
 
