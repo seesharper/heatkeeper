@@ -3,6 +3,8 @@ SET
     name = @name,
     description = @description,
     defaultOutsideZoneId = @defaultOutsideZoneId,
-    defaultInsideZoneId = @defaultInsideZoneId
+    defaultInsideZoneId = @defaultInsideZoneId,
+    longitude = @longitude,
+    latitude = @latitude
 WHERE
     id = @Id

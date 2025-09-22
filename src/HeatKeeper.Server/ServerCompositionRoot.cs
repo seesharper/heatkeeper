@@ -1,4 +1,5 @@
 using System.Data.Common;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using CQRS.LightInject;
 using CQRS.Transactions;
@@ -7,6 +8,7 @@ using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Authentication;
 
+using HeatKeeper.Server.Lighting;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
@@ -55,6 +57,9 @@ public class ServerCompositionRoot : ICompositionRoot
             .RegisterSingleton<IEmailValidator, EmailValidator>()
             .RegisterSingleton<ICronExpressionValidator, CronExpressionValidator>()
             .RegisterSingleton<IMessageBus, MessageBus>()
+            .RegisterSingleton<IOutdoorLightsController, OutdoorLightsController>()
+            .RegisterSingleton<HttpClient>()
+            .RegisterSingleton<ISunCalculationService, ExternalSunCalculationService>()
 
             .Decorate<ICommandHandler<CreateLocationCommand>, ValidateCreateLocation>()
             .Decorate<ICommandHandler<UpdateLocationCommand>, ValidateUpdateLocation>()

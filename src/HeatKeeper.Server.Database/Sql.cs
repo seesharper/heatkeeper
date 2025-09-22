@@ -317,9 +317,12 @@ public interface ISqlProvider
     string GetNotificationSendingDetails { get; }
 
     string CreateNotificationSubscriptionsTable { get; }
-
     string InsertNotification { get; }
 
     string GetNotifications { get; }
+
+    string AddLongitudeAndLatitudeToLocationsTable { get; }
+
+    string GetLocationCoordinates { get; }
 
 }

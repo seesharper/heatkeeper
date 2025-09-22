@@ -4,6 +4,8 @@ SELECT
     l.Description,
     l.DefaultInsideZoneId,
     l.DefaultOutsideZoneId,
-    l.ActiveProgramId
+    l.ActiveProgramId,
+    l.Longitude,
+    l.Latitude
 FROM Locations l
 WHERE l.id = @id

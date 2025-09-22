@@ -20,6 +20,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             createdLocation.Id.Should().Be(locationId);
             createdLocation.Name.Should().Be(TestData.Locations.Home.Name);
             createdLocation.Description.Should().Be(TestData.Locations.Home.Description);
+            createdLocation.Longitude.Should().Be(TestData.Locations.Home.Longitude);
+            createdLocation.Latitude.Should().Be(TestData.Locations.Home.Latitude);
         }
 
         [Fact]
@@ -30,7 +32,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var locationId = await client.CreateLocation(TestData.Locations.Home, token);
 
-            var updateLocationCommand = new UpdateLocationCommand(locationId, TestData.Locations.Cabin.Name, TestData.Locations.Cabin.Description, null, null);
+            var updateLocationCommand = new UpdateLocationCommand(locationId, TestData.Locations.Cabin.Name, TestData.Locations.Cabin.Description, null, null, TestData.Locations.Cabin.Longitude, TestData.Locations.Cabin.Latitude);
 
 
             await client.UpdateLocation(updateLocationCommand, locationId, token);
@@ -39,6 +41,8 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             updatedLocation.Name.Should().Be(TestData.Locations.Cabin.Name);
             updatedLocation.Description.Should().Be(TestData.Locations.Cabin.Description);
+            updatedLocation.Longitude.Should().Be(TestData.Locations.Cabin.Longitude);
+            updatedLocation.Latitude.Should().Be(TestData.Locations.Cabin.Latitude);
             updatedLocation.Id.Should().Be(locationId);
         }
 
@@ -83,7 +87,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             await client.CreateLocation(TestData.Locations.Home, token);
             var cabinLocationId = await client.CreateLocation(TestData.Locations.Cabin, token);
 
-            var updateLocationCommand = new UpdateLocationCommand(cabinLocationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, null);
+            var updateLocationCommand = new UpdateLocationCommand(cabinLocationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, null, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude);
 
 
             await client.UpdateLocation(updateLocationCommand, cabinLocationId, token, problem: details => details.ShouldHaveConflictStatus());
