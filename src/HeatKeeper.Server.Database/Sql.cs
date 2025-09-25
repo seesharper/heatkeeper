@@ -325,4 +325,14 @@ public interface ISqlProvider
 
     string GetLocationCoordinates { get; }
 
+    string CreateEventTriggersTable { get; }
+
+    string GetAllEventTriggers { get; }
+
+    string InsertEventTrigger { get; }
+
+    string UpdateEventTrigger { get; }
+
+    string DeleteEventTrigger { get; }
+
 }
