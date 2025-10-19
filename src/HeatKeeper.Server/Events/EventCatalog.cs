@@ -5,12 +5,16 @@ namespace HeatKeeper.Server.Events;
 /// <summary>
 /// Metadata about an event type and its payload properties.
 /// </summary>
+/// <param name="Id">Unique identifier for the event type</param>
+/// <param name="Name">Human-readable name for the event</param>
+/// <param name="Description">Description of what this event represents</param>
 /// <param name="EventType">The event type name (derived from payload type name)</param>
-/// <param name="PayloadType">The .NET type of the payload</param>
 /// <param name="Properties">List of properties in the payload</param>
-public sealed record EventTypeInfo(
+public sealed record EventDetails(
+    int Id,
+    string Name,
+    string Description,
     string EventType,
-    Type PayloadType,
     IReadOnlyList<EventPropertyInfo> Properties
 );
 
@@ -33,7 +37,9 @@ public sealed record EventPropertyInfo(
 /// </summary>
 public sealed class EventCatalog : IEventCatalog
 {
-    private readonly List<EventTypeInfo> _eventTypes = new();
+    private readonly Dictionary<int, EventDetails> _eventTypes = new();
+    private readonly HashSet<Assembly> _scannedAssemblies = new();
+    private readonly object _lock = new();
 
     /// <summary>
     /// Scans the specified assembly for types that can be used as DomainEvent payloads.
@@ -43,16 +49,41 @@ public sealed class EventCatalog : IEventCatalog
     {
         assembly ??= Assembly.GetCallingAssembly();
 
-        var payloadTypes = assembly.GetTypes()
-            .Where(IsValidPayloadType)
-            .ToList();
-
-        foreach (var payloadType in payloadTypes)
+        lock (_lock)
         {
-            var eventType = payloadType.Name; // This matches DomainEvent<T>.EventType logic
-            var properties = GetPayloadProperties(payloadType);
+            // Skip if this assembly has already been scanned
+            if (_scannedAssemblies.Contains(assembly))
+            {
+                return;
+            }
 
-            _eventTypes.Add(new EventTypeInfo(eventType, payloadType, properties));
+            var payloadTypes = assembly.GetTypes()
+                .Where(IsValidPayloadType)
+                .Where(type => type.GetCustomAttribute<DomainEventAttribute>() != null) // Only types with DomainEventAttribute
+                .ToList();
+
+            foreach (var payloadType in payloadTypes)
+            {
+                var eventType = payloadType.Name; // This matches DomainEvent<T>.EventType logic
+
+                // Extract metadata from DomainEventAttribute (we know it exists now)
+                var domainEventAttribute = payloadType.GetCustomAttribute<DomainEventAttribute>()!;
+                var id = domainEventAttribute.Id;
+                var name = domainEventAttribute.Name;
+                var description = domainEventAttribute.Description;
+
+                // Check if this event is already registered to avoid duplicates
+                if (_eventTypes.ContainsKey(id))
+                {
+                    continue;
+                }
+
+                var properties = GetPayloadProperties(payloadType);
+                _eventTypes.Add(id, new EventDetails(id, name, description, eventType, properties));
+            }
+
+            // Mark this assembly as scanned
+            _scannedAssemblies.Add(assembly);
         }
     }
 
@@ -60,20 +91,38 @@ public sealed class EventCatalog : IEventCatalog
     /// Gets all discovered event types.
     /// </summary>
     /// <returns>A read-only list of event type information</returns>
-    public IReadOnlyList<EventTypeInfo> ListEventTypes() => _eventTypes.AsReadOnly();
+    public IReadOnlyList<EventDetails> ListEventTypes()
+    {
+        lock (_lock)
+        {
+            return _eventTypes.Values.ToList().AsReadOnly();
+        }
+    }
 
     /// <summary>
-    /// Gets event type information by event type name.
+    /// Gets event details by event ID.
     /// </summary>
-    /// <param name="eventType">The event type name</param>
-    /// <returns>Event type info if found, null otherwise</returns>
-    public EventTypeInfo? GetEventType(string eventType)
-        => _eventTypes.FirstOrDefault(e => e.EventType.Equals(eventType, StringComparison.OrdinalIgnoreCase));
+    /// <param name="id">The event ID</param>
+    /// <returns>Event details if found</returns>
+    public EventDetails GetEventDetails(int id)
+    {
+        lock (_lock)
+        {
+            return _eventTypes[id]; // Throws KeyNotFoundException if not found
+        }
+    }
 
     /// <summary>
     /// Clears all discovered event types.
     /// </summary>
-    public void Clear() => _eventTypes.Clear();
+    public void Clear()
+    {
+        lock (_lock)
+        {
+            _eventTypes.Clear();
+            _scannedAssemblies.Clear();
+        }
+    }
 
     private static bool IsValidPayloadType(Type type)
     {

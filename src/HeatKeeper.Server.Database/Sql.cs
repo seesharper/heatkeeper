@@ -329,6 +329,8 @@ public interface ISqlProvider
 
     string GetAllEventTriggers { get; }
 
+    string GetEventTrigger { get; }
+
     string InsertEventTrigger { get; }
 
     string UpdateEventTrigger { get; }

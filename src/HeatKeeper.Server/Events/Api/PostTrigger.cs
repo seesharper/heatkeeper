@@ -4,9 +4,9 @@ namespace HeatKeeper.Server.Events.Api;
 
 [RequireUserRole]
 [Post("api/triggers")]
-public record PostTriggerCommand(TriggerDefinition Trigger) : PostCommand;
+public record PostTriggerCommand(string Name) : PostCommand;
 
-public class PostTrigger(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<PostTriggerCommand>
+public class PostTrigger(IDbConnection dbConnection) : ICommandHandler<PostTriggerCommand>
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -16,14 +16,21 @@ public class PostTrigger(IDbConnection dbConnection, ISqlProvider sqlProvider) :
 
     public async Task HandleAsync(PostTriggerCommand command, CancellationToken cancellationToken = default)
     {
-        var definition = JsonSerializer.Serialize(command.Trigger, JsonOptions);
+        // Create an empty TriggerDefinition with the provided name
+        var emptyTriggerDefinition = new TriggerDefinition(
+            command.Name,
+            string.Empty, // Empty event type
+            new Dictionary<string, object>(), // Empty values
+            new List<Condition>(), // Empty conditions
+            new List<ActionBinding>() // Empty actions
+        );
 
         var parameters = new
         {
-            Name = command.Trigger.Name,
-            Definition = definition
+            Name = command.Name,
+            Definition = JsonSerializer.Serialize(emptyTriggerDefinition, JsonOptions)
         };
 
-        await dbConnection.ExecuteAsync(sqlProvider.InsertEventTrigger, parameters);
+        await dbConnection.ExecuteAsync("INSERT INTO EventTriggers (Name, Definition) VALUES (@Name, @Definition)", parameters);
     }
 }

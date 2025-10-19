@@ -87,9 +87,9 @@ public static partial class TestData
 
 public class TriggerTests : TestBase
 {
-    private static PostTriggerCommand CreateTemperatureTrigger => new(TestData.Triggers.TemperatureTrigger);
-    private static PostTriggerCommand CreateHumidityTrigger => new(TestData.Triggers.HumidityTrigger);
-    private static PostTriggerCommand CreateEmptyNameTrigger => new(TestData.Triggers.EmptyNameTrigger);
+    private static PostTriggerCommand CreateTemperatureTrigger => new(TestData.Triggers.TemperatureTrigger.Name);
+    private static PostTriggerCommand CreateHumidityTrigger => new(TestData.Triggers.HumidityTrigger.Name);
+    private static PostTriggerCommand CreateEmptyNameTrigger => new(TestData.Triggers.EmptyNameTrigger.Name);
 
     [Fact]
     public async Task ShouldCreateTrigger()
@@ -117,16 +117,12 @@ public class TriggerTests : TestBase
         triggers.Should().HaveCount(2);
 
         var tempTrigger = triggers.First(t => t.Name == "Temperature Alert");
-        tempTrigger.AppliesToEventType.Should().Be("TemperatureReading");
-        tempTrigger.Values.Should().ContainKey("Threshold");
-        tempTrigger.Values["Threshold"].Should().Be(25.0);
-        tempTrigger.Conditions.Should().HaveCount(1);
-        tempTrigger.Actions.Should().HaveCount(1);
+        tempTrigger.Id.Should().BeGreaterThan(0);
+        tempTrigger.Name.Should().Be("Temperature Alert");
 
         var humidityTrigger = triggers.First(t => t.Name == "Humidity Alert");
-        humidityTrigger.AppliesToEventType.Should().Be("HumidityReading");
-        humidityTrigger.Conditions.First().Operator.Should().Be(ComparisonOperator.LessThan);
-        humidityTrigger.Actions.First().ActionName.Should().Be("TurnHeatersOffAction");
+        humidityTrigger.Id.Should().BeGreaterThan(0);
+        humidityTrigger.Name.Should().Be("Humidity Alert");
     }
 
     [Fact]
@@ -142,8 +138,8 @@ public class TriggerTests : TestBase
         var triggers = await client.Get(new GetTriggersQuery());
         triggers.Should().HaveCount(1);
         var originalTrigger = triggers.First();
+        originalTrigger.Id.Should().BeGreaterThan(0);
         originalTrigger.Name.Should().Be("Temperature Alert");
-        originalTrigger.Values["Threshold"].Should().Be(25.0);
 
         // Update the trigger (using ID 1 as we know it's the first one)
         var updateCommand = new PatchTriggerCommand(1, TestData.Triggers.UpdatedTemperatureTrigger);
@@ -153,10 +149,8 @@ public class TriggerTests : TestBase
         var updatedTriggers = await client.Get(new GetTriggersQuery());
         updatedTriggers.Should().HaveCount(1);
         var updatedTrigger = updatedTriggers.First();
+        updatedTrigger.Id.Should().Be(originalTrigger.Id); // Same ID after update
         updatedTrigger.Name.Should().Be("Updated Temperature Alert");
-        updatedTrigger.Values["Threshold"].Should().Be(30.0);
-        updatedTrigger.Values["ZoneId"].Should().Be(2);
-        updatedTrigger.Conditions.First().RightKeyOrLiteral.Should().Be("30.0");
     }
 
     [Fact]
@@ -232,23 +226,15 @@ public class TriggerTests : TestBase
             }
         );
 
-        var createCommand = new PostTriggerCommand(complexTrigger);
+        var createCommand = new PostTriggerCommand(complexTrigger.Name);
         await client.Post(createCommand);
 
         var triggers = await client.Get(new GetTriggersQuery());
         triggers.Should().HaveCount(1);
 
         var retrievedTrigger = triggers.First();
+        retrievedTrigger.Id.Should().BeGreaterThan(0);
         retrievedTrigger.Name.Should().Be("Complex Multi-Condition Trigger");
-        retrievedTrigger.AppliesToEventType.Should().Be("SensorReading");
-        retrievedTrigger.Values.Should().HaveCount(5);
-        retrievedTrigger.Values["MinTemperature"].Should().Be(18.5);
-        retrievedTrigger.Values["MaxTemperature"].Should().Be(25.0);
-        retrievedTrigger.Values["LocationId"].Should().Be(42);
-        retrievedTrigger.Values["IsEnabled"].Should().Be(true);
-        retrievedTrigger.Values["Tags"].Should().Be("critical,hvac,monitoring");
-        retrievedTrigger.Conditions.Should().HaveCount(3);
-        retrievedTrigger.Actions.Should().HaveCount(2);
     }
 
     [Fact]
@@ -282,22 +268,14 @@ public class TriggerTests : TestBase
             }
         );
 
-        await client.Post(new PostTriggerCommand(originalTrigger));
+        await client.Post(new PostTriggerCommand(originalTrigger.Name));
 
         var triggers = await client.Get(new GetTriggersQuery());
         triggers.Should().HaveCount(1);
 
         var retrievedTrigger = triggers.First();
+        retrievedTrigger.Id.Should().BeGreaterThan(0);
         retrievedTrigger.Name.Should().Be("JSON Fidelity Test");
-        retrievedTrigger.AppliesToEventType.Should().Be("TestEvent");
-        retrievedTrigger.Values["StringValue"].Should().Be("test string");
-        retrievedTrigger.Values["IntValue"].Should().Be(42);
-        retrievedTrigger.Values["DoubleValue"].Should().Be(3.14159);
-        retrievedTrigger.Values["BoolValue"].Should().Be(true);
-        retrievedTrigger.Values["ArrayValue"].Should().Be("1,2,3");
-        retrievedTrigger.Values["ObjectValue"].Should().Be("nested:value");
-        retrievedTrigger.Conditions.First().LeftKey.Should().Be("TestProperty");
-        retrievedTrigger.Actions.First().ActionName.Should().Be("TestAction");
     }
 
     public static TheoryData<PostTriggerCommand, string> InvalidTriggers()
@@ -350,5 +328,70 @@ public class TriggerTests : TestBase
         // Verify operation completed without issues
         var triggers = await client.Get(new GetTriggersQuery());
         triggers.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task ShouldGetTriggerDetails()
+    {
+        var testLocation = await Factory.CreateTestLocation();
+        var client = testLocation.HttpClient;
+
+        // Create a trigger
+        var triggerId = await client.Post(CreateTemperatureTrigger);
+        triggerId.Should().BeGreaterThan(0);
+
+        // Update it with full definition to have proper JSON data
+        await client.Patch(new PatchTriggerCommand(triggerId, TestData.Triggers.TemperatureTrigger));
+
+        // Now retrieve the trigger details
+        var triggerDetails = await client.Get(new TriggerDetailsQuery(triggerId));
+
+        triggerDetails.Should().NotBeNull();
+        triggerDetails.Name.Should().Be("Temperature Alert");
+        triggerDetails.AppliesToEventType.Should().Be("TemperatureReading");
+        triggerDetails.Values.Should().ContainKey("Threshold");
+        triggerDetails.Values["Threshold"].Should().Be(25.0);
+        triggerDetails.Values.Should().ContainKey("ZoneId");
+        triggerDetails.Values["ZoneId"].Should().Be(1);
+        triggerDetails.Conditions.Should().HaveCount(1);
+        triggerDetails.Actions.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task ShouldHandleGetTriggerDetailsForNonExistentTrigger()
+    {
+        var testLocation = await Factory.CreateTestLocation();
+        var client = testLocation.HttpClient;
+
+        // Try to get details for non-existent trigger
+        var action = () => client.Get(new TriggerDetailsQuery(99999));
+
+        await action.Should().ThrowAsync<Exception>();
+    }
+
+    [Fact]
+    public async Task ShouldCreateEmptyTriggerDefinitionAndRetrieveIt()
+    {
+        var testLocation = await Factory.CreateTestLocation();
+        var client = testLocation.HttpClient;
+
+        // Create a trigger using PostTrigger
+        var triggerName = "Test Empty Trigger";
+        var triggerId = await client.Post(new PostTriggerCommand(triggerName));
+        triggerId.Should().BeGreaterThan(0);
+
+        // Retrieve the created trigger using GetTriggerDetails
+        var triggerDetails = await client.Get(new TriggerDetailsQuery(triggerId));
+
+        // Verify the trigger has proper empty structure
+        triggerDetails.Should().NotBeNull();
+        triggerDetails.Name.Should().Be(triggerName);
+        triggerDetails.AppliesToEventType.Should().Be(string.Empty);
+        triggerDetails.Values.Should().NotBeNull();
+        triggerDetails.Values.Should().BeEmpty();
+        triggerDetails.Conditions.Should().NotBeNull();
+        triggerDetails.Conditions.Should().BeEmpty();
+        triggerDetails.Actions.Should().NotBeNull();
+        triggerDetails.Actions.Should().BeEmpty();
     }
 }

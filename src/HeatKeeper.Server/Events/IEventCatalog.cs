@@ -17,14 +17,14 @@ public interface IEventCatalog
     /// Gets all discovered event types.
     /// </summary>
     /// <returns>A read-only list of event type information</returns>
-    IReadOnlyList<EventTypeInfo> ListEventTypes();
+    IReadOnlyList<EventDetails> ListEventTypes();
 
     /// <summary>
-    /// Gets event type information by event type name.
+    /// Gets event details by event ID.
     /// </summary>
-    /// <param name="eventType">The event type name</param>
-    /// <returns>Event type info if found, null otherwise</returns>
-    EventTypeInfo? GetEventType(string eventType);
+    /// <param name="id">The event ID</param>
+    /// <returns>Event details if found</returns>
+    EventDetails GetEventDetails(int id);
 
     /// <summary>
     /// Clears all discovered event types.

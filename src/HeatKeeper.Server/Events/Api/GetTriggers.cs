@@ -1,43 +1,14 @@
-using System.Text.Json;
-
 namespace HeatKeeper.Server.Events.Api;
+
+public record TriggerInfo(long Id, string Name);
 
 [RequireUserRole]
 [Get("api/triggers")]
-public record GetTriggersQuery : IQuery<TriggerDefinition[]>;
+public record GetTriggersQuery : IQuery<TriggerInfo[]>;
 
-public class GetTriggers(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<GetTriggersQuery, TriggerDefinition[]>
+public class GetTriggers(IDbConnection dbConnection) : IQueryHandler<GetTriggersQuery, TriggerInfo[]>
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true
-    };
 
-    public async Task<TriggerDefinition[]> HandleAsync(GetTriggersQuery query, CancellationToken cancellationToken = default)
-    {
-        var triggerInfos = await dbConnection.ReadAsync<TriggerInfo>(sqlProvider.GetAllEventTriggers);
-        var triggers = new List<TriggerDefinition>();
-
-        foreach (var info in triggerInfos)
-        {
-            try
-            {
-                var definition = JsonSerializer.Deserialize<TriggerDefinition>(info.Definition, JsonOptions);
-                if (definition != null)
-                {
-                    triggers.Add(definition);
-                }
-            }
-            catch (JsonException)
-            {
-                // Skip invalid JSON definitions
-                continue;
-            }
-        }
-
-        return triggers.ToArray();
-    }
+    public async Task<TriggerInfo[]> HandleAsync(GetTriggersQuery query, CancellationToken cancellationToken = default)
+        => [.. await dbConnection.ReadAsync<TriggerInfo>("SELECT Id, Name FROM EventTriggers")];
 }
-
-public record TriggerInfo(long Id, string Name, string Definition);
