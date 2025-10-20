@@ -1,4 +1,3 @@
-using System.Collections.Frozen;
 using Newtonsoft.Json;
 
 namespace HeatKeeper.Server.Events;
@@ -14,14 +13,7 @@ namespace HeatKeeper.Server.Events;
 public sealed record TriggerDefinition(
     string Name,
     string AppliesToEventType,
-    IReadOnlyDictionary<string, object?> Values,
+    IReadOnlyDictionary<string, object> Values,
     IReadOnlyList<Condition> Conditions,
     IReadOnlyList<ActionBinding> Actions
-)
-{
-    /// <summary>
-    /// Gets the trigger values as a frozen dictionary for performance.
-    /// </summary>
-    [Newtonsoft.Json.JsonIgnore]
-    public FrozenDictionary<string, object?> ValuesFrozen => Values.ToFrozenDictionary();
-}
+);
