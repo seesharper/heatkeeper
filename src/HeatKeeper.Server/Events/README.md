@@ -81,22 +81,21 @@ Triggers work seamlessly with strongly-typed events using reflection-based prope
 var trigger = new TriggerDefinition(
     Name: "Turn heaters off when too warm",
     AppliesToEventType: "TemperatureReadingPayload", // Payload type name
-    Values: new Dictionary<string, object?> { ["Threshold"] = 19.5 },
     Conditions: new List<Condition>
     {
         new(
             LeftSource: "payload",      // Access event payload
             LeftKey: "Temperature",     // Property name (case-insensitive)
             Operator: ComparisonOperator.GreaterThan,
-            RightSource: "trigger",     // Access trigger values
-            RightKeyOrLiteral: "Threshold")
+            RightSource: "literal",     // Use literal value
+            RightKeyOrLiteral: "19.5")  // Literal threshold value
     },
     Actions: new List<ActionBinding>
     {
         new("TurnHeatersOff", new Dictionary<string, string>
         {
-            ["ZoneId"] = "{{payload.ZoneId}}",     // Template resolution
-            ["Reason"] = "{{trigger.Reason}}"
+            ["ZoneId"] = "{{payload.ZoneId}}",     // Template resolution from payload
+            ["Reason"] = "Temperature too high"     // Literal string
         })
     }
 );

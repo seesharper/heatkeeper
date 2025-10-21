@@ -16,11 +16,6 @@ public static partial class TestData
         public static TriggerDefinition TemperatureTrigger => new(
             "Temperature Alert",
             "TemperatureReading",
-            new Dictionary<string, object>
-            {
-                ["Threshold"] = 25.0,
-                ["ZoneId"] = 1
-            },
             new List<Condition>
             {
                 new("payload", "Temperature", ComparisonOperator.GreaterThan, "literal", "25.0")
@@ -37,11 +32,6 @@ public static partial class TestData
         public static TriggerDefinition UpdatedTemperatureTrigger => new(
             "Updated Temperature Alert",
             "TemperatureReading",
-            new Dictionary<string, object>
-            {
-                ["Threshold"] = 30.0,
-                ["ZoneId"] = 2
-            },
             new List<Condition>
             {
                 new("payload", "Temperature", ComparisonOperator.GreaterThan, "literal", "30.0")
@@ -58,7 +48,6 @@ public static partial class TestData
         public static TriggerDefinition EmptyNameTrigger => new(
             "",
             "TemperatureReading",
-            new Dictionary<string, object>(),
             new List<Condition>(),
             new List<ActionBinding>()
         );
@@ -66,10 +55,6 @@ public static partial class TestData
         public static TriggerDefinition HumidityTrigger => new(
             "Humidity Alert",
             "HumidityReading",
-            new Dictionary<string, object>
-            {
-                ["Threshold"] = 60.0
-            },
             new List<Condition>
             {
                 new("payload", "Humidity", ComparisonOperator.LessThan, "literal", "40.0")
@@ -197,18 +182,10 @@ public class TriggerTests : TestBase
         var complexTrigger = new TriggerDefinition(
             "Complex Multi-Condition Trigger",
             "SensorReading",
-            new Dictionary<string, object>
-            {
-                ["MinTemperature"] = 18.5,
-                ["MaxTemperature"] = 25.0,
-                ["LocationId"] = 42,
-                ["IsEnabled"] = true,
-                ["Tags"] = "critical,hvac,monitoring"
-            },
             new List<Condition>
             {
-                new("payload", "Temperature", ComparisonOperator.GreaterThan, "trigger", "MinTemperature"),
-                new("payload", "Temperature", ComparisonOperator.LessThan, "trigger", "MaxTemperature"),
+                new("payload", "Temperature", ComparisonOperator.GreaterThan, "literal", "18.5"),
+                new("payload", "Temperature", ComparisonOperator.LessThan, "literal", "25.0"),
                 new("payload", "Humidity", ComparisonOperator.GreaterThan, "literal", "40.0")
             },
             new List<ActionBinding>
@@ -246,15 +223,6 @@ public class TriggerTests : TestBase
         var originalTrigger = new TriggerDefinition(
             "JSON Fidelity Test",
             "TestEvent",
-            new Dictionary<string, object>
-            {
-                ["StringValue"] = "test string",
-                ["IntValue"] = 42,
-                ["DoubleValue"] = 3.14159,
-                ["BoolValue"] = true,
-                ["ArrayValue"] = "1,2,3",
-                ["ObjectValue"] = "nested:value"
-            },
             new List<Condition>
             {
                 new("payload", "TestProperty", ComparisonOperator.Equals, "literal", "test value")
@@ -349,10 +317,6 @@ public class TriggerTests : TestBase
         triggerDetails.Should().NotBeNull();
         triggerDetails.Name.Should().Be("Temperature Alert");
         triggerDetails.AppliesToEventType.Should().Be("TemperatureReading");
-        triggerDetails.Values.Should().ContainKey("Threshold");
-        triggerDetails.Values["Threshold"].Should().Be(25.0);
-        triggerDetails.Values.Should().ContainKey("ZoneId");
-        triggerDetails.Values["ZoneId"].Should().Be(1);
         triggerDetails.Conditions.Should().HaveCount(1);
         triggerDetails.Actions.Should().HaveCount(1);
     }
@@ -387,8 +351,6 @@ public class TriggerTests : TestBase
         triggerDetails.Should().NotBeNull();
         triggerDetails.Name.Should().Be(triggerName);
         triggerDetails.AppliesToEventType.Should().Be(string.Empty);
-        triggerDetails.Values.Should().NotBeNull();
-        triggerDetails.Values.Should().BeEmpty();
         triggerDetails.Conditions.Should().NotBeNull();
         triggerDetails.Conditions.Should().BeEmpty();
         triggerDetails.Actions.Should().NotBeNull();

@@ -11,7 +11,7 @@ namespace HeatKeeper.Server.Events;
 /// </summary>
 public sealed class TriggerEngine
 {
-    private static readonly Regex Template = new(@"\{\{\s*(payload|trigger)\.([a-zA-Z0-9_]+)\s*\}\}", RegexOptions.Compiled);
+    private static readonly Regex Template = new(@"\{\{\s*payload\.([a-zA-Z0-9_]+)\s*\}\}", RegexOptions.Compiled);
 
     private readonly IEventBus _bus;
     private readonly ActionCatalog _catalog;
@@ -77,7 +77,7 @@ public sealed class TriggerEngine
                             continue;
                         }
 
-                        var resolved = ResolveParameters(binding.ParameterMap, evt, trig);
+                        var resolved = ResolveParameters(binding.ParameterMap, evt);
 
                         // Create a new scope and resolve the action from DI container
                         using var scope = _serviceProvider.CreateScope();
@@ -104,10 +104,10 @@ public sealed class TriggerEngine
     {
         foreach (var c in trig.Conditions)
         {
-            var left = ReadValue(c.LeftSource, c.LeftKey, evt, trig);
+            var left = ReadValue(c.LeftSource, c.LeftKey, evt);
             var right = c.RightSource.Equals("literal", StringComparison.OrdinalIgnoreCase)
                 ? c.RightKeyOrLiteral
-                : ReadValue(c.RightSource, c.RightKeyOrLiteral, evt, trig);
+                : ReadValue(c.RightSource, c.RightKeyOrLiteral, evt);
 
             if (!Compare(left, right, c.Operator))
                 return false;
@@ -115,15 +115,13 @@ public sealed class TriggerEngine
         return true;
     }
 
-    private static object? ReadValue(string source, string key, IDomainEvent evt, TriggerDefinition trig)
+    private static object? ReadValue(string source, string key, IDomainEvent evt)
     {
         if (source.Equals("payload", StringComparison.OrdinalIgnoreCase))
         {
             return ReadValueFromStronglyTypedEvent(evt, key);
         }
-        if (source.Equals("trigger", StringComparison.OrdinalIgnoreCase))
-            return trig.Values.TryGetValue(key, out var v) ? v : null;
-        throw new InvalidOperationException($"Unknown value source '{source}'.");
+        throw new InvalidOperationException($"Unknown value source '{source}'. Only 'payload' is supported.");
     }
 
     private static object? ReadValueFromStronglyTypedEvent(IDomainEvent evt, string key)
@@ -187,17 +185,15 @@ public sealed class TriggerEngine
 
     private static IReadOnlyDictionary<string, object?> ResolveParameters(
         IReadOnlyDictionary<string, string> parameterMap,
-        IDomainEvent evt,
-        TriggerDefinition trig)
+        IDomainEvent evt)
     {
         var dict = new Dictionary<string, object?>();
         foreach (var kvp in parameterMap)
         {
             var value = Template.Replace(kvp.Value, m =>
             {
-                var src = m.Groups[1].Value;
-                var key = m.Groups[2].Value;
-                var v = ReadValue(src, key, evt, trig);
+                var key = m.Groups[1].Value;
+                var v = ReadValue("payload", key, evt);
                 return v is JsonElement je ? je.ToString() : v?.ToString() ?? string.Empty;
             });
             dict[kvp.Key] = value;

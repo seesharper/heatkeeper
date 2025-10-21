@@ -15,7 +15,7 @@ namespace HeatKeeper.Server.Events;
 public class EventBusTests
 {
     [Fact]
-    public async Task EventBus_CanPublishAndReceiveEvents()
+    public async Task CanPublishAndReceiveEvents()
     {
         // Arrange
         var bus = new EventBus();
@@ -393,15 +393,14 @@ public class TriggerEngineIntegrationTests
         var tempHighTrigger = new TriggerDefinition(
             Name: "Turn heaters off when too warm",
             AppliesToEventType: "TemperatureReadingPayload",
-            Values: new Dictionary<string, object?> { ["Threshold"] = 19.5 },
             Conditions: new List<Condition>
             {
                 new(
                     LeftSource: "payload",
                     LeftKey: "Temperature",
                     Operator: ComparisonOperator.GreaterThan,
-                    RightSource: "trigger",
-                    RightKeyOrLiteral: "Threshold")
+                    RightSource: "literal",
+                    RightKeyOrLiteral: "19.5")
             },
             Actions: new List<ActionBinding>
             {

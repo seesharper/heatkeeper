@@ -20,7 +20,6 @@ public class PostTrigger(IDbConnection dbConnection) : ICommandHandler<PostTrigg
         var emptyTriggerDefinition = new TriggerDefinition(
             command.Name,
             string.Empty, // Empty event type
-            new Dictionary<string, object>(), // Empty values
             new List<Condition>(), // Empty conditions
             new List<ActionBinding>() // Empty actions
         );
