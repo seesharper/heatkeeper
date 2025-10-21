@@ -104,24 +104,13 @@ public sealed class TriggerEngine
     {
         foreach (var c in trig.Conditions)
         {
-            var left = ReadValue(c.LeftSource, c.LeftKey, evt);
-            var right = c.RightSource.Equals("literal", StringComparison.OrdinalIgnoreCase)
-                ? c.RightKeyOrLiteral
-                : ReadValue(c.RightSource, c.RightKeyOrLiteral, evt);
+            var left = ReadValueFromStronglyTypedEvent(evt, c.PropertyName);
+            var right = c.Value;
 
             if (!Compare(left, right, c.Operator))
                 return false;
         }
         return true;
-    }
-
-    private static object? ReadValue(string source, string key, IDomainEvent evt)
-    {
-        if (source.Equals("payload", StringComparison.OrdinalIgnoreCase))
-        {
-            return ReadValueFromStronglyTypedEvent(evt, key);
-        }
-        throw new InvalidOperationException($"Unknown value source '{source}'. Only 'payload' is supported.");
     }
 
     private static object? ReadValueFromStronglyTypedEvent(IDomainEvent evt, string key)
@@ -193,7 +182,7 @@ public sealed class TriggerEngine
             var value = Template.Replace(kvp.Value, m =>
             {
                 var key = m.Groups[1].Value;
-                var v = ReadValue("payload", key, evt);
+                var v = ReadValueFromStronglyTypedEvent(evt, key);
                 return v is JsonElement je ? je.ToString() : v?.ToString() ?? string.Empty;
             });
             dict[kvp.Key] = value;

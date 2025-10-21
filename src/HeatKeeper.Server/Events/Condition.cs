@@ -1,18 +1,14 @@
 namespace HeatKeeper.Server.Events;
 
 /// <summary>
-/// A single condition that can read from the event payload or use literal values.
+/// A single condition that compares an event payload property to a literal value.
 /// </summary>
-/// <param name="LeftSource">"payload" to read from event payload</param>
-/// <param name="LeftKey">e.g. "Temperature" or "ZoneId"</param>
+/// <param name="PropertyName">The property name from the event payload (e.g. "Temperature" or "ZoneId")</param>
 /// <param name="Operator">The comparison operator to use</param>
-/// <param name="RightSource">"literal" or "payload"</param>
-/// <param name="RightKeyOrLiteral">key if payload, otherwise literal value (string/number)</param>
+/// <param name="Value">The literal value to compare against (string/number)</param>
 public sealed record Condition
 (
-    string LeftSource,
-    string LeftKey,
+    string PropertyName,
     ComparisonOperator Operator,
-    string RightSource,
-    string RightKeyOrLiteral
+    string Value
 );

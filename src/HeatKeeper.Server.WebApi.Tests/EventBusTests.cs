@@ -396,11 +396,9 @@ public class TriggerEngineIntegrationTests
             Conditions: new List<Condition>
             {
                 new(
-                    LeftSource: "payload",
-                    LeftKey: "Temperature",
+                    PropertyName: "Temperature",
                     Operator: ComparisonOperator.GreaterThan,
-                    RightSource: "literal",
-                    RightKeyOrLiteral: "19.5")
+                    Value: "19.5")
             },
             Actions: new List<ActionBinding>
             {

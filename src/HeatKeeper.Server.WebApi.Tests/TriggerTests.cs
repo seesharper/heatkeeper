@@ -18,7 +18,7 @@ public static partial class TestData
             "TemperatureReading",
             new List<Condition>
             {
-                new("payload", "Temperature", ComparisonOperator.GreaterThan, "literal", "25.0")
+                new("Temperature", ComparisonOperator.GreaterThan, "25.0")
             },
             new List<ActionBinding>
             {
@@ -34,7 +34,7 @@ public static partial class TestData
             "TemperatureReading",
             new List<Condition>
             {
-                new("payload", "Temperature", ComparisonOperator.GreaterThan, "literal", "30.0")
+                new("Temperature", ComparisonOperator.GreaterThan, "30.0")
             },
             new List<ActionBinding>
             {
@@ -57,7 +57,7 @@ public static partial class TestData
             "HumidityReading",
             new List<Condition>
             {
-                new("payload", "Humidity", ComparisonOperator.LessThan, "literal", "40.0")
+                new("Humidity", ComparisonOperator.LessThan, "40.0")
             },
             new List<ActionBinding>
             {
@@ -184,9 +184,9 @@ public class TriggerTests : TestBase
             "SensorReading",
             new List<Condition>
             {
-                new("payload", "Temperature", ComparisonOperator.GreaterThan, "literal", "18.5"),
-                new("payload", "Temperature", ComparisonOperator.LessThan, "literal", "25.0"),
-                new("payload", "Humidity", ComparisonOperator.GreaterThan, "literal", "40.0")
+                new("Temperature", ComparisonOperator.GreaterThan, "18.5"),
+                new("Temperature", ComparisonOperator.LessThan, "25.0"),
+                new("Humidity", ComparisonOperator.GreaterThan, "40.0")
             },
             new List<ActionBinding>
             {
@@ -225,7 +225,7 @@ public class TriggerTests : TestBase
             "TestEvent",
             new List<Condition>
             {
-                new("payload", "TestProperty", ComparisonOperator.Equals, "literal", "test value")
+                new("TestProperty", ComparisonOperator.Equals, "test value")
             },
             new List<ActionBinding>
             {

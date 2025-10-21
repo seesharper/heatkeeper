@@ -84,11 +84,9 @@ var trigger = new TriggerDefinition(
     Conditions: new List<Condition>
     {
         new(
-            LeftSource: "payload",      // Access event payload
-            LeftKey: "Temperature",     // Property name (case-insensitive)
+            PropertyName: "Temperature",                    // Property name from payload (case-insensitive)
             Operator: ComparisonOperator.GreaterThan,
-            RightSource: "literal",     // Use literal value
-            RightKeyOrLiteral: "19.5")  // Literal threshold value
+            Value: "19.5")                                  // Literal threshold value
     },
     Actions: new List<ActionBinding>
     {
