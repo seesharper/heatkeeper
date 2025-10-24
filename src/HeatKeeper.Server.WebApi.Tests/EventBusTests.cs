@@ -377,8 +377,8 @@ public class TriggerEngineIntegrationTests
         // Arrange
         var bus = new EventBus();
         var catalog = new ActionCatalog();
-        catalog.Register(TurnHeatersOffAction.GetActionInfo());
-        catalog.Register(SendNotificationAction.GetActionInfo());
+        catalog.Register(ActionInfoBuilder.BuildFrom(typeof(TurnHeatersOffAction)));
+        catalog.Register(ActionInfoBuilder.BuildFrom(typeof(SendNotificationAction)));
 
         // Create mock service provider with actions
         var actions = new Dictionary<string, IAction>

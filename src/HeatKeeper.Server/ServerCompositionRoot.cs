@@ -70,8 +70,8 @@ public class ServerCompositionRoot : ICompositionRoot
             .RegisterInstance(catalog)
             .RegisterSingleton<TriggerEngine>()
 
-            // Register actions from the catalog
-            .RegisterActionsFromCatalog(catalog, typeof(ServerCompositionRoot).Assembly)
+            // Discover and register actions automatically
+            .RegisterActions(catalog, typeof(ServerCompositionRoot).Assembly)
 
             .Decorate<ICommandHandler<CreateLocationCommand>, ValidateCreateLocation>()
             .Decorate<ICommandHandler<UpdateLocationCommand>, ValidateUpdateLocation>()
@@ -109,13 +109,8 @@ public class ServerCompositionRoot : ICompositionRoot
 
     private static ActionCatalog CreateActionCatalog()
     {
-        var catalog = new ActionCatalog();
-
-        // Register action metadata
-        catalog.Register(TurnHeatersOffAction.GetActionInfo());
-        catalog.Register(SendNotificationAction.GetActionInfo());
-
-        return catalog;
+        // Actions will be discovered and registered automatically by RegisterActions
+        return new ActionCatalog();
     }
 
     private static IManagedMqttClient CreateManagedMqttClient(IConfiguration configuration)

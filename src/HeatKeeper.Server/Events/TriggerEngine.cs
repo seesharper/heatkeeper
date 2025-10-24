@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -87,11 +88,16 @@ public sealed class TriggerEngine
                         try
                         {
                             var action = (IAction)serviceFactory.GetInstance(typeof(IAction), actionInfo.Name);
-                            await action.ExecuteAsync(resolved, ct);
+                            await InvokeActionAsync(action, resolved, ct);
                         }
                         catch (InvalidOperationException)
                         {
                             Console.WriteLine($"[WARN] No action service registered for '{actionInfo.Name}' in trigger '{trig.Name}'.");
+                            continue;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[ERROR] Failed to execute action '{actionInfo.Name}': {ex.Message}");
                             continue;
                         }
                     }
@@ -188,5 +194,58 @@ public sealed class TriggerEngine
             dict[kvp.Key] = value;
         }
         return new ReadOnlyDictionary<string, object?>(dict);
+    }
+
+    private static async Task InvokeActionAsync(IAction action, IReadOnlyDictionary<string, object?> parameters, CancellationToken ct)
+    {
+        // Find the IAction<TParameters> interface to get the parameter type
+        var actionType = action.GetType();
+        var genericInterface = actionType.GetInterfaces()
+            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAction<>));
+
+        if (genericInterface == null)
+        {
+            throw new InvalidOperationException($"Action {actionType.Name} does not implement IAction<TParameters>");
+        }
+
+        var parameterType = genericInterface.GetGenericArguments()[0];
+
+        // Convert the dictionary to strongly-typed parameters
+        var typedParameters = ConvertToTypedParameters(parameters, parameterType);
+
+        // Invoke ExecuteAsync using reflection
+        var executeMethod = genericInterface.GetMethod("ExecuteAsync");
+        if (executeMethod == null)
+        {
+            throw new InvalidOperationException($"Could not find ExecuteAsync method on {actionType.Name}");
+        }
+
+        var task = executeMethod.Invoke(action, new object[] { typedParameters, ct });
+        if (task is Task t)
+        {
+            await t;
+        }
+    }
+
+    private static object ConvertToTypedParameters(IReadOnlyDictionary<string, object?> parameters, Type parameterType)
+    {
+        // Serialize to JSON and deserialize to the target type
+        // This handles property name mapping and type conversion
+        var json = JsonSerializer.Serialize(parameters, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        var result = JsonSerializer.Deserialize(json, parameterType, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (result == null)
+        {
+            throw new InvalidOperationException($"Failed to deserialize parameters to {parameterType.Name}");
+        }
+
+        return result;
     }
 }

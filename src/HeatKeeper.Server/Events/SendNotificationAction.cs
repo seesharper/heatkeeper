@@ -1,26 +1,30 @@
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
 namespace HeatKeeper.Server.Events;
+
+/// <summary>
+/// Parameters for sending a notification.
+/// </summary>
+public sealed class SendNotificationParameters
+{
+    [Required]
+    [Description("The notification message")]
+    public required string Message { get; init; }
+
+    [Description("The notification severity level")]
+    public string? Severity { get; init; }
+}
 
 /// <summary>
 /// Sample action that simulates sending notifications.
 /// </summary>
-public sealed class SendNotificationAction : IAction
+[DisplayName("Send Notification")]
+public sealed class SendNotificationAction : IAction<SendNotificationParameters>
 {
-    public static ActionInfo GetActionInfo() => new()
+    public Task ExecuteAsync(SendNotificationParameters parameters, CancellationToken ct)
     {
-        Name = "SendNotification",
-        DisplayName = "Send Notification",
-        ParameterSchema = new[]
-        {
-            new ActionParameter("Message", "string", true),
-            new ActionParameter("Severity", "string", false)
-        }
-    };
-
-    public Task ExecuteAsync(IReadOnlyDictionary<string, object> parameters, CancellationToken ct)
-    {
-        var severity = parameters.TryGetValue("Severity", out var s) ? s : null;
-        var message = parameters.TryGetValue("Message", out var m) ? m : null;
-        Console.WriteLine($"[ACTION] Notify => {severity} :: {message} ");
+        Console.WriteLine($"[ACTION] Notify => {parameters.Severity} :: {parameters.Message}");
         return Task.CompletedTask;
     }
 }
