@@ -19,7 +19,7 @@ public sealed class TurnHeatersOffParameters
 /// <summary>
 /// Sample action that simulates turning heaters off in a specified zone.
 /// </summary>
-[DisplayName("Turn Heaters Off")]
+[Action(2, "Turn Heaters Off", "Turns off heaters in a specified zone with an optional reason")]
 public sealed class TurnHeatersOffAction : IAction<TurnHeatersOffParameters>
 {
     public Task ExecuteAsync(TurnHeatersOffParameters parameters, CancellationToken ct)

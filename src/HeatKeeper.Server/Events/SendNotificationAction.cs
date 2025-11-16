@@ -19,7 +19,7 @@ public sealed class SendNotificationParameters
 /// <summary>
 /// Sample action that simulates sending notifications.
 /// </summary>
-[DisplayName("Send Notification")]
+[Action(1, "Send Notification", "Sends a notification with a message and optional severity level")]
 public sealed class SendNotificationAction : IAction<SendNotificationParameters>
 {
     public Task ExecuteAsync(SendNotificationParameters parameters, CancellationToken ct)

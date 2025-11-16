@@ -5,18 +5,18 @@ using System.Reflection;
 namespace HeatKeeper.Server.Events;
 
 /// <summary>
-/// Helper class to build ActionInfo from IAction&lt;TParameters&gt; types using reflection.
+/// Helper class to build ActionDetails from IAction&lt;TParameters&gt; types using reflection.
 /// </summary>
-public static class ActionInfoBuilder
+public static class ActionDetailsBuilder
 {
     /// <summary>
-    /// Builds an ActionInfo from an action type that implements IAction&lt;TParameters&gt;.
+    /// Builds an ActionDetails from an action type that implements IAction&lt;TParameters&gt;.
     /// Uses the type name as the action name, DisplayName attribute for display name,
     /// and reflects over TParameters properties to build the parameter schema.
     /// </summary>
     /// <param name="actionType">The action type</param>
-    /// <returns>An ActionInfo describing the action</returns>
-    public static ActionInfo BuildFrom(Type actionType)
+    /// <returns>An ActionDetails describing the action</returns>
+    public static ActionDetails BuildFrom(Type actionType)
     {
         if (!typeof(IAction).IsAssignableFrom(actionType))
         {
@@ -34,22 +34,27 @@ public static class ActionInfoBuilder
 
         var parameterType = genericInterface.GetGenericArguments()[0];
 
+        // Get the ActionAttribute
+        var actionAttr = actionType.GetCustomAttribute<ActionAttribute>();
+        if (actionAttr == null)
+        {
+            throw new ArgumentException($"Type {actionType.Name} must have an [Action] attribute", nameof(actionType));
+        }
+
         // Get the action name from the type name (remove "Action" suffix if present)
         var name = actionType.Name.EndsWith("Action", StringComparison.OrdinalIgnoreCase)
             ? actionType.Name[..^6]
             : actionType.Name;
 
-        // Get display name from DisplayName attribute, fallback to name
-        var displayNameAttr = actionType.GetCustomAttribute<DisplayNameAttribute>();
-        var displayName = displayNameAttr?.DisplayName ?? name;
-
         // Build parameter schema from TParameters properties
         var parameterSchema = BuildParameterSchema(parameterType);
 
-        return new ActionInfo
+        return new ActionDetails
         {
+            Id = actionAttr.Id,
             Name = name,
-            DisplayName = displayName,
+            DisplayName = actionAttr.Name,
+            Description = actionAttr.Description,
             ParameterSchema = parameterSchema
         };
     }

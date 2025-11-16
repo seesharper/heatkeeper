@@ -9,7 +9,7 @@ namespace HeatKeeper.Server.Events;
 public static class ActionRegistrar
 {
     /// <summary>
-    /// Discovers all types implementing IAction, builds ActionInfo for each using reflection,
+    /// Discovers all types implementing IAction, builds ActionDetails for each using reflection,
     /// registers them in the catalog, and registers them as named services in the DI container.
     /// </summary>
     /// <param name="serviceRegistry">The LightInject service registry</param>
@@ -32,16 +32,16 @@ public static class ActionRegistrar
         {
             try
             {
-                // Build ActionInfo from the type using reflection
-                var actionInfo = ActionInfoBuilder.BuildFrom(actionType);
+                // Build ActionDetails from the type using reflection
+                var actionDetails = ActionDetailsBuilder.BuildFrom(actionType);
 
                 // Register in catalog
-                catalog.Register(actionInfo);
+                catalog.Register(actionDetails);
 
                 // Register as named scoped service in LightInject
-                serviceRegistry.RegisterScoped(typeof(IAction), actionType, actionInfo.Name);
+                serviceRegistry.RegisterScoped(typeof(IAction), actionType, actionDetails.Name);
 
-                Console.WriteLine($"[SETUP] Registered action '{actionInfo.Name}' -> {actionType.Name}");
+                Console.WriteLine($"[SETUP] Registered action '{actionDetails.Name}' -> {actionType.Name}");
             }
             catch (Exception ex)
             {

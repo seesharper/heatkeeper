@@ -213,6 +213,31 @@ public class EventCatalogTests
 public class EventsApiTests : TestBase
 {
     [Fact]
+    public async Task GetActions_ReturnsRegisteredActionsWithoutDuplicates()
+    {
+        // Arrange
+        var client = Factory.CreateClient();
+        var token = await client.AuthenticateAsAdminUser();
+
+        // Act
+        var actions = await client.GetActions(token);
+
+        // Assert
+        Assert.NotNull(actions);
+        Assert.NotEmpty(actions);
+
+        // Verify no duplicate IDs
+        Assert.Equal(actions.Length, actions.Select(a => a.Id).Distinct().Count());
+
+        // Verify no duplicate display names
+        Assert.Equal(actions.Length, actions.Select(a => a.DisplayName).Distinct().Count());
+
+        // Expected actions (based on attributes on action classes)
+        Assert.Contains(actions, a => a.Id == 1 && a.DisplayName == "Send Notification");
+        Assert.Contains(actions, a => a.Id == 2 && a.DisplayName == "Turn Heaters Off");
+    }
+
+    [Fact]
     public async Task GetEvents_ReturnsEventInfoWithoutDuplicates()
     {
         // Arrange
@@ -377,8 +402,8 @@ public class TriggerEngineIntegrationTests
         // Arrange
         var bus = new EventBus();
         var catalog = new ActionCatalog();
-        catalog.Register(ActionInfoBuilder.BuildFrom(typeof(TurnHeatersOffAction)));
-        catalog.Register(ActionInfoBuilder.BuildFrom(typeof(SendNotificationAction)));
+        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(TurnHeatersOffAction)));
+        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(SendNotificationAction)));
 
         // Create mock service provider with actions
         var actions = new Dictionary<string, IAction>

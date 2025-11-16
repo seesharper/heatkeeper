@@ -195,6 +195,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<HeatKeeper.Server.Events.EventDetails> GetEventDetails(this HttpClient client, int eventId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<HeatKeeper.Server.Events.EventDetails>(client, $"api/events/{eventId}", token, success, problem);
 
+        public static async Task<HeatKeeper.Server.Events.Api.ActionInfo[]> GetActions(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<HeatKeeper.Server.Events.Api.ActionInfo[]>(client, "api/actions", token, success, problem);
+
         public static async Task<UnassignedSensorInfo[]> GetUnassignedSensors(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<UnassignedSensorInfo[]>(client, "api/sensors", token, success, problem);
 

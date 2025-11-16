@@ -7,13 +7,13 @@ namespace HeatKeeper.Server.Events;
 /// </summary>
 public sealed class ActionCatalog
 {
-    private readonly ConcurrentDictionary<string, ActionInfo> _actions = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, ActionDetails> _actions = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Registers an action in the catalog.
     /// </summary>
     /// <param name="action">The action metadata to register</param>
-    public void Register(ActionInfo action) => _actions[action.Name] = action;
+    public void Register(ActionDetails action) => _actions[action.Name] = action;
 
     /// <summary>
     /// Attempts to retrieve action metadata by name.
@@ -21,13 +21,13 @@ public sealed class ActionCatalog
     /// <param name="name">The action name</param>
     /// <param name="action">The retrieved action metadata, if found</param>
     /// <returns>True if the action was found, false otherwise</returns>
-    public bool TryGet(string name, out ActionInfo action) => _actions.TryGetValue(name, out action!);
+    public bool TryGet(string name, out ActionDetails action) => _actions.TryGetValue(name, out action!);
 
     /// <summary>
     /// Lists all registered actions with their metadata.
     /// </summary>
     /// <returns>A list of action metadata (name, display name, parameter schema)</returns>
-    public IReadOnlyList<ActionInfo> List()
+    public IReadOnlyList<ActionDetails> List()
         => _actions.Values
             .OrderBy(a => a.DisplayName)
             .ToList();

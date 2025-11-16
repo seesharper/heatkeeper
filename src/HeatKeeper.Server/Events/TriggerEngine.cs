@@ -72,7 +72,7 @@ public sealed class TriggerEngine
                 {
                     foreach (var binding in trig.Actions)
                     {
-                        if (!_catalog.TryGet(binding.ActionName, out var actionInfo))
+                        if (!_catalog.TryGet(binding.ActionName, out var actionDetails))
                         {
                             Console.WriteLine($"[WARN] Unknown action '{binding.ActionName}' in trigger '{trig.Name}'.");
                             continue;
@@ -87,17 +87,17 @@ public sealed class TriggerEngine
 
                         try
                         {
-                            var action = (IAction)serviceFactory.GetInstance(typeof(IAction), actionInfo.Name);
+                            var action = (IAction)serviceFactory.GetInstance(typeof(IAction), actionDetails.Name);
                             await InvokeActionAsync(action, resolved, ct);
                         }
                         catch (InvalidOperationException)
                         {
-                            Console.WriteLine($"[WARN] No action service registered for '{actionInfo.Name}' in trigger '{trig.Name}'.");
+                            Console.WriteLine($"[WARN] No action service registered for '{actionDetails.Name}' in trigger '{trig.Name}'.");
                             continue;
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"[ERROR] Failed to execute action '{actionInfo.Name}': {ex.Message}");
+                            Console.WriteLine($"[ERROR] Failed to execute action '{actionDetails.Name}': {ex.Message}");
                             continue;
                         }
                     }
