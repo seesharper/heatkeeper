@@ -285,6 +285,52 @@ public class EventsApiTests : TestBase
     }
 
     [Fact]
+    public async Task GetActionDetails_ForSendNotification_ReturnsExpectedSchema()
+    {
+        // Arrange
+        var client = Factory.CreateClient();
+        var token = await client.AuthenticateAsAdminUser();
+
+        // Act
+        var details = await client.GetActionDetails(1, token); // SendNotificationAction has ID 1
+
+        // Assert
+        Assert.NotNull(details);
+        Assert.Equal(1, details.Id);
+        Assert.Equal("SendNotification", details.Name);
+        Assert.Equal("Send Notification", details.DisplayName);
+        Assert.Equal("Sends a notification with a message and optional severity level", details.Description);
+        Assert.NotNull(details.ParameterSchema);
+        Assert.Equal(2, details.ParameterSchema.Count);
+
+        Assert.Contains(details.ParameterSchema, p => p.Name == "Message" && p.Type == "string" && p.Required && p.Description == "The notification message");
+        Assert.Contains(details.ParameterSchema, p => p.Name == "Severity" && p.Type == "string" && !p.Required && p.Description == "The notification severity level");
+    }
+
+    [Fact]
+    public async Task GetActionDetails_ForTurnHeatersOff_ReturnsExpectedSchema()
+    {
+        // Arrange
+        var client = Factory.CreateClient();
+        var token = await client.AuthenticateAsAdminUser();
+
+        // Act
+        var details = await client.GetActionDetails(2, token); // TurnHeatersOffAction has ID 2
+
+        // Assert
+        Assert.NotNull(details);
+        Assert.Equal(2, details.Id);
+        Assert.Equal("TurnHeatersOff", details.Name);
+        Assert.Equal("Turn Heaters Off", details.DisplayName);
+        Assert.Equal("Turns off heaters in a specified zone with an optional reason", details.Description);
+        Assert.NotNull(details.ParameterSchema);
+        Assert.Equal(2, details.ParameterSchema.Count);
+
+        Assert.Contains(details.ParameterSchema, p => p.Name == "ZoneId" && p.Type == "number" && p.Required && p.Description == "Which zone to target");
+        Assert.Contains(details.ParameterSchema, p => p.Name == "Reason" && p.Type == "string" && !p.Required && p.Description == "Optional reason");
+    }
+
+    [Fact]
     public async Task GetEvents_CalledMultipleTimes_DoesNotReturnDuplicates()
     {
         // Arrange

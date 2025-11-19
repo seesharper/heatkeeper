@@ -31,4 +31,12 @@ public sealed class ActionCatalog
         => _actions.Values
             .OrderBy(a => a.DisplayName)
             .ToList();
+
+    /// <summary>
+    /// Gets action details by action ID.
+    /// </summary>
+    /// <param name="id">The action ID</param>
+    /// <returns>Action details if found</returns>
+    public ActionDetails GetActionDetails(int id)
+        => _actions.Values.First(a => a.Id == id);
 }
