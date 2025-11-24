@@ -34,10 +34,10 @@ public sealed record DoorEventPayload(
 /// Strongly-typed payload for sundown events.
 /// </summary>
 [DomainEvent(4, "Sunrise Event", "Event triggered at sunrise")]
-public sealed record SunrisePayload();
+public sealed record SunrisePayload(string Location);
 
 /// <summary>
 /// Strongly-typed payload for sunrise events.
 /// </summary>
 [DomainEvent(5, "Sunset Event", "Event triggered at sunset")]
-public sealed record SunsetPayload();
+public sealed record SunsetPayload(string Location);

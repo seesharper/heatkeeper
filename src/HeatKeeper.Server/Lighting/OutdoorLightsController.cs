@@ -1,5 +1,6 @@
 using System.Linq;
 using CQRS.Query.Abstractions;
+using HeatKeeper.Server.Events;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Messaging;
@@ -57,6 +58,8 @@ public class OutdoorLightsController : IOutdoorLightsController
 {
     private readonly OutdoorLightsOptions _options;
     private readonly IMessageBus _messageBus;
+
+    private readonly IEventBus _eventBus;
     private readonly TimeProvider _timeProvider;
     private readonly ISunCalculationService _sunCalculationService;
     private readonly IQueryExecutor _queryExecutor;
@@ -68,6 +71,7 @@ public class OutdoorLightsController : IOutdoorLightsController
     public OutdoorLightsController(
         IConfiguration configuration,
         IMessageBus messageBus,
+        IEventBus eventBus,
         TimeProvider timeProvider,
         ISunCalculationService sunCalculationService,
         IQueryExecutor queryExecutor,
@@ -75,6 +79,7 @@ public class OutdoorLightsController : IOutdoorLightsController
     {
         _options = configuration.GetOutdoorLightsOptions();
         _messageBus = messageBus;
+        _eventBus = eventBus;
         _timeProvider = timeProvider;
         _sunCalculationService = sunCalculationService;
         _queryExecutor = queryExecutor;
@@ -141,6 +146,15 @@ public class OutdoorLightsController : IOutdoorLightsController
                     locationState.LocationName, currentState, reason);
 
                 await _messageBus.Publish(lightEvent);
+                if (currentState == LightState.On)
+                {
+                    await _eventBus.PublishAsync(DomainEvent<SunrisePayload>.Create(new SunrisePayload(locationState.LocationName)), CancellationToken.None);
+                }    
+                else
+                {
+                    await _eventBus.PublishAsync(DomainEvent<SunsetPayload>.Create(new SunsetPayload(locationState.LocationName)), CancellationToken.None);
+                }
+
                 locationState.LastPublishedState = currentState;
             }
             else
