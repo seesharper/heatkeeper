@@ -22,7 +22,7 @@ public static partial class TestData
             },
             new List<ActionBinding>
             {
-                new("SendNotificationAction", new Dictionary<string, string>
+                new(1, new Dictionary<string, string>
                 {
                     ["Message"] = "Temperature too high!"
                 })
@@ -38,7 +38,7 @@ public static partial class TestData
             },
             new List<ActionBinding>
             {
-                new("SendNotificationAction", new Dictionary<string, string>
+                new(1, new Dictionary<string, string>
                 {
                     ["Message"] = "Temperature critically high!"
                 })
@@ -61,7 +61,7 @@ public static partial class TestData
             },
             new List<ActionBinding>
             {
-                new("TurnHeatersOffAction", new Dictionary<string, string>
+                new(2, new Dictionary<string, string>
                 {
                     ["ZoneId"] = "1"
                 })
@@ -190,12 +190,12 @@ public class TriggerTests : TestBase
             },
             new List<ActionBinding>
             {
-                new("SendNotificationAction", new Dictionary<string, string>
+                new(1, new Dictionary<string, string>
                 {
                     ["Priority"] = "High",
                     ["Recipients"] = "admin@example.com,operator@example.com"
                 }),
-                new("TurnHeatersOffAction", new Dictionary<string, string>
+                new(2, new Dictionary<string, string>
                 {
                     ["ZoneId"] = "{{trigger.LocationId}}",
                     ["DelaySeconds"] = "30"
@@ -229,7 +229,7 @@ public class TriggerTests : TestBase
             },
             new List<ActionBinding>
             {
-                new("TestAction", new Dictionary<string, string>
+                new(999, new Dictionary<string, string>
                 {
                     ["Parameter"] = "test parameter"
                 })

@@ -90,10 +90,10 @@ var trigger = new TriggerDefinition(
     },
     Actions: new List<ActionBinding>
     {
-        new("TurnHeatersOff", new Dictionary<string, string>
+        new(2, new Dictionary<string, string>
         {
-            ["ZoneId"] = "{{payload.ZoneId}}",     // Template resolution from payload
-            ["Reason"] = "Temperature too high"     // Literal string
+            ["ZoneId"] = "1",                 // Literal zone id
+            ["Reason"] = "Temperature too high" // Literal string
         })
     }
 );

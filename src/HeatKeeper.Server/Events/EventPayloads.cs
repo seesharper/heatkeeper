@@ -29,3 +29,15 @@ public sealed record DoorEventPayload(
     string Action, // "opened" or "closed"
     string? UserId = null
 );
+
+/// <summary>
+/// Strongly-typed payload for sundown events.
+/// </summary>
+[DomainEvent(4, "Sunrise Event", "Event triggered at sunrise")]
+public sealed record SunrisePayload();
+
+/// <summary>
+/// Strongly-typed payload for sunrise events.
+/// </summary>
+[DomainEvent(5, "Sunset Event", "Event triggered at sunset")]
+public sealed record SunsetPayload();

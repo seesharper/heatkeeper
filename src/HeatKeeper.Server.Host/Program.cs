@@ -19,6 +19,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddJanitor();
 builder.Services.AddHostedService<MessageBusHostedService>();
 builder.Services.AddHostedService<OutdoorLightsHostedService>();
+builder.Services.AddHostedService<TriggerEngineHostedService>();
 builder.Services.AddHttpClient();
 builder.Services.AddCorsPolicy();
 builder.Services.AddHttpClient<IWebPushClient, WebPushClient>();

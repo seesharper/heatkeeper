@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HeatKeeper.Server.Events;
@@ -12,8 +11,6 @@ namespace HeatKeeper.Server.Events;
 /// </summary>
 public sealed class TriggerEngine
 {
-    private static readonly Regex Template = new(@"\{\{\s*payload\.([a-zA-Z0-9_]+)\s*\}\}", RegexOptions.Compiled);
-
     private readonly IEventBus _bus;
     private readonly ActionCatalog _catalog;
     private readonly IServiceProvider _serviceProvider;
@@ -72,9 +69,14 @@ public sealed class TriggerEngine
                 {
                     foreach (var binding in trig.Actions)
                     {
-                        if (!_catalog.TryGet(binding.ActionName, out var actionDetails))
+                        ActionDetails actionDetails;
+                        try
                         {
-                            Console.WriteLine($"[WARN] Unknown action '{binding.ActionName}' in trigger '{trig.Name}'.");
+                            actionDetails = _catalog.GetActionDetails(binding.ActionId);
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            Console.WriteLine($"[WARN] Unknown action ID '{binding.ActionId}' in trigger '{trig.Name}'.");
                             continue;
                         }
 
@@ -182,18 +184,30 @@ public sealed class TriggerEngine
         IReadOnlyDictionary<string, string> parameterMap,
         IDomainEvent evt)
     {
+        // Parameter values are treated as literals; no template resolution against the event payload.
         var dict = new Dictionary<string, object?>();
         foreach (var kvp in parameterMap)
         {
-            var value = Template.Replace(kvp.Value, m =>
-            {
-                var key = m.Groups[1].Value;
-                var v = ReadValueFromStronglyTypedEvent(evt, key);
-                return v is JsonElement je ? je.ToString() : v?.ToString() ?? string.Empty;
-            });
-            dict[kvp.Key] = value;
+            dict[kvp.Key] = kvp.Value;
         }
+
         return new ReadOnlyDictionary<string, object?>(dict);
+    }
+
+    /// <summary>
+    /// Invokes an action with string parameters (for testing/manual execution).
+    /// </summary>
+    /// <param name="action">The action to invoke</param>
+    /// <param name="parameterMap">String parameter map</param>
+    /// <param name="ct">Cancellation token</param>
+    public static Task InvokeActionAsync(IAction action, IReadOnlyDictionary<string, string> parameterMap, CancellationToken ct)
+    {
+        var dict = new Dictionary<string, object?>();
+        foreach (var kvp in parameterMap)
+        {
+            dict[kvp.Key] = kvp.Value;
+        }
+        return InvokeActionAsync(action, new ReadOnlyDictionary<string, object?>(dict), ct);
     }
 
     private static async Task InvokeActionAsync(IAction action, IReadOnlyDictionary<string, object?> parameters, CancellationToken ct)
