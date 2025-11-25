@@ -58,8 +58,10 @@ public class OutdoorLightsIntegrationTests : TestBase
         // Arrange
         var receivedEvents = new List<OutdoorLightStateChanged>();
 
+        using var factory = new IntegrationTestWebApplicationFactory();
+        
         // Configure for a specific time zone and use fake time provider
-        Factory.ConfigureHostBuilder(hostBuilder =>
+        factory.ConfigureHostBuilder(hostBuilder =>
             hostBuilder.ConfigureServices((context, services) =>
             {
                 var fakeTimeProvider = new FakeTimeProvider(new DateTime(2024, 6, 21, 2, 0, 0, DateTimeKind.Utc));
@@ -70,9 +72,9 @@ public class OutdoorLightsIntegrationTests : TestBase
             }));
 
 
-        var messageBus = Factory.Services.GetRequiredService<IMessageBus>();
-        var controller = Factory.Services.GetRequiredService<IOutdoorLightsController>();
-        var timeProvider = Factory.Services.GetRequiredService<TimeProvider>() as FakeTimeProvider;
+        var messageBus = factory.Services.GetRequiredService<IMessageBus>();
+        var controller = factory.Services.GetRequiredService<IOutdoorLightsController>();
+        var timeProvider = factory.Services.GetRequiredService<TimeProvider>() as FakeTimeProvider;
 
         messageBus.Subscribe<OutdoorLightStateChanged>((OutdoorLightStateChanged lightEvent) =>
         {
