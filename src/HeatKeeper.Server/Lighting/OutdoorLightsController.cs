@@ -113,7 +113,7 @@ public class OutdoorLightsController(
                 logger.LogInformation("Publishing outdoor light state change for location '{LocationName}': {State} - {Reason}",
                     locationState.LocationName, currentState, reason);
 
-                await messageBus.Publish(lightEvent);              
+                await messageBus.Publish(lightEvent);
                 locationState.LastPublishedState = currentState;
             }
             else
@@ -151,10 +151,14 @@ public class OutdoorLightsController(
             // Lights should be ON when it's after sunset OR before sunrise
             if (now >= adjustedSunset || now < adjustedSunrise)
             {
+                logger.LogDebug("Determined light state ON for location '{LocationName}' (ID: {LocationId}). Now: {Now}, Adjusted Sunrise: {Sunrise}, Adjusted Sunset: {Sunset}",
+                    locationState.LocationName, locationState.LocationId, now, adjustedSunrise, adjustedSunset);
                 return LightState.On;
             }
 
             // Lights should be OFF between sunrise and sunset
+            logger.LogDebug("Determined light state OFF for location '{LocationName}' (ID: {LocationId}). Now: {Now}, Adjusted Sunrise: {Sunrise}, Adjusted Sunset: {Sunset}",
+                locationState.LocationName, locationState.LocationId, now, adjustedSunrise, adjustedSunset);
             return LightState.Off;
         }
         catch (ArgumentOutOfRangeException ex)
