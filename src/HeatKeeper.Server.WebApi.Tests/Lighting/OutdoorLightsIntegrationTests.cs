@@ -16,8 +16,7 @@ public class OutdoorLightsIntegrationTests : TestBase
     public void OutdoorLightsController_ShouldBeRegistered_InDependencyContainer()
     {
         // Arrange & Act
-        using var scope = Factory.Services.CreateScope();
-        var controller = scope.ServiceProvider.GetService<IOutdoorLightsController>();
+        var controller = Factory.Services.GetService<IOutdoorLightsController>();
 
         // Assert
         controller.Should().NotBeNull();
@@ -30,9 +29,8 @@ public class OutdoorLightsIntegrationTests : TestBase
         // Arrange
         var receivedEvents = new List<OutdoorLightStateChanged>();
 
-        using var scope = Factory.Services.CreateScope();
-        var messageBus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
-        var controller = scope.ServiceProvider.GetRequiredService<IOutdoorLightsController>();
+        var messageBus = Factory.Services.GetRequiredService<IMessageBus>();
+        var controller = Factory.Services.GetRequiredService<IOutdoorLightsController>();
 
         // Subscribe to events
         messageBus.Subscribe<OutdoorLightStateChanged>((OutdoorLightStateChanged lightEvent) =>
@@ -71,10 +69,10 @@ public class OutdoorLightsIntegrationTests : TestBase
                 fakeTimeProvider.SetUtcNow(new DateTime(2024, 6, 21, 2, 0, 0, DateTimeKind.Utc));
             }));
 
-        using var scope = Factory.Services.CreateScope();
-        var messageBus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
-        var controller = scope.ServiceProvider.GetRequiredService<IOutdoorLightsController>();
-        var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>() as FakeTimeProvider;
+
+        var messageBus = Factory.Services.GetRequiredService<IMessageBus>();
+        var controller = Factory.Services.GetRequiredService<IOutdoorLightsController>();
+        var timeProvider = Factory.Services.GetRequiredService<TimeProvider>() as FakeTimeProvider;
 
         messageBus.Subscribe<OutdoorLightStateChanged>((OutdoorLightStateChanged lightEvent) =>
         {
@@ -103,8 +101,7 @@ public class OutdoorLightsIntegrationTests : TestBase
     public async Task GetCurrentLightState_ShouldWorkWithRealSunCalculations()
     {
         // Arrange
-        using var scope = Factory.Services.CreateScope();
-        var controller = scope.ServiceProvider.GetRequiredService<IOutdoorLightsController>();
+        var controller = Factory.Services.GetRequiredService<IOutdoorLightsController>();
 
         // Act
         var states = await controller.GetCurrentLightStatesAsync();
@@ -125,9 +122,9 @@ public class OutdoorLightsIntegrationTests : TestBase
         var subscriber1Events = new List<OutdoorLightStateChanged>();
         var subscriber2Events = new List<OutdoorLightStateChanged>();
 
-        using var scope = Factory.Services.CreateScope();
-        var messageBus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
-        var controller = scope.ServiceProvider.GetRequiredService<IOutdoorLightsController>();
+        
+        var messageBus = Factory.Services.GetRequiredService<IMessageBus>();
+        var controller = Factory.Services.GetRequiredService<IOutdoorLightsController>();
 
         // Multiple subscribers
         messageBus.Subscribe<OutdoorLightStateChanged>((OutdoorLightStateChanged lightEvent) =>
