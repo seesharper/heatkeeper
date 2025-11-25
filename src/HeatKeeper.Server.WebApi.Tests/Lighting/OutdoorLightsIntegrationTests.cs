@@ -70,7 +70,7 @@ public class OutdoorLightsIntegrationTests : TestBase
                 // Set initial time to night (2 AM)
                 //fakeTimeProvider.SetUtcNow(new DateTime(2024, 6, 21, 2, 0, 0, DateTimeKind.Utc));
             }));
-
+        
 
         var messageBus = factory.Services.GetRequiredService<IMessageBus>();
         var controller = factory.Services.GetRequiredService<IOutdoorLightsController>();
