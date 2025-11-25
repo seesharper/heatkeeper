@@ -62,11 +62,11 @@ public class OutdoorLightsIntegrationTests : TestBase
         Factory.ConfigureHostBuilder(hostBuilder =>
             hostBuilder.ConfigureServices((context, services) =>
             {
-                var fakeTimeProvider = new FakeTimeProvider();
+                var fakeTimeProvider = new FakeTimeProvider(new DateTime(2024, 6, 21, 2, 0, 0, DateTimeKind.Utc));
                 services.AddSingleton<TimeProvider>(fakeTimeProvider);
 
                 // Set initial time to night (2 AM)
-                fakeTimeProvider.SetUtcNow(new DateTime(2024, 6, 21, 2, 0, 0, DateTimeKind.Utc));
+                //fakeTimeProvider.SetUtcNow(new DateTime(2024, 6, 21, 2, 0, 0, DateTimeKind.Utc));
             }));
 
 
@@ -84,7 +84,7 @@ public class OutdoorLightsIntegrationTests : TestBase
         await controller.CheckAndPublishLightStates();
 
         // Act 2 - Change to day time
-        timeProvider!.SetUtcNow(new DateTime(2024, 6, 21, 12, 0, 0, DateTimeKind.Utc));
+        timeProvider.Advance(TimeSpan.FromHours(12)); // Advance time by 12 hours to 2 PM
         await controller.CheckAndPublishLightStates();
 
         // Process all messages at once
@@ -122,7 +122,7 @@ public class OutdoorLightsIntegrationTests : TestBase
         var subscriber1Events = new List<OutdoorLightStateChanged>();
         var subscriber2Events = new List<OutdoorLightStateChanged>();
 
-        
+
         var messageBus = Factory.Services.GetRequiredService<IMessageBus>();
         var controller = Factory.Services.GetRequiredService<IOutdoorLightsController>();
 
