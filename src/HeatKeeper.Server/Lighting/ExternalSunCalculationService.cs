@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -27,8 +28,12 @@ public class ExternalSunCalculationService : ISunCalculationService
     {
         try
         {
-            var dateString = date.ToString("yyyy-MM-dd");
-            var url = $"https://api.sunrise-sunset.org/json?lat={latitude:F6}&lng={longitude:F6}&date={dateString}&formatted=0";
+            var dateString = date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            
+            // Use InvariantCulture to ensure period as decimal separator (not comma)
+            var latString = latitude.ToString("F6", CultureInfo.InvariantCulture);
+            var lngString = longitude.ToString("F6", CultureInfo.InvariantCulture);
+            var url = $"https://api.sunrise-sunset.org/json?lat={latString}&lng={lngString}&date={dateString}&formatted=0";
 
             _logger.LogDebug("Requesting sun times from API: {Url}", url);
 
@@ -58,7 +63,7 @@ public class ExternalSunCalculationService : ISunCalculationService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to get sun times from API for {Date} at {Latitude}, {Longitude}",
-                date.ToString("yyyy-MM-dd"), latitude, longitude);
+                date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), latitude, longitude);
 
             // Simple fallback: assume standard sunrise at 6:00 UTC and sunset at 18:00 UTC
             // This is a reasonable default for outdoor lighting control when API is unavailable

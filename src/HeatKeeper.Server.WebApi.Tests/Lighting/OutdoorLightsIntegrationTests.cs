@@ -64,7 +64,7 @@ public class OutdoorLightsIntegrationTests : TestBase
         factory.ConfigureHostBuilder(hostBuilder =>
             hostBuilder.ConfigureServices((context, services) =>
             {
-                var fakeTimeProvider = new FakeTimeProvider(new DateTime(2024, 6, 21, 2, 0, 0, DateTimeKind.Utc));
+                var fakeTimeProvider = new FakeTimeProvider(new DateTime(2024, 6, 21, 1, 0, 0, DateTimeKind.Utc));
                 services.AddSingleton<TimeProvider>(fakeTimeProvider);
 
                 // Set initial time to night (2 AM)
