@@ -64,7 +64,7 @@ public sealed class EventCatalog : IEventCatalog
 
             foreach (var payloadType in payloadTypes)
             {
-                var eventType = payloadType.Name; // This matches DomainEvent<T>.EventType logic
+                var eventType = payloadType.Name; // This matches EventBus.PublishAsync logic
 
                 // Extract metadata from DomainEventAttribute (we know it exists now)
                 var domainEventAttribute = payloadType.GetCustomAttribute<DomainEventAttribute>()!;

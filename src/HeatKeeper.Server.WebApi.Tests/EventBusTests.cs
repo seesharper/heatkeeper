@@ -22,28 +22,26 @@ public class EventBusTests
     {
         // Arrange
         var bus = new EventBus();
-        var receivedEvents = new List<DomainEvent<TemperatureReadingPayload>>();
+        var receivedEvents = new List<EventEnvelope>();
 
         // Act - Subscribe to events
         _ = Task.Run(async () =>
         {
             await foreach (var evt in bus.Reader.ReadAllAsync())
             {
-                if (evt is DomainEvent<TemperatureReadingPayload> tempEvent)
+                if (evt.Payload is TemperatureReadingPayload)
                 {
-                    receivedEvents.Add(tempEvent);
+                    receivedEvents.Add(evt);
                     if (receivedEvents.Count >= 2) break;
                 }
             }
         });
 
-        var event1 = DomainEvent<TemperatureReadingPayload>.Create(
-            new TemperatureReadingPayload(ZoneId: 1, Temperature: 20.0, SensorName: "Sensor-A"));
-        var event2 = DomainEvent<TemperatureReadingPayload>.Create(
-            new TemperatureReadingPayload(ZoneId: 2, Temperature: 18.5, SensorName: "Sensor-B"));
+        var payload1 = new TemperatureReadingPayload(ZoneId: 1, Temperature: 20.0, SensorName: "Sensor-A");
+        var payload2 = new TemperatureReadingPayload(ZoneId: 2, Temperature: 18.5, SensorName: "Sensor-B");
 
-        await bus.PublishAsync(event1);
-        await bus.PublishAsync(event2);
+        await bus.PublishAsync(payload1);
+        await bus.PublishAsync(payload2);
 
         // Wait a bit for events to be processed
         await Task.Delay(100);
@@ -51,41 +49,9 @@ public class EventBusTests
         // Assert
         Assert.Equal(2, receivedEvents.Count);
         Assert.Equal("TemperatureReadingPayload", receivedEvents[0].EventType);
-        Assert.Equal(1, receivedEvents[0].Payload.ZoneId);
-        Assert.Equal(20.0, receivedEvents[0].Payload.Temperature);
-    }
-}
-
-/// <summary>
-/// Tests for strongly-typed DomainEvent functionality
-/// </summary>
-public class DomainEventTests
-{
-    [Fact]
-    public void DomainEvent_AutoGeneratesEventType()
-    {
-        // Arrange & Act
-        var tempEvent = DomainEvent<TemperatureReadingPayload>.Create(
-            new TemperatureReadingPayload(ZoneId: 1, Temperature: 20.0, SensorName: "Kitchen"));
-
-        // Assert
-        Assert.Equal("TemperatureReadingPayload", tempEvent.EventType);
-        Assert.True(tempEvent.OccurredAt > DateTimeOffset.UtcNow.AddMinutes(-1));
-    }
-
-    [Fact]
-    public void DomainEvent_DifferentPayloadTypes_GenerateDifferentEventTypes()
-    {
-        // Arrange & Act
-        var tempEvent = DomainEvent<TemperatureReadingPayload>.Create(
-            new TemperatureReadingPayload(ZoneId: 1, Temperature: 20.0, SensorName: "Kitchen"));
-        var motionEvent = DomainEvent<MotionDetectedPayload>.Create(
-            new MotionDetectedPayload(ZoneId: 2, Location: "Hallway", DetectedAt: DateTimeOffset.UtcNow));
-
-        // Assert
-        Assert.Equal("TemperatureReadingPayload", tempEvent.EventType);
-        Assert.Equal("MotionDetectedPayload", motionEvent.EventType);
-        Assert.NotEqual(tempEvent.EventType, motionEvent.EventType);
+        var typedPayload1 = (TemperatureReadingPayload)receivedEvents[0].Payload;
+        Assert.Equal(1, typedPayload1.ZoneId);
+        Assert.Equal(20.0, typedPayload1.Temperature);
     }
 }
 
@@ -445,7 +411,7 @@ public class EventsApiTests : TestBase
         // Arrange
         var client = Factory.CreateClient();
         var token = await client.AuthenticateAsAdminUser();
-        
+
         var parameterMap = new Dictionary<string, string>
         {
             { "message", "Test notification from integration test" },
@@ -453,10 +419,10 @@ public class EventsApiTests : TestBase
         };
 
         // Act - Call the endpoint
-        var response = await client.PostAsync("api/actions", 
+        var response = await client.PostAsync("api/actions",
             new StringContent(
-                System.Text.Json.JsonSerializer.Serialize(new { actionId = 1, parameterMap }), 
-                System.Text.Encoding.UTF8, 
+                System.Text.Json.JsonSerializer.Serialize(new { actionId = 1, parameterMap }),
+                System.Text.Encoding.UTF8,
                 "application/json"));
 
         // Assert - Endpoint should be reachable and process the request
@@ -470,7 +436,7 @@ public class EventsApiTests : TestBase
         // Arrange
         var client = Factory.CreateClient();
         var token = await client.AuthenticateAsAdminUser();
-        
+
         var parameterMap = new Dictionary<string, string>
         {
             { "severity", "info" }
@@ -478,10 +444,10 @@ public class EventsApiTests : TestBase
         };
 
         // Act - Call the endpoint with missing required field
-        var response = await client.PostAsync("api/actions", 
+        var response = await client.PostAsync("api/actions",
             new StringContent(
-                System.Text.Json.JsonSerializer.Serialize(new { actionId = 1, parameterMap }), 
-                System.Text.Encoding.UTF8, 
+                System.Text.Json.JsonSerializer.Serialize(new { actionId = 1, parameterMap }),
+                System.Text.Encoding.UTF8,
                 "application/json"));
 
         // Assert - Endpoint should be reachable and return some response
@@ -545,10 +511,9 @@ public class TriggerEngineIntegrationTests
         _ = Task.Run(() => engine.StartAsync(cts.Token));
 
         // Act - Publish a temperature event that should trigger the action
-        var hotEvent = DomainEvent<TemperatureReadingPayload>.Create(
-            new TemperatureReadingPayload(ZoneId: 1, Temperature: 25.0, SensorName: "Kitchen"));
+        var hotPayload = new TemperatureReadingPayload(ZoneId: 1, Temperature: 25.0, SensorName: "Kitchen");
 
-        await bus.PublishAsync(hotEvent, cts.Token);
+        await bus.PublishAsync(hotPayload, cts.Token);
 
         // Give the engine time to process
         await Task.Delay(100);

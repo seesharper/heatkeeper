@@ -19,7 +19,14 @@ public class MessageBusHostedService(IMessageBus messageBus) : BackgroundService
 
         messageBus.Subscribe<OutdoorLightStateChanged>(async (OutdoorLightStateChanged eventMessage, IEventBus eventBus) =>
             {
-                await eventBus.PublishAsync(DomainEvent<OutdoorLightStateChanged>.Create(eventMessage), CancellationToken.None);
+                if (eventMessage.State == LightState.On)
+                {
+                    await eventBus.PublishAsync(new SunriseEvent(eventMessage.LocationName), CancellationToken.None);
+                }
+                else if (eventMessage.State == LightState.Off)
+                {
+                    await eventBus.PublishAsync(new SunsetEvent(eventMessage.LocationName), CancellationToken.None);
+                }
             });
 
         if (!AppEnvironment.IsRunningFromTests)

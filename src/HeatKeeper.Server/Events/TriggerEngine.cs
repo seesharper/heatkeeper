@@ -108,11 +108,11 @@ public sealed class TriggerEngine
         }
     }
 
-    private static bool Matches(IDomainEvent evt, TriggerDefinition trig)
+    private static bool Matches(EventEnvelope evt, TriggerDefinition trig)
     {
         foreach (var c in trig.Conditions)
         {
-            var left = ReadValueFromStronglyTypedEvent(evt, c.PropertyName);
+            var left = ReadValueFromPayload(evt.Payload, c.PropertyName);
             var right = c.Value;
 
             if (!Compare(left, right, c.Operator))
@@ -121,12 +121,9 @@ public sealed class TriggerEngine
         return true;
     }
 
-    private static object? ReadValueFromStronglyTypedEvent(IDomainEvent evt, string key)
+    private static object? ReadValueFromPayload(object payload, string key)
     {
-        var payload = evt.GetPayload();
-        if (payload == null) return null;
-
-        // Use reflection to get the property value from the strongly-typed payload
+        // Use reflection to get the property value from the payload
         var payloadType = payload.GetType();
         var property = payloadType.GetProperty(key, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
 
@@ -182,7 +179,7 @@ public sealed class TriggerEngine
 
     private static IReadOnlyDictionary<string, object?> ResolveParameters(
         IReadOnlyDictionary<string, string> parameterMap,
-        IDomainEvent evt)
+        EventEnvelope evt)
     {
         // Parameter values are treated as literals; no template resolution against the event payload.
         var dict = new Dictionary<string, object?>();

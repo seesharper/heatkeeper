@@ -1,51 +1,53 @@
 namespace HeatKeeper.Server.Events;
 
 /// <summary>
-/// Example demonstrating the benefits of strongly-typed domain events.
+/// Example demonstrating the benefits of strongly-typed domain event payloads.
+/// Events are published directly and wrapped internally by the EventBus.
 /// </summary>
 public static class TypeSafetyExample
 {
-    public static void DemonstrateTypeSafety()
+    public static async Task DemonstrateTypeSafety()
     {
-        // ✅ Strongly-typed events provide compile-time safety and IntelliSense
-        var temperatureEvent = DomainEvent<TemperatureReadingPayload>.Create(
-            new TemperatureReadingPayload(
-                ZoneId: 1,
-                Temperature: 23.5,
-                SensorName: "Kitchen-Sensor"
-            ));
+        var bus = new EventBus();
+
+        // ✅ Event payloads provide compile-time safety and IntelliSense
+        var temperaturePayload = new TemperatureReadingPayload(
+            ZoneId: 1,
+            Temperature: 23.5,
+            SensorName: "Kitchen-Sensor"
+        );
 
         // ✅ Type-safe property access with IntelliSense
-        var zoneId = temperatureEvent.Payload.ZoneId;          // int - compile-time safe!
-        var temperature = temperatureEvent.Payload.Temperature; // double - compile-time safe!
-        var sensorName = temperatureEvent.Payload.SensorName;   // string? - compile-time safe!
+        var zoneId = temperaturePayload.ZoneId;          // int - compile-time safe!
+        var temperature = temperaturePayload.Temperature; // double - compile-time safe!
+        var sensorName = temperaturePayload.SensorName;   // string? - compile-time safe!
 
         // ✅ Motion event with different payload structure
-        var motionEvent = DomainEvent<MotionDetectedPayload>.Create(
-            new MotionDetectedPayload(
-                ZoneId: 2,
-                Location: "Living Room",
-                DetectedAt: DateTimeOffset.Now
-            ));
+        var motionPayload = new MotionDetectedPayload(
+            ZoneId: 2,
+            Location: "Living Room",
+            DetectedAt: DateTimeOffset.Now
+        );
 
         // ✅ Door event demonstrating flexibility
-        var doorEvent = DomainEvent<DoorEventPayload>.Create(
-            new DoorEventPayload(
-                DoorId: "main-entrance",
-                Action: "opened",
-                UserId: "user-123"
-            ));
+        var doorPayload = new DoorEventPayload(
+            DoorId: "main-entrance",
+            Action: "opened",
+            UserId: "user-123"
+        );
 
-        Console.WriteLine("Strongly-typed events created successfully!");
+        // Publish events - the bus wraps them internally
+        await bus.PublishAsync(temperaturePayload);
+        await bus.PublishAsync(motionPayload);
+        await bus.PublishAsync(doorPayload);
+
+        Console.WriteLine("Strongly-typed event payloads published successfully!");
         Console.WriteLine($"Temperature in zone {zoneId}: {temperature}°C from {sensorName}");
-        Console.WriteLine($"Motion detected in: {motionEvent.Payload.Location}");
-        Console.WriteLine($"Door {doorEvent.Payload.DoorId} was {doorEvent.Payload.Action}");
-
-        // ✅ Event types are automatically derived from payload type names
-        Console.WriteLine($"Event types: {temperatureEvent.EventType}, {motionEvent.EventType}, {doorEvent.EventType}");
+        Console.WriteLine($"Motion detected in: {motionPayload.Location}");
+        Console.WriteLine($"Door {doorPayload.DoorId} was {doorPayload.Action}");
 
         // ✅ Demonstrate compile-time error prevention
-        // var badAccess = temperatureEvent.Payload.InvalidProperty; // ❌ Won't compile!
-        // var wrongType = (string)temperatureEvent.Payload.ZoneId;  // ❌ Won't compile!
+        // var badAccess = temperaturePayload.InvalidProperty; // ❌ Won't compile!
+        // var wrongType = (string)temperaturePayload.ZoneId;  // ❌ Won't compile!
     }
 }
