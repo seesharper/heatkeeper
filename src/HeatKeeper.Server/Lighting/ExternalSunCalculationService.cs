@@ -50,7 +50,7 @@ public class ExternalSunCalculationService : ISunCalculationService
             var sunrise = DateTime.Parse(apiResponse.Results.Sunrise).ToUniversalTime();
             var sunset = DateTime.Parse(apiResponse.Results.Sunset).ToUniversalTime();
 
-            _logger.LogDebug("Retrieved sun times for {Date} at {Latitude}, {Longitude}: sunrise {Sunrise}, sunset {Sunset}",
+            _logger.LogInformation("Retrieved sun times for {Date} at {Latitude}, {Longitude}: sunrise {Sunrise}, sunset {Sunset}",
                 dateString, latitude, longitude, sunrise, sunset);
 
             return (sunrise, sunset);
