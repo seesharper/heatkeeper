@@ -234,6 +234,12 @@ public interface ISqlProvider
 
     string GetHeatersMqttInfo { get; }
 
+    string EnableHeater { get; }
+
+    string DisableHeater { get; }
+
+    string AddEnabledColumnToHeatersTable { get; }
+
     string GetSensorDetails { get; }
 
     string DeleteOldPushSubscriptions { get; }

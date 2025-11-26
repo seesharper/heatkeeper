@@ -5,7 +5,8 @@ INSERT INTO
         Description,
         MqttTopic,
         OnPayload,
-        OffPayload
+        OffPayload,
+        Enabled
     )
 VALUES
     (
@@ -14,5 +15,6 @@ VALUES
         @Description,
         @MqttTopic,
         @OnPayload,
-        @OffPayload
+        @OffPayload,
+        @Enabled
     );
