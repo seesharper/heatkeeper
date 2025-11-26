@@ -187,7 +187,7 @@ namespace HeatKeeper.Server.WebApi.Tests
                 new(Name: TestHeaterName, Description: TestHeaterDescription, MqttTopic: TestHeaterMqttTopic, OnPayload: TestHeaterOnPayload, OffPayload: TestHeaterOffPayload, ZoneId: testZoneId);
 
             public static UpdateHeaterCommand UpdateHeater(long heaterId) =>
-                new(heaterId, UpdatedLivingRoomHeaterName, UpdatedLivingRoomHeaterDescription, UpdatedLivingRoomHeaterMqttTopic, UpdatedLivingRoomHeaterOnPayload, UpdatedLivingRoomHeaterOffPayload);
+                new(heaterId, UpdatedLivingRoomHeaterName, UpdatedLivingRoomHeaterDescription, UpdatedLivingRoomHeaterMqttTopic, UpdatedLivingRoomHeaterOnPayload, UpdatedLivingRoomHeaterOffPayload, true);
         }
 
 

@@ -1,5 +1,9 @@
 using System.Threading.Tasks;
+using CQRS.Command.Abstractions;
 using FluentAssertions;
+using HeatKeeper.Server.Heaters;
+using HeatKeeper.Server.Heaters.Api;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace HeatKeeper.Server.WebApi.Tests;
@@ -64,5 +68,47 @@ public class HeatersTests : TestBase
 
         var heaters = await client.GetHeaters(testLocation.LivingRoomZoneId, testLocation.Token);
         heaters.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task ShouldDisableAndEnableHeaterUsingCommands()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+
+        var heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        heater.Enabled.Should().BeTrue();
+
+        await Factory.Services.GetRequiredService<ICommandHandler<DisableHeaterCommand>>()
+            .HandleAsync(new DisableHeaterCommand(testLocation.LivingRoomHeaterId1));
+        heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        
+        heater.Enabled.Should().BeFalse();
+
+        await Factory.Services.GetRequiredService<ICommandHandler<EnableHeaterCommand>>()
+            .HandleAsync(new EnableHeaterCommand(testLocation.LivingRoomHeaterId1));
+        heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        
+        heater.Enabled.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task ShouldDisableAndEnableHeaterUsingEndpoints()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+
+        var heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        heater.Enabled.Should().BeTrue();
+
+        await client.Patch(new UpdateHeaterCommand(testLocation.LivingRoomHeaterId1, heater.Name, heater.Description, heater.MqttTopic, heater.OnPayload, heater.OffPayload, false), testLocation.Token);
+        heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        
+        heater.Enabled.Should().BeFalse();
+
+        await client.Patch(new UpdateHeaterCommand(testLocation.LivingRoomHeaterId1, heater.Name, heater.Description, heater.MqttTopic, heater.OnPayload, heater.OffPayload, true), testLocation.Token);
+        heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        
+        heater.Enabled.Should().BeTrue();       
     }
 }
