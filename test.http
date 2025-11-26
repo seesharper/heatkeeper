@@ -32,4 +32,18 @@ content-type: application/json
     }
 ]
 
+###
+# Test an action with parameters (e.g., Send Notification with actionId 1)
+POST http://localhost:5000/api/actions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJnaXZlbl9uYW1lIjoiRmlyc3QgbmFtZSIsImZhbWlseV9uYW1lIjoiTGFzdCBOYW1lIiwiZW1haWwiOiJhZG1pbkBuby5vcmciLCJyb2xlIjoiYWRtaW4iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9zaWQiOiIxIiwibmJmIjoxNTg5Mjg3MDg4LCJleHAiOjE1ODk4OTE4ODgsImlhdCI6MTU4OTI4NzA4OH0.v_HMb3mKTJ9rJ86h6Fyetl3vdQ9vArjyT5C-bNUNabE
+content-type: application/json
+
+{
+    "actionId": 1,
+    "parameterMap": {
+        "message": "Test notification from API",
+        "severity": "info"
+    }
+}
+
 

@@ -1,4 +1,5 @@
 using System.Data.Common;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using CQRS.LightInject;
 using CQRS.Transactions;
@@ -6,7 +7,9 @@ using HeatKeeper.Abstractions;
 using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Authentication;
+using HeatKeeper.Server.Events;
 
+using HeatKeeper.Server.Lighting;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
@@ -41,7 +44,11 @@ public class ServerCompositionRoot : ICompositionRoot
         DbReaderOptions.WhenReading<decimal>().Use((rd, i) => rd.GetDecimal(i));
     }
 
-    public void Compose(IServiceRegistry serviceRegistry) => _ = serviceRegistry.RegisterCommandHandlers()
+    public void Compose(IServiceRegistry serviceRegistry)
+    {
+        var catalog = CreateActionCatalog();
+
+        serviceRegistry.RegisterCommandHandlers()
             .RegisterQueryHandlers()
             .RegisterValidators()
 
@@ -55,6 +62,16 @@ public class ServerCompositionRoot : ICompositionRoot
             .RegisterSingleton<IEmailValidator, EmailValidator>()
             .RegisterSingleton<ICronExpressionValidator, CronExpressionValidator>()
             .RegisterSingleton<IMessageBus, MessageBus>()
+            .RegisterSingleton<IOutdoorLightsController, OutdoorLightsController>()
+            .RegisterSingleton<HttpClient>()
+            .RegisterSingleton<ISunCalculationService, ExternalSunCalculationService>()
+            .RegisterSingleton<IEventBus, EventBus>()
+            .RegisterSingleton<IEventCatalog, EventCatalog>()
+            .RegisterInstance(catalog)
+            .RegisterSingleton<TriggerEngine>()
+
+            // Discover and register actions automatically
+            .RegisterActions(catalog, typeof(ServerCompositionRoot).Assembly)
 
             .Decorate<ICommandHandler<CreateLocationCommand>, ValidateCreateLocation>()
             .Decorate<ICommandHandler<UpdateLocationCommand>, ValidateUpdateLocation>()
@@ -86,8 +103,15 @@ public class ServerCompositionRoot : ICompositionRoot
             .Decorate(typeof(ICommandHandler<>), typeof(CommandValidator<>))
             .Decorate(typeof(ICommandHandler<>), typeof(AuthorizedCommandHandler<>))
             .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>));
+    }
 
     // Auth - Validate - When - Transaction 
+
+    private static ActionCatalog CreateActionCatalog()
+    {
+        // Actions will be discovered and registered automatically by RegisterActions
+        return new ActionCatalog();
+    }
 
     private static IManagedMqttClient CreateManagedMqttClient(IConfiguration configuration)
     {

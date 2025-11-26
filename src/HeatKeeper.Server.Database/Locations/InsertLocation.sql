@@ -1,1 +1,2 @@
-INSERT INTO Locations (Name, Description) VALUES (@name, @description)
+INSERT INTO Locations (Name, Description, Longitude, Latitude)
+VALUES (@name, @description, @longitude, @latitude)

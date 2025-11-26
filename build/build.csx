@@ -1,4 +1,4 @@
-#load "nuget:Dotnet.Build, 0.24.0"
+#load "nuget:Dotnet.Build, 0.26.0"
 #load "nuget:dotnet-steps, 0.0.2"
 
 BuildContext.CodeCoverageThreshold = 30;
@@ -24,10 +24,13 @@ Step testcoverage = () =>
 };
 
 [StepDescription("Runs all the tests for all target frameworks")]
-Step test = () =>
+AsyncStep test = async () =>
 {
     Command.Execute("docker", $"compose -f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" up -d");
-    DotNet.Test();
+    Command.Execute("dotnet", "test --verbosity normal", BuildContext.RepositoryFolder);
+
+
+    // DotNet.Test();
     Command.Execute("docker", $"compose -f \"{Path.Combine(BuildContext.RepositoryFolder, "docker-compose-dev.yml")}\" down");
 };
 
@@ -41,7 +44,7 @@ AsyncStep dockerImage = async () =>
 [StepDescription("Deploys packages if we are on a tag commit in a secure environment.")]
 AsyncStep deploy = async () =>
 {
-    test();
+    await test();
     testcoverage();
     await BuildContainer();
 

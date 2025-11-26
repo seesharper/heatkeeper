@@ -15,6 +15,7 @@ using HeatKeeper.Server.Dashboard;
 using HeatKeeper.Server.EnergyPriceAreas;
 using HeatKeeper.Server.EnergyPriceAreas.Api;
 using HeatKeeper.Server.EnergyPrices.Api;
+using HeatKeeper.Server.Events.Api;
 using HeatKeeper.Server.Heaters.Api;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
@@ -187,6 +188,25 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task<DeadSensor[]> GetDeadSensors(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<DeadSensor[]>(client, "api/sensors/deadsensors", token, success, problem);
+
+        public static async Task<HeatKeeper.Server.Events.Api.EventInfo[]> GetEvents(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<HeatKeeper.Server.Events.Api.EventInfo[]>(client, "api/events", token, success, problem);
+
+        public static async Task<HeatKeeper.Server.Events.EventDetails> GetEventDetails(this HttpClient client, int eventId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<HeatKeeper.Server.Events.EventDetails>(client, $"api/events/{eventId}", token, success, problem);
+
+        public static async Task<HeatKeeper.Server.Events.Api.ActionInfo[]> GetActions(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<HeatKeeper.Server.Events.Api.ActionInfo[]>(client, "api/actions", token, success, problem);
+
+        public static async Task<HeatKeeper.Server.Events.ActionDetails> GetActionDetails(this HttpClient client, int actionId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<HeatKeeper.Server.Events.ActionDetails>(client, $"api/actions/{actionId}", token, success, problem);
+
+        public static async Task PostTestAction(this HttpClient client, int actionId, Dictionary<string, string> parameterMap, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        {
+            var command = new { ActionId = actionId, ParameterMap = parameterMap };
+            success ??= (response) => response.StatusCode.Should().Be(HttpStatusCode.Created);
+            await Post<object, object>(client, "api/actions", command, token, success, problem);
+        }
 
         public static async Task<UnassignedSensorInfo[]> GetUnassignedSensors(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<UnassignedSensorInfo[]>(client, "api/sensors", token, success, problem);

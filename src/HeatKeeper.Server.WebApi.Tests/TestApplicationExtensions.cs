@@ -49,7 +49,7 @@ public static class TestApplicationExtensions
         var livingRoomHeaterId2 = await client.CreateHeater(TestData.Heaters.LivingRoomHeater1(livingRoomZoneId), token);
         var kitchenHeaterId = await client.CreateHeater(TestData.Heaters.KitchenHeater(kitchenZoneId), token);
 
-        await client.UpdateLocation(new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, livingRoomZoneId), locationId, token);
+        await client.UpdateLocation(new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, livingRoomZoneId, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude), locationId, token);
 
         await client.AssignLocationToUser(new AssignLocationToUserCommand(1, locationId), token);
 

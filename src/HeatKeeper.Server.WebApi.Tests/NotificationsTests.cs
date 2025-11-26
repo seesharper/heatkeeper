@@ -19,7 +19,7 @@ public static partial class TestData
 {
     public static class Notifications
     {
-        public static PostNotificationCommand DeadSensorNotification => new(
+        public static PostNotificationCommand   DeadSensorNotification => new(
             "Test Notification",
             "Test Notification Description",
             NotificationType.DeadSensors,
