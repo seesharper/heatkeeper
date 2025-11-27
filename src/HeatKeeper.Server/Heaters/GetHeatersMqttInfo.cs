@@ -3,7 +3,7 @@ namespace HeatKeeper.Server.Heaters;
 [RequireBackgroundRole]
 public record HeatersMqttInfoQuery(long ZoneId) : IQuery<HeaterMqttInfo[]>;
 
-public record HeaterMqttInfo(string Topic, string OnPayload, string OffPayload);
+public record HeaterMqttInfo(string Topic, string OnPayload, string OffPayload, bool Enabled);
 
 public class GetHeatersMqttInfo(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<HeatersMqttInfoQuery, HeaterMqttInfo[]>
 {

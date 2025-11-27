@@ -16,14 +16,23 @@ public class SetZoneHeatingStatus(IQueryExecutor queryExecutor, ICommandExecutor
 {
     public async Task HandleAsync(SetZoneHeatingStatusCommand command, CancellationToken cancellationToken = default)
     {
-        
+
         var heatersMqttInfo = await queryExecutor.ExecuteAsync(new HeatersMqttInfoQuery(command.ZoneId), cancellationToken);
 
         if (command.HeatingStatus == HeatingStatus.On)
         {
             foreach (var heaterMqttInfo in heatersMqttInfo)
             {
-                await commandExecutor.ExecuteAsync(new PublishMqttMessageCommand(heaterMqttInfo.Topic, heaterMqttInfo.OnPayload), cancellationToken);
+                // Only turn on heaters that are enabled
+                if (heaterMqttInfo.Enabled)
+                {
+                    await commandExecutor.ExecuteAsync(new PublishMqttMessageCommand(heaterMqttInfo.Topic, heaterMqttInfo.OnPayload), cancellationToken);
+                }
+                else
+                {
+                    // Ensure disabled heaters are turned off
+                    await commandExecutor.ExecuteAsync(new PublishMqttMessageCommand(heaterMqttInfo.Topic, heaterMqttInfo.OffPayload), cancellationToken);
+                }
             }
         }
         else
