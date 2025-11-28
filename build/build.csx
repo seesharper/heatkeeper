@@ -6,6 +6,7 @@ BuildContext.CodeCoverageThreshold = 30;
 var dockerImageName = "heatkeeper";
 var TagVersion = BuildContext.LatestTag;
 
+WriteLine($"TagVersion: {TagVersion}");
 
 [StepDescription("Runs the tests with test coverage")]
 Step testcoverage = () =>
