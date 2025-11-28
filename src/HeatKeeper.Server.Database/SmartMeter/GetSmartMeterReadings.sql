@@ -1,7 +1,7 @@
 select (
    select value
      from measurements
-    where measurementtype = 11
+    where measurementtype = 5
 ) as activepowerimport,
        (
           select value
