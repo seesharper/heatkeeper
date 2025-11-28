@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <noWarn>1591</noWarn>
     <OutputType>library</OutputType>
@@ -16,10 +16,10 @@
     <PackageReference Include="LightInject" Version="7.0.1" />
     <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.3.7.1207" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.8.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.0" />
     <PackageReference Include="WebPush" Version="1.0.12" />
   </ItemGroup>
   <ItemGroup>
