@@ -343,4 +343,5 @@ public interface ISqlProvider
 
     string DeleteEventTrigger { get; }
 
+    string GetSmartMeterReadings { get; }
 }
