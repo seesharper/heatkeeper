@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace HeatKeeper.Server.SmartMeter;
@@ -16,7 +15,8 @@ public record SmartMeterReadings(
     double VoltageBetweenPhase1AndPhase2,
     double VoltageBetweenPhase1AndPhase3,
     double VoltageBetweenPhase2AndPhase3,
-    double CumulativePowerImport
+    double CumulativePowerImport,
+    DateTime Timestamp
 );
 
 public class GetSmartMeterReadings(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<GetSmartMeterReadingsQuery, ServerSentEventsResult<SmartMeterReadings>>
