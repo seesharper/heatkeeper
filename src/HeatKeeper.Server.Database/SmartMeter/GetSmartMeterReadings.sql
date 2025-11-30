@@ -37,4 +37,9 @@ select (
           select value
             from measurements
            where measurementtype = 12
-       ) as cumulativepowerimport
+       ) as cumulativepowerimport,
+       (
+          select max(created)
+            from measurements
+           where measurementtype in (5, 6, 7, 8, 9, 10, 11, 12)
+       ) as timestamp
