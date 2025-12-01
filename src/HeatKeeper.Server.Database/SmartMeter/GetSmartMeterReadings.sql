@@ -39,7 +39,14 @@ select (
            where measurementtype = 12
        ) as cumulativepowerimport,
        (
-          select max(created)
+          select max(updated)
             from latestzonemeasurements
-           where measurementtype in (5, 6, 7, 8, 9, 10, 11, 12)
+           where measurementtype in ( 5,
+                                      6,
+                                      7,
+                                      8,
+                                      9,
+                                      10,
+                                      11,
+                                      12 )
        ) as timestamp
