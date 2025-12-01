@@ -1,6 +1,7 @@
 using System.Data.Common;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using CQRS.Execution;
 using CQRS.LightInject;
 using CQRS.Transactions;
 using HeatKeeper.Abstractions;
@@ -104,7 +105,10 @@ public class ServerCompositionRoot : ICompositionRoot
             })
             .Decorate(typeof(ICommandHandler<>), typeof(CommandValidator<>))
             .Decorate(typeof(ICommandHandler<>), typeof(AuthorizedCommandHandler<>))
-            .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>))
+            .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>), sr =>
+            {
+                return sr.ImplementingType != null && sr.ImplementingType.IsGenericTypeDefinition && sr.ImplementingType.GetGenericTypeDefinition() != typeof(ScopedQueryHandler<,>);
+            })
             .Decorate<IQueryHandler<ReadSmartMeterReadingsQuery, SmartMeterReadings>, CachedSmartMeterReadingsDecorator>();
     }
 
