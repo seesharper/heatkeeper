@@ -19,7 +19,7 @@ public record SmartMeterReadings(
     DateTime Timestamp
 );
 
-public class GetSmartMeterReadings(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<GetSmartMeterReadingsQuery, ServerSentEventsResult<SmartMeterReadings>>
+public class GetSmartMeterReadings(IQueryExecutor queryExecutor) : IQueryHandler<GetSmartMeterReadingsQuery, ServerSentEventsResult<SmartMeterReadings>>
 {
     public async Task<ServerSentEventsResult<SmartMeterReadings>> HandleAsync(GetSmartMeterReadingsQuery query, CancellationToken cancellationToken = default)
     {
@@ -39,8 +39,7 @@ public class GetSmartMeterReadings(IDbConnection dbConnection, ISqlProvider sqlP
 
     private async Task<SmartMeterReadings> GetReadingsFromDatabase()
     {
-        var readings = (await dbConnection.ReadAsync<SmartMeterReadings>(sqlProvider.GetSmartMeterReadings)).Single();
-        return readings;
+        return await queryExecutor.ExecuteAsync(new ReadSmartMeterReadingsQuery(), CancellationToken.None);
     }
 }
 

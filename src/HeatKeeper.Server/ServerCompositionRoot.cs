@@ -20,6 +20,7 @@ using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Programs.Api;
 using HeatKeeper.Server.Schedules;
 using HeatKeeper.Server.Schedules.Api;
+using HeatKeeper.Server.SmartMeter;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Users.Api;
 using HeatKeeper.Server.Validation;
@@ -69,6 +70,7 @@ public class ServerCompositionRoot : ICompositionRoot
             .RegisterSingleton<IEventCatalog, EventCatalog>()
             .RegisterInstance(catalog)
             .RegisterSingleton<TriggerEngine>()
+            .RegisterSingleton<ISmartMeterReadingsCache, SmartMeterReadingsCache>()
 
             // Discover and register actions automatically
             .RegisterActions(catalog, typeof(ServerCompositionRoot).Assembly)
@@ -102,7 +104,8 @@ public class ServerCompositionRoot : ICompositionRoot
             })
             .Decorate(typeof(ICommandHandler<>), typeof(CommandValidator<>))
             .Decorate(typeof(ICommandHandler<>), typeof(AuthorizedCommandHandler<>))
-            .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>));
+            .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>))
+            .Decorate<IQueryHandler<ReadSmartMeterReadingsQuery, SmartMeterReadings>, CachedSmartMeterReadingsDecorator>();
     }
 
     // Auth - Validate - When - Transaction 
