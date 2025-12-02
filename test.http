@@ -15,7 +15,7 @@ POST https://heatkeeper.no/api/energy-prices/import
 content-type: application/json
 
 {
-    "DateToImport": "2025-01-11"
+    "DateToImport": "2025-12-03"
 }
 
 ###

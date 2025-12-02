@@ -33,13 +33,16 @@ public class SendDeadSensorsNotification(IQueryExecutor queryExecutor, ICommandE
             }
 
 
-            var pushSubscriptionDetails = await queryExecutor.ExecuteAsync(new GetPushSubscriptionByUserQuery(userSubscribedToNotification.UserId), cancellationToken);
-            if (pushSubscriptionDetails == null)
+            var pushSubscriptionByUser = await queryExecutor.ExecuteAsync(new GetPushSubscriptionByUserQuery(userSubscribedToNotification.UserId), cancellationToken);
+            if (pushSubscriptionByUser.Length == 0)
             {
                 continue;
             }
-            var pushSubscription = new PushSubscription(pushSubscriptionDetails.Endpoint, pushSubscriptionDetails.P256dh, pushSubscriptionDetails.Auth);
-            await messageBus.Publish(new SendPushNotificationCommand(pushSubscription, payLoad.ToString()));
+            foreach (var pushSubscriptionDetails in pushSubscriptionByUser)
+            {
+                var pushSubscription = new PushSubscription(pushSubscriptionDetails.Endpoint, pushSubscriptionDetails.P256dh, pushSubscriptionDetails.Auth);
+                await messageBus.Publish(new SendPushNotificationCommand(pushSubscription, payLoad.ToString()));
+            }
         }
     }
 
