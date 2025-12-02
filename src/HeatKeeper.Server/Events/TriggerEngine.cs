@@ -84,12 +84,10 @@ public sealed class TriggerEngine
 
                         // Create a new scope and resolve the action from DI container
                         using var scope = _serviceProvider.CreateScope();
-                        var serviceFactory = scope.ServiceProvider as LightInject.IServiceFactory
-                            ?? throw new InvalidOperationException("Expected LightInject service factory");
 
                         try
                         {
-                            var action = (IAction)serviceFactory.GetInstance(typeof(IAction), actionDetails.Name);
+                            var action = (IAction)scope.ServiceProvider.GetRequiredKeyedService(typeof(IAction), actionDetails.Name);
                             await InvokeActionAsync(action, resolved, ct);
                         }
                         catch (InvalidOperationException)
@@ -181,11 +179,11 @@ public sealed class TriggerEngine
         IReadOnlyDictionary<string, string> parameterMap,
         EventEnvelope evt)
     {
-        // Parameter values are treated as literals; no template resolution against the event payload.
+        // Resolve parameter values, replacing {{propertyName}} placeholders with actual values from the event payload
         var dict = new Dictionary<string, object?>();
         foreach (var kvp in parameterMap)
         {
-            dict[kvp.Key] = kvp.Value;
+            dict[kvp.Key] = PropertyResolver.ResolveValue(kvp.Value, evt.Payload);
         }
 
         return new ReadOnlyDictionary<string, object?>(dict);
@@ -249,7 +247,8 @@ public sealed class TriggerEngine
 
         var result = JsonSerializer.Deserialize(json, parameterType, new JsonSerializerOptions
         {
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString
         });
 
         if (result == null)
