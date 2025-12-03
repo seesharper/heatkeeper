@@ -19,6 +19,24 @@
   What about user defined jobs. Like running a query in the database. Jobs are probably preconfigured or stored in the database. They are scheduled in Janitor.
 
 
+DisabledReason 
+
+* None
+* DeadSensor
+* User 
+* Overload
+
+Scenario 
+A trigger disables a heater. That should always be possible 
+A trigger enables the heater. Should only be possible when no dead sensors exists 
+
+A sensor comes back online and tries to enable the heater
+Should only be possible if the heater was disabled because of a dead sensor 
+
+
+
+We cannot enable a heater that has a dead sensor
+We cannot re-enable a heater that is disabled 
 
   
 
