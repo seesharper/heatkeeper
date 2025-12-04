@@ -55,8 +55,9 @@ public static class ActionDetailsBuilder
             var type = GetTypeString(prop.PropertyType);
             var required = IsRequired(prop);
             var description = GetDescription(prop);
+            var lookupUrl = GetLookupUrl(prop);
 
-            parameters.Add(new ActionParameter(name, type, required, description));
+            parameters.Add(new ActionParameter(name, type, required, description, lookupUrl));
         }
 
         return parameters;
@@ -99,5 +100,11 @@ public static class ActionDetailsBuilder
     {
         var descriptionAttr = property.GetCustomAttribute<DescriptionAttribute>();
         return descriptionAttr?.Description;
+    }
+
+    private static string? GetLookupUrl(PropertyInfo property)
+    {
+        var lookupAttr = property.GetCustomAttribute<LookupAttribute>();
+        return lookupAttr?.Url;
     }
 }

@@ -6,7 +6,7 @@ using HeatKeeper.Server.Heaters;
 namespace HeatKeeper.Server.Events;
 
 [Action(4, "Enable Heater", "Enables a specific heater")]
-[RequireAdminRole]
+[RequireBackgroundRole]
 public record EnableHeaterCommand(
     [property: Description("The ID of the heater to enable"), Required] long HeaterId);
 

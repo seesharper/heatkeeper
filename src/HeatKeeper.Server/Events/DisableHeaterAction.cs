@@ -6,7 +6,7 @@ using HeatKeeper.Server.Heaters;
 namespace HeatKeeper.Server.Events;
 
 [Action(5, "Disable Heater", "Disables a specific heater")]
-[RequireAdminRole]
+[RequireBackgroundRole]
 public record DisableHeaterCommand(
     [property: Description("The ID of the heater to disable"), Required] long HeaterId,
     [property: Description("The reason for disabling the heater"), Required] HeaterDisabledReason DisabledReason);

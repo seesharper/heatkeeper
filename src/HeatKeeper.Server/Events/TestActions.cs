@@ -12,7 +12,7 @@ namespace HeatKeeper.Server.Events;
 /// Test command for sending notifications - used only in tests
 /// </summary>
 [Action(-1, "[TEST] Send Notification", "Sends a notification with a message and optional severity level (test action)")]
-[RequireAdminRole]
+[RequireBackgroundRole]
 public record TestSendNotificationCommand(
     [property: Description("The notification message"), Required] string Message,
     [property: Description("The notification severity level")] string? Severity = null);
@@ -31,11 +31,12 @@ public sealed class TestSendNotificationCommandHandler : ICommandHandler<TestSen
 /// Test command for turning heaters off - used only in tests
 /// </summary>
 [Action(-2, "[TEST] Turn Heaters Off", "Turns off heaters in a specified zone with an optional reason (test action)")]
-[RequireAdminRole]
+[RequireBackgroundRole]
 public sealed class TestTurnHeatersOffCommand
 {
     [Required]
     [Description("Which zone to target")]
+    [Lookup("api/zones")]
     public required int ZoneId { get; init; }
 
     [Description("Optional reason")]
@@ -56,7 +57,7 @@ public sealed class TestTurnHeatersOffCommandHandler : ICommandHandler<TestTurnH
 /// Test command for disabling heater - used only in tests
 /// </summary>
 [Action(-100, "[TEST] Disable Heater", "Disables a specific heater for testing (test action)")]
-[RequireAdminRole]
+[RequireBackgroundRole]
 public record TestDisableHeaterCommand(
     [property: Description("The ID of the heater to disable"), Required] long HeaterId,
     [property: Description("The reason for disabling")] int DisabledReason = 0);

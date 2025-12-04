@@ -10,7 +10,7 @@ namespace HeatKeeper.Server.Events;
 /// Command for sending a notification.
 /// </summary>
 [Action(1, "Send Notification", "Sends a notification with a message and optional severity level")]
-[RequireAdminRole]
+[RequireBackgroundRole]
 public sealed class SendNotificationCommand
 {
     [Required]

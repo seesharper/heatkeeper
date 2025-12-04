@@ -10,11 +10,12 @@ namespace HeatKeeper.Server.Events;
 /// Command for turning heaters off.
 /// </summary>
 [Action(2, "Turn Heaters Off", "Turns off all heaters in a specific zone for a specified reason")]
-[RequireAdminRole]
+[RequireBackgroundRole]
 public sealed class TurnHeatersOffCommand
 {
     [Required]
     [Description("Which zone to target")]
+    [Lookup("api/zones")]
     public required int ZoneId { get; init; }
 
     [Description("Optional reason")]

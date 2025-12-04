@@ -151,8 +151,8 @@ public class PropertyResolverTests
     {
         // Arrange
         var payload = new MotionDetectedPayload(
+            LocationId: 1,
             ZoneId: 10,
-            Location: "Hallway",
             DetectedAt: new DateTimeOffset(2025, 12, 2, 10, 30, 0, TimeSpan.Zero)
         );
         var parameterValue = "Motion in {{Location}} (Zone {{ZoneId}})";
@@ -169,7 +169,7 @@ public class PropertyResolverTests
     {
         // Arrange
         var detectedAt = new DateTimeOffset(2025, 12, 2, 10, 30, 0, TimeSpan.Zero);
-        var payload = new MotionDetectedPayload(ZoneId: 1, Location: "Kitchen", DetectedAt: detectedAt);
+        var payload = new MotionDetectedPayload(LocationId: 1, ZoneId: 1, DetectedAt: detectedAt);
         var parameterValue = "{{DetectedAt}}";
 
         // Act

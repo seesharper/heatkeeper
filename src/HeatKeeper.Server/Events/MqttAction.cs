@@ -6,7 +6,7 @@ using MQTTnet.Extensions.ManagedClient;
 namespace HeatKeeper.Server.Events;
 
 [Action(3, "Send MQTT Message", "Sends a message to an MQTT topic")]
-[RequireAdminRole]
+[RequireBackgroundRole]
 public record MqttCommand(
     [property: Description("The MQTT topic to publish to"), Required] string Topic,
     [property: Description("The payload to send"), Required] string Payload);

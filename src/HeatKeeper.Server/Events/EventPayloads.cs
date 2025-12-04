@@ -15,8 +15,8 @@ public sealed record TemperatureReadingPayload(
 /// </summary>
 [DomainEvent(2, "Motion Detected", "Event triggered when motion is detected in a zone")]
 public sealed record MotionDetectedPayload(
-    int ZoneId,
-    string Location,
+    [property: Lookup("api/locations")] int LocationId,
+    [property: Lookup("api/locations/{locationId}/zones")] int ZoneId,
     DateTimeOffset DetectedAt
 );
 
