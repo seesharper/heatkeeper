@@ -9,7 +9,7 @@ namespace HeatKeeper.Server.WebApi.Tests;
 
 public class EntsoeTests : TestBase
 {
-    [Fact(Skip = "Platform temporarily lacks internet access")]
+    [Fact()]
     public async Task ShouldGetrMarketDocument()
     {
         Factory.WithConfiguration("ENTSOE_SECURITY_TOKEN", "25dabe3a-9fe1-4074-8cca-b2b3100b26a8");
