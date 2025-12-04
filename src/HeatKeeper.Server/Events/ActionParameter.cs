@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace HeatKeeper.Server.Events;
 
 /// <summary>
@@ -7,4 +9,5 @@ namespace HeatKeeper.Server.Events;
 /// <param name="Type">The parameter type (e.g. "string", "number", "boolean")</param>
 /// <param name="Required">Whether this parameter is required</param>
 /// <param name="Description">Optional description of the parameter</param>
-public sealed record ActionParameter(string Name, string Type, bool Required, string? Description = null);
+/// <param name="LookupUrl">Optional API URL for lookup options (e.g., "api/locations")</param>
+public sealed record ActionParameter(string Name, string Type, bool Required, string? Description = null, string? LookupUrl = null);

@@ -1,15 +1,17 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using HeatKeeper.Server.Authorization;
 using HeatKeeper.Server.Heaters;
 
 namespace HeatKeeper.Server.Events;
 
-public record EnableHeaterActionParameters(
+[Action(4, "Enable Heater", "Enables a specific heater")]
+[RequireBackgroundRole]
+public record EnableHeaterCommand(
     [property: Description("The ID of the heater to enable"), Required] long HeaterId);
 
-[Action(4, "Enable Heater", "Enables a specific heater")]
-public sealed class EnableHeaterAction(ICommandExecutor commandExecutor) : IAction<EnableHeaterActionParameters>
+public sealed class EnableHeaterCommandHandler(ICommandExecutor commandExecutor) : ICommandHandler<EnableHeaterCommand>
 {
-    public async Task ExecuteAsync(EnableHeaterActionParameters parameters, CancellationToken cancellationToken = default)
-        => await commandExecutor.ExecuteAsync(new EnableHeaterCommand(parameters.HeaterId), cancellationToken);
+    public async Task HandleAsync(EnableHeaterCommand command, CancellationToken cancellationToken = default)
+        => await commandExecutor.ExecuteAsync(new Heaters.EnableHeaterCommand(command.HeaterId), cancellationToken);
 }

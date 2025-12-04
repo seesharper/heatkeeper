@@ -25,11 +25,13 @@ public sealed record EventDetails(
 /// <param name="Type">The property type name (e.g., "int", "string", "double")</param>
 /// <param name="IsNullable">Whether the property can be null</param>
 /// <param name="Description">Optional description from XML documentation</param>
+/// <param name="LookupUrl">Optional API URL for lookup options (e.g., "api/zones")</param>
 public sealed record EventPropertyInfo(
     string Name,
     string Type,
     bool IsNullable,
-    string? Description = null
+    string? Description = null,
+    string? LookupUrl = null
 );
 
 /// <summary>
@@ -152,12 +154,14 @@ public sealed class EventCatalog : IEventCatalog
             var propertyType = prop.PropertyType;
             var isNullable = IsNullableType(propertyType);
             var typeName = GetFriendlyTypeName(propertyType);
+            var lookupUrl = prop.GetCustomAttribute<LookupAttribute>()?.Url;
 
             properties.Add(new EventPropertyInfo(
                 Name: prop.Name,
                 Type: typeName,
                 IsNullable: isNullable,
-                Description: null // Could be enhanced with XML documentation parsing
+                Description: null, // Could be enhanced with XML documentation parsing
+                LookupUrl: lookupUrl
             ));
         }
 

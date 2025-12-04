@@ -1,25 +1,20 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using HeatKeeper.Server.Authorization;
 using MQTTnet.Extensions.ManagedClient;
 
 namespace HeatKeeper.Server.Events;
 
-public record MqttActionParameters(
+[Action(3, "Send MQTT Message", "Sends a message to an MQTT topic")]
+[RequireBackgroundRole]
+public record MqttCommand(
     [property: Description("The MQTT topic to publish to"), Required] string Topic,
     [property: Description("The payload to send"), Required] string Payload);
 
-[Action(3, "Send MQTT Message", "Sends a message to an MQTT topic")]
-public sealed class MqttAction : IAction<MqttActionParameters>
+public sealed class MqttCommandHandler(IManagedMqttClient managedMqttClient) : ICommandHandler<MqttCommand>
 {
-    private readonly IManagedMqttClient _managedMqttClient;
-
-    public MqttAction(IManagedMqttClient managedMqttClient)
+    public async Task HandleAsync(MqttCommand command, CancellationToken cancellationToken = default)
     {
-        _managedMqttClient = managedMqttClient;
-    }
-
-    public async Task ExecuteAsync(MqttActionParameters parameters, CancellationToken cancellationToken = default)
-    {
-        await _managedMqttClient.EnqueueAsync(parameters.Topic, parameters.Payload);
+        await managedMqttClient.EnqueueAsync(command.Topic, command.Payload);
     }
 }

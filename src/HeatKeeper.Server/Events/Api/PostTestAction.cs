@@ -6,17 +6,16 @@ namespace HeatKeeper.Server.Events.Api;
 [Post("api/actions")]
 public record PostTestActionCommand(int ActionId, IReadOnlyDictionary<string, string> ParameterMap) : PostCommand;
 
-public class PostTestAction(ActionCatalog catalog, IServiceProvider serviceProvider) : ICommandHandler<PostTestActionCommand>
+public class PostTestAction(ActionCatalog catalog, ICommandExecutor commandExecutor) : ICommandHandler<PostTestActionCommand>
 {
     public async Task HandleAsync(PostTestActionCommand command, CancellationToken cancellationToken = default)
     {
         var actionDetails = catalog.GetActionDetails(command.ActionId);
 
-        using var scope = serviceProvider.CreateScope();
+        // Create the command instance from the parameter map
+        var actionCommand = TriggerEngine.CreateCommandFromParameters(actionDetails, command.ParameterMap);
 
-
-        var action = (IAction)scope.ServiceProvider.GetRequiredKeyedService(typeof(IAction), actionDetails.Name);
-
-        await TriggerEngine.InvokeActionAsync(action, command.ParameterMap, cancellationToken);
+        // Execute the command
+        await commandExecutor.ExecuteAsync((dynamic)actionCommand, cancellationToken);
     }
 }

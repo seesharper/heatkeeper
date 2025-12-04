@@ -11,7 +11,7 @@ namespace HeatKeeper.Server.WebApi.Tests;
 
 public class EnergyPricesTests : TestBase
 {
-    [Fact]
+    [Fact()]
     public async Task ShouldImportElectricalPricesUsingJanitor()
     {
         Factory.UseFakeTimeProvider(TestData.Clock.Today);
@@ -20,7 +20,7 @@ public class EnergyPricesTests : TestBase
         await janitor.Run("ImportEnergyPrices");
     }
 
-    [Fact]
+    [Fact()]
     public async Task ShouldImportEnergyPrices()
     {
         Factory.WithConfiguration("ENTSOE_SECURITY_TOKEN", "25dabe3a-9fe1-4074-8cca-b2b3100b26a8");
@@ -32,7 +32,7 @@ public class EnergyPricesTests : TestBase
         energyPrices.Length.Should().BeGreaterThanOrEqualTo(24);
     }
 
-    [Fact]
+    [Fact()]
     public async Task ShouldNotImportEnergyPricesTwice()
     {
         Factory.WithConfiguration("ENTSOE_SECURITY_TOKEN", "25dabe3a-9fe1-4074-8cca-b2b3100b26a8");

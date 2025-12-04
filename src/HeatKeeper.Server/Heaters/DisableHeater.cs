@@ -1,7 +1,7 @@
 namespace HeatKeeper.Server.Heaters;
 
 [RequireBackgroundRole]
-public record DisableHeaterCommand(long HeaterId);
+public record DisableHeaterCommand(long HeaterId, HeaterDisabledReason DisabledReason);
 
 public class DisableHeater(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<DisableHeaterCommand>
 {

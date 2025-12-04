@@ -26,8 +26,8 @@ public class PostTestActionTests : TestBase
 
         var request = new
         {
-            actionId = 1, // SendNotificationAction
-            parameterMap = new Dictionary<string, string>
+            ActionId = 1, // SendNotificationAction
+            ParameterMap = new Dictionary<string, string>
             {
                 { "message", "Test notification message" },
                 { "severity", "1" } // Using int as string to test type conversion
@@ -56,8 +56,8 @@ public class PostTestActionTests : TestBase
 
         var request = new
         {
-            actionId = 99999, // Non-existent action
-            parameterMap = new Dictionary<string, string>()
+            ActionId = 99999, // Non-existent action
+            ParameterMap = new Dictionary<string, string>()
         };
 
         // Act
@@ -83,8 +83,8 @@ public class PostTestActionTests : TestBase
 
         var request = new
         {
-            actionId = 1, // SendNotificationAction requires "message"
-            parameterMap = new Dictionary<string, string>
+            ActionId = 1, // TestSendNotificationAction requires "message"
+            ParameterMap = new Dictionary<string, string>
             {
                 { "severity", "info" }
                 // Missing required "message" parameter
@@ -134,8 +134,8 @@ public class PostTestActionTests : TestBase
 
         var request = new
         {
-            actionId = 1,
-            parameterMap = new Dictionary<string, string>
+            ActionId = 1,
+            ParameterMap = new Dictionary<string, string>
             {
                 { "message", "test" },
                 { "severity", "info" }
@@ -162,8 +162,8 @@ public class PostTestActionTests : TestBase
 
         var request = new
         {
-            actionId = 1,
-            parameterMap = new Dictionary<string, string>
+            ActionId = 1,
+            ParameterMap = new Dictionary<string, string>
             {
                 { "message", "Complex notification message" },
                 { "severity", "warning" },
@@ -194,8 +194,8 @@ public class PostTestActionTests : TestBase
 
         var request = new
         {
-            actionId = 1,
-            parameterMap = new Dictionary<string, string>
+            ActionId = 1,
+            ParameterMap = new Dictionary<string, string>
             {
                 { "message", "Test with special chars: <>&\"'åäö" },
                 { "severity", "info" }
@@ -224,8 +224,8 @@ public class PostTestActionTests : TestBase
 
         var request = new
         {
-            actionId = 2, // TurnHeatersOffAction
-            parameterMap = new Dictionary<string, string>
+            ActionId = 2, // TestTurnHeatersOffAction
+            ParameterMap = new Dictionary<string, string>
             {
                 { "zoneId", "42" } // String representation of int
             }
@@ -253,8 +253,8 @@ public class PostTestActionTests : TestBase
 
         var request = new
         {
-            actionId = 2, // TurnHeatersOffAction
-            parameterMap = new Dictionary<string, string>
+            ActionId = 2, // TestTurnHeatersOffAction
+            ParameterMap = new Dictionary<string, string>
             {
                 { "zoneId", "not-a-number" } // Invalid numeric string
             }

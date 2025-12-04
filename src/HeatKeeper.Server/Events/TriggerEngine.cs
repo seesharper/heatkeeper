@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
@@ -9,25 +11,15 @@ namespace HeatKeeper.Server.Events;
 /// <summary>
 /// The main trigger engine that evaluates conditions and executes actions when triggers fire.
 /// </summary>
-public sealed class TriggerEngine
+/// <remarks>
+/// Initializes a new trigger engine.
+/// </remarks>
+/// <param name="bus">The event bus to listen to</param>
+/// <param name="catalog">The action catalog for resolving actions</param>
+/// <param name="commandExecutor">The command executor for executing action commands</param>
+public sealed class TriggerEngine(IEventBus bus, ActionCatalog catalog, ICommandExecutor commandExecutor)
 {
-    private readonly IEventBus _bus;
-    private readonly ActionCatalog _catalog;
-    private readonly IServiceProvider _serviceProvider;
     private readonly List<TriggerDefinition> _triggers = new();
-
-    /// <summary>
-    /// Initializes a new trigger engine.
-    /// </summary>
-    /// <param name="bus">The event bus to listen to</param>
-    /// <param name="catalog">The action catalog for resolving actions</param>
-    /// <param name="serviceProvider">The service provider for creating action instances</param>
-    public TriggerEngine(IEventBus bus, ActionCatalog catalog, IServiceProvider serviceProvider)
-    {
-        _bus = bus;
-        _catalog = catalog;
-        _serviceProvider = serviceProvider;
-    }
 
     /// <summary>
     /// Adds a trigger definition to the engine.
@@ -58,7 +50,7 @@ public sealed class TriggerEngine
     /// <returns>A task that runs until cancelled</returns>
     public async Task StartAsync(CancellationToken ct)
     {
-        await foreach (var evt in _bus.Reader.ReadAllAsync(ct))
+        await foreach (var evt in bus.Reader.ReadAllAsync(ct))
         {
             foreach (var trig in _triggers)
             {
@@ -72,7 +64,7 @@ public sealed class TriggerEngine
                         ActionDetails actionDetails;
                         try
                         {
-                            actionDetails = _catalog.GetActionDetails(binding.ActionId);
+                            actionDetails = catalog.GetActionDetails(binding.ActionId);
                         }
                         catch (InvalidOperationException)
                         {
@@ -82,18 +74,13 @@ public sealed class TriggerEngine
 
                         var resolved = ResolveParameters(binding.ParameterMap, evt);
 
-                        // Create a new scope and resolve the action from DI container
-                        using var scope = _serviceProvider.CreateScope();
-
                         try
                         {
-                            var action = (IAction)scope.ServiceProvider.GetRequiredKeyedService(typeof(IAction), actionDetails.Name);
-                            await InvokeActionAsync(action, resolved, ct);
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            Console.WriteLine($"[WARN] No action service registered for '{actionDetails.Name}' in trigger '{trig.Name}'.");
-                            continue;
+                            // Create the command from the resolved parameters
+                            var command = CreateCommandFromParameters(actionDetails, resolved);
+
+                            // Execute the command using ICommandExecutor
+                            await commandExecutor.ExecuteAsync((dynamic)command, ct);
                         }
                         catch (Exception ex)
                         {
@@ -190,62 +177,47 @@ public sealed class TriggerEngine
     }
 
     /// <summary>
-    /// Invokes an action with string parameters (for testing/manual execution).
+    /// Creates a command instance from an ActionDetails and parameter map.
     /// </summary>
-    /// <param name="action">The action to invoke</param>
+    /// <param name="actionDetails">The action details containing the command type information</param>
     /// <param name="parameterMap">String parameter map</param>
-    /// <param name="ct">Cancellation token</param>
-    public static Task InvokeActionAsync(IAction action, IReadOnlyDictionary<string, string> parameterMap, CancellationToken ct)
+    /// <returns>A command instance ready to be executed</returns>
+    public static object CreateCommandFromParameters(ActionDetails actionDetails, IReadOnlyDictionary<string, string> parameterMap)
     {
         var dict = new Dictionary<string, object?>();
         foreach (var kvp in parameterMap)
         {
             dict[kvp.Key] = kvp.Value;
         }
-        return InvokeActionAsync(action, new ReadOnlyDictionary<string, object?>(dict), ct);
+        return CreateCommandFromParameters(actionDetails, new ReadOnlyDictionary<string, object?>(dict));
     }
 
-    private static async Task InvokeActionAsync(IAction action, IReadOnlyDictionary<string, object?> parameters, CancellationToken ct)
+    /// <summary>
+    /// Creates a command instance from an ActionDetails and parameter dictionary.
+    /// </summary>
+    /// <param name="actionDetails">The action details containing the command type information</param>
+    /// <param name="parameters">Parameter dictionary</param>
+    /// <returns>A command instance ready to be executed</returns>
+    public static object CreateCommandFromParameters(ActionDetails actionDetails, IReadOnlyDictionary<string, object?> parameters)
     {
-        // Find the IAction<TParameters> interface to get the parameter type
-        var actionType = action.GetType();
-        var genericInterface = actionType.GetInterfaces()
-            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAction<>));
+        // Find the command type by looking for a type with the [Action] attribute matching the action ID
+        var assembly = typeof(TriggerEngine).Assembly;
+        var commandType = assembly.GetTypes()
+            .FirstOrDefault(t => t.GetCustomAttribute<ActionAttribute>()?.Id == actionDetails.Id);
 
-        if (genericInterface == null)
+        if (commandType == null)
         {
-            throw new InvalidOperationException($"Action {actionType.Name} does not implement IAction<TParameters>");
+            throw new InvalidOperationException($"Could not find command type for action ID {actionDetails.Id}");
         }
 
-        var parameterType = genericInterface.GetGenericArguments()[0];
-
-        // Convert the dictionary to strongly-typed parameters
-        var typedParameters = ConvertToTypedParameters(parameters, parameterType);
-
-        // Invoke ExecuteAsync using reflection
-        var executeMethod = genericInterface.GetMethod("ExecuteAsync");
-        if (executeMethod == null)
-        {
-            throw new InvalidOperationException($"Could not find ExecuteAsync method on {actionType.Name}");
-        }
-
-        var task = executeMethod.Invoke(action, new object[] { typedParameters, ct });
-        if (task is Task t)
-        {
-            await t;
-        }
-    }
-
-    private static object ConvertToTypedParameters(IReadOnlyDictionary<string, object?> parameters, Type parameterType)
-    {
-        // Serialize to JSON and deserialize to the target type
+        // Serialize to JSON and deserialize to the command type
         // This handles property name mapping and type conversion
         var json = JsonSerializer.Serialize(parameters, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         });
 
-        var result = JsonSerializer.Deserialize(json, parameterType, new JsonSerializerOptions
+        var result = JsonSerializer.Deserialize(json, commandType, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
             NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString
@@ -253,7 +225,7 @@ public sealed class TriggerEngine
 
         if (result == null)
         {
-            throw new InvalidOperationException($"Failed to deserialize parameters to {parameterType.Name}");
+            throw new InvalidOperationException($"Failed to deserialize parameters to {commandType.Name}");
         }
 
         return result;

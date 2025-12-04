@@ -25,7 +25,7 @@ public static class TypeSafetyExample
         // ✅ Motion event with different payload structure
         var motionPayload = new MotionDetectedPayload(
             ZoneId: 2,
-            Location: "Living Room",
+            LocationId: 1,
             DetectedAt: DateTimeOffset.Now
         );
 
@@ -43,7 +43,7 @@ public static class TypeSafetyExample
 
         Console.WriteLine("Strongly-typed event payloads published successfully!");
         Console.WriteLine($"Temperature in zone {zoneId}: {temperature}°C from {sensorName}");
-        Console.WriteLine($"Motion detected in: {motionPayload.Location}");
+        Console.WriteLine($"Motion detected in: {motionPayload.LocationId}");
         Console.WriteLine($"Door {doorPayload.DoorId} was {doorPayload.Action}");
 
         // ✅ Demonstrate compile-time error prevention

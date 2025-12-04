@@ -240,6 +240,8 @@ public interface ISqlProvider
 
     string AddEnabledColumnToHeatersTable { get; }
 
+    string AddDisabledReasonColumnToHeatersTable { get; }
+
     string GetSensorDetails { get; }
 
     string DeleteOldPushSubscriptions { get; }

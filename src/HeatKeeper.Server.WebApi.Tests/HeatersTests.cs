@@ -80,15 +80,15 @@ public class HeatersTests : TestBase
         heater.Enabled.Should().BeTrue();
 
         await Factory.Services.GetRequiredService<ICommandHandler<DisableHeaterCommand>>()
-            .HandleAsync(new DisableHeaterCommand(testLocation.LivingRoomHeaterId1));
+            .HandleAsync(new DisableHeaterCommand(testLocation.LivingRoomHeaterId1, HeaterDisabledReason.User));
         heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
-        
+
         heater.Enabled.Should().BeFalse();
 
         await Factory.Services.GetRequiredService<ICommandHandler<EnableHeaterCommand>>()
             .HandleAsync(new EnableHeaterCommand(testLocation.LivingRoomHeaterId1));
         heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
-        
+
         heater.Enabled.Should().BeTrue();
     }
 
@@ -103,12 +103,27 @@ public class HeatersTests : TestBase
 
         await client.Patch(new UpdateHeaterCommand(testLocation.LivingRoomHeaterId1, heater.Name, heater.Description, heater.MqttTopic, heater.OnPayload, heater.OffPayload, false), testLocation.Token);
         heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
-        
+
         heater.Enabled.Should().BeFalse();
 
         await client.Patch(new UpdateHeaterCommand(testLocation.LivingRoomHeaterId1, heater.Name, heater.Description, heater.MqttTopic, heater.OnPayload, heater.OffPayload, true), testLocation.Token);
         heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
-        
-        heater.Enabled.Should().BeTrue();       
+
+        heater.Enabled.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task ShouldGetHeaterDisabledReasons()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+
+        var reasons = await client.GetHeaterDisabledReasons(testLocation.Token);
+
+        reasons.Should().HaveCount(4);
+        reasons.Should().ContainSingle(r => r.Id == 0 && r.Name == "No specific reason or heater is enabled.");
+        reasons.Should().ContainSingle(r => r.Id == 1 && r.Name == "Heater was disabled because of a dead sensor.");
+        reasons.Should().ContainSingle(r => r.Id == 2 && r.Name == "Heater was manually disabled by the user.");
+        reasons.Should().ContainSingle(r => r.Id == 3 && r.Name == "Heater was disabled to prevent overload.");
     }
 }

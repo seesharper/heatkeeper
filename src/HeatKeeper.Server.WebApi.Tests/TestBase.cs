@@ -1,7 +1,9 @@
 using System;
 using CQRS.AspNet.Testing;
+using HeatKeeper.Server.Events;
 using HeatKeeper.Server.WebApi.Tests.Transactions;
 using LightInject;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace HeatKeeper.Server.WebApi.Tests
