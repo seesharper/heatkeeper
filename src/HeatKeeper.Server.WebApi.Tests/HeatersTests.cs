@@ -111,4 +111,19 @@ public class HeatersTests : TestBase
 
         heater.Enabled.Should().BeTrue();
     }
+
+    [Fact]
+    public async Task ShouldGetHeaterDisabledReasons()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+
+        var reasons = await client.GetHeaterDisabledReasons(testLocation.Token);
+
+        reasons.Should().HaveCount(4);
+        reasons.Should().ContainSingle(r => r.Id == 0 && r.Name == "No specific reason or heater is enabled.");
+        reasons.Should().ContainSingle(r => r.Id == 1 && r.Name == "Heater was disabled because of a dead sensor.");
+        reasons.Should().ContainSingle(r => r.Id == 2 && r.Name == "Heater was manually disabled by the user.");
+        reasons.Should().ContainSingle(r => r.Id == 3 && r.Name == "Heater was disabled to prevent overload.");
+    }
 }
