@@ -155,13 +155,13 @@ public class PropertyResolverTests
             ZoneId: 10,
             DetectedAt: new DateTimeOffset(2025, 12, 2, 10, 30, 0, TimeSpan.Zero)
         );
-        var parameterValue = "Motion in {{Location}} (Zone {{ZoneId}})";
+        var parameterValue = "Motion in Location {{LocationId}} (Zone {{ZoneId}})";
 
         // Act
         var result = PropertyResolver.ResolveValue(parameterValue, payload);
 
         // Assert
-        Assert.Equal("Motion in Hallway (Zone 10)", result);
+        Assert.Equal("Motion in Location 1 (Zone 10)", result);
     }
 
     [Fact]
