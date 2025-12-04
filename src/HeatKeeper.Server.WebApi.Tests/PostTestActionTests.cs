@@ -83,7 +83,7 @@ public class PostTestActionTests : TestBase
 
         var request = new
         {
-            actionId = 1, // SendNotificationAction requires "message"
+            actionId = 1, // TestSendNotificationAction requires "message"
             parameterMap = new Dictionary<string, string>
             {
                 { "severity", "info" }
@@ -224,7 +224,7 @@ public class PostTestActionTests : TestBase
 
         var request = new
         {
-            actionId = 2, // TurnHeatersOffAction
+            actionId = 2, // TestTurnHeatersOffAction
             parameterMap = new Dictionary<string, string>
             {
                 { "zoneId", "42" } // String representation of int
@@ -253,7 +253,7 @@ public class PostTestActionTests : TestBase
 
         var request = new
         {
-            actionId = 2, // TurnHeatersOffAction
+            actionId = 2, // TestTurnHeatersOffAction
             parameterMap = new Dictionary<string, string>
             {
                 { "zoneId", "not-a-number" } // Invalid numeric string

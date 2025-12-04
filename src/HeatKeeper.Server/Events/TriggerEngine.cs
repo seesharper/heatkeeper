@@ -9,25 +9,15 @@ namespace HeatKeeper.Server.Events;
 /// <summary>
 /// The main trigger engine that evaluates conditions and executes actions when triggers fire.
 /// </summary>
-public sealed class TriggerEngine
+/// <remarks>
+/// Initializes a new trigger engine.
+/// </remarks>
+/// <param name="bus">The event bus to listen to</param>
+/// <param name="catalog">The action catalog for resolving actions</param>
+/// <param name="serviceProvider">The service provider for creating action instances</param>
+public sealed class TriggerEngine(IEventBus bus, ActionCatalog catalog, IServiceProvider serviceProvider)
 {
-    private readonly IEventBus _bus;
-    private readonly ActionCatalog _catalog;
-    private readonly IServiceProvider _serviceProvider;
     private readonly List<TriggerDefinition> _triggers = new();
-
-    /// <summary>
-    /// Initializes a new trigger engine.
-    /// </summary>
-    /// <param name="bus">The event bus to listen to</param>
-    /// <param name="catalog">The action catalog for resolving actions</param>
-    /// <param name="serviceProvider">The service provider for creating action instances</param>
-    public TriggerEngine(IEventBus bus, ActionCatalog catalog, IServiceProvider serviceProvider)
-    {
-        _bus = bus;
-        _catalog = catalog;
-        _serviceProvider = serviceProvider;
-    }
 
     /// <summary>
     /// Adds a trigger definition to the engine.
@@ -58,7 +48,7 @@ public sealed class TriggerEngine
     /// <returns>A task that runs until cancelled</returns>
     public async Task StartAsync(CancellationToken ct)
     {
-        await foreach (var evt in _bus.Reader.ReadAllAsync(ct))
+        await foreach (var evt in bus.Reader.ReadAllAsync(ct))
         {
             foreach (var trig in _triggers)
             {
@@ -72,7 +62,7 @@ public sealed class TriggerEngine
                         ActionDetails actionDetails;
                         try
                         {
-                            actionDetails = _catalog.GetActionDetails(binding.ActionId);
+                            actionDetails = catalog.GetActionDetails(binding.ActionId);
                         }
                         catch (InvalidOperationException)
                         {
@@ -83,7 +73,7 @@ public sealed class TriggerEngine
                         var resolved = ResolveParameters(binding.ParameterMap, evt);
 
                         // Create a new scope and resolve the action from DI container
-                        using var scope = _serviceProvider.CreateScope();
+                        using var scope = serviceProvider.CreateScope();
 
                         try
                         {

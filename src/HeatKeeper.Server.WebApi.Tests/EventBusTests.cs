@@ -201,9 +201,14 @@ public class EventsApiTests : TestBase
         // Verify no duplicate display names
         Assert.Equal(actions.Length, actions.Select(a => a.DisplayName).Distinct().Count());
 
-        // Expected actions (based on attributes on action classes)
-        Assert.Contains(actions, a => a.Id == 1 && a.DisplayName == "Send Notification");
-        Assert.Contains(actions, a => a.Id == 2 && a.DisplayName == "Turn Heaters Off");
+        // Production actions (with positive IDs)
+        var productionActions = actions.Where(a => a.Id > 0).ToArray();
+        Assert.Contains(productionActions, a => a.Id == 1 && a.DisplayName == "Send Notification");
+        Assert.Contains(productionActions, a => a.Id == 2 && a.DisplayName == "Turn Heaters Off");
+
+        // Test actions (with negative IDs) should also be present
+        var testActions = actions.Where(a => a.Id < 0).ToArray();
+        Assert.NotEmpty(testActions);
     }
 
     [Fact]
@@ -261,7 +266,7 @@ public class EventsApiTests : TestBase
         var token = await client.AuthenticateAsAdminUser();
 
         // Act
-        var details = await client.GetActionDetails(1, token); // SendNotificationAction has ID 1
+        var details = await client.GetActionDetails(1, token); // TestSendNotificationAction has ID 1
 
         // Assert
         Assert.NotNull(details);
@@ -284,7 +289,7 @@ public class EventsApiTests : TestBase
         var token = await client.AuthenticateAsAdminUser();
 
         // Act
-        var details = await client.GetActionDetails(2, token); // TurnHeatersOffAction has ID 2
+        var details = await client.GetActionDetails(2, token); // TestTurnHeatersOffAction has ID 2
 
         // Assert
         Assert.NotNull(details);
@@ -468,14 +473,14 @@ public class TriggerEngineIntegrationTests
         // Arrange
         var bus = new EventBus();
         var catalog = new ActionCatalog();
-        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(TurnHeatersOffAction)));
-        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(SendNotificationAction)));
+        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(TestTurnHeatersOffAction)));
+        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(TestSendNotificationAction)));
 
         // Create mock service provider with actions
         var actions = new Dictionary<string, IAction>
         {
-            ["TurnHeatersOff"] = new TurnHeatersOffAction(),
-            ["SendNotification"] = new SendNotificationAction()
+            ["TurnHeatersOff"] = new TestTurnHeatersOffAction(),
+            ["SendNotification"] = new TestSendNotificationAction()
         };
         var mockServiceProvider = new MockServiceProvider(actions);
 
