@@ -1,12 +1,17 @@
+#nullable enable
+
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Events;
 
 /// <summary>
-/// Parameters for turning heaters off.
+/// Command for turning heaters off.
 /// </summary>
-public sealed class TurnHeatersOffParameters
+[Action(2, "Turn Heaters Off", "Turns off all heaters in a specific zone for a specified reason")]
+[RequireAdminRole]
+public sealed class TurnHeatersOffCommand
 {
     [Required]
     [Description("Which zone to target")]
@@ -16,15 +21,11 @@ public sealed class TurnHeatersOffParameters
     public string? Reason { get; init; }
 }
 
-/// <summary>
-/// Sample action that simulates turning heaters off in a specified zone.
-/// </summary>
-[Action(2, "Turn Heaters Off", "Turns off heaters in a specified zone with an optional reason")]
-public sealed class TurnHeatersOffAction : IAction<TurnHeatersOffParameters>
+public sealed class TurnHeatersOffCommandHandler : ICommandHandler<TurnHeatersOffCommand>
 {
-    public Task ExecuteAsync(TurnHeatersOffParameters parameters, CancellationToken ct)
+    public Task HandleAsync(TurnHeatersOffCommand command, CancellationToken cancellationToken = default)
     {
-        Console.WriteLine($"[ACTION] TurnHeatersOff => ZoneId={parameters.ZoneId}, Reason='{parameters.Reason}'");
+        Console.WriteLine($"[ACTION] TurnHeatersOff => ZoneId={command.ZoneId}, Reason='{command.Reason}'");
         // Place real device/API calls here
         return Task.CompletedTask;
     }

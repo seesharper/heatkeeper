@@ -4,31 +4,35 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Events;
 
 /// <summary>
-/// Test action for sending notifications - used only in tests
+/// Test command for sending notifications - used only in tests
 /// </summary>
-public record TestSendNotificationParameters(
+[Action(-1, "[TEST] Send Notification", "Sends a notification with a message and optional severity level (test action)")]
+[RequireAdminRole]
+public record TestSendNotificationCommand(
     [property: Description("The notification message"), Required] string Message,
     [property: Description("The notification severity level")] string? Severity = null);
 
-[Action(-1, "[TEST] Send Notification", "Sends a notification with a message and optional severity level (test action)")]
-public sealed class TestSendNotificationAction : IAction<TestSendNotificationParameters>
+public sealed class TestSendNotificationCommandHandler : ICommandHandler<TestSendNotificationCommand>
 {
-    public Task ExecuteAsync(TestSendNotificationParameters parameters, CancellationToken cancellationToken = default)
+    public Task HandleAsync(TestSendNotificationCommand command, CancellationToken cancellationToken = default)
     {
         // Test implementation - just log
-        System.Console.WriteLine($"[TEST ACTION] SendNotification => Message='{parameters.Message}', Severity='{parameters.Severity}'");
+        System.Console.WriteLine($"[TEST ACTION] SendNotification => Message='{command.Message}', Severity='{command.Severity}'");
         return Task.CompletedTask;
     }
 }
 
 /// <summary>
-/// Test action for turning heaters off - used only in tests
+/// Test command for turning heaters off - used only in tests
 /// </summary>
-public sealed class TestTurnHeatersOffParameters
+[Action(-2, "[TEST] Turn Heaters Off", "Turns off heaters in a specified zone with an optional reason (test action)")]
+[RequireAdminRole]
+public sealed class TestTurnHeatersOffCommand
 {
     [Required]
     [Description("Which zone to target")]
@@ -38,31 +42,31 @@ public sealed class TestTurnHeatersOffParameters
     public string? Reason { get; init; }
 }
 
-[Action(-2, "[TEST] Turn Heaters Off", "Turns off heaters in a specified zone with an optional reason (test action)")]
-public sealed class TestTurnHeatersOffAction : IAction<TestTurnHeatersOffParameters>
+public sealed class TestTurnHeatersOffCommandHandler : ICommandHandler<TestTurnHeatersOffCommand>
 {
-    public Task ExecuteAsync(TestTurnHeatersOffParameters parameters, CancellationToken ct)
+    public Task HandleAsync(TestTurnHeatersOffCommand command, CancellationToken cancellationToken = default)
     {
         // Test implementation - just log
-        System.Console.WriteLine($"[TEST ACTION] TurnHeatersOff => ZoneId={parameters.ZoneId}, Reason='{parameters.Reason}'");
+        System.Console.WriteLine($"[TEST ACTION] TurnHeatersOff => ZoneId={command.ZoneId}, Reason='{command.Reason}'");
         return Task.CompletedTask;
     }
 }
 
 /// <summary>
-/// Test action for disabling heater - used only in tests
+/// Test command for disabling heater - used only in tests
 /// </summary>
-public record TestDisableHeaterParameters(
+[Action(-100, "[TEST] Disable Heater", "Disables a specific heater for testing (test action)")]
+[RequireAdminRole]
+public record TestDisableHeaterCommand(
     [property: Description("The ID of the heater to disable"), Required] long HeaterId,
     [property: Description("The reason for disabling")] int DisabledReason = 0);
 
-[Action(-100, "[TEST] Disable Heater", "Disables a specific heater for testing (test action)")]
-public sealed class TestDisableHeaterAction : IAction<TestDisableHeaterParameters>
+public sealed class TestDisableHeaterCommandHandler : ICommandHandler<TestDisableHeaterCommand>
 {
-    public Task ExecuteAsync(TestDisableHeaterParameters parameters, CancellationToken cancellationToken = default)
+    public Task HandleAsync(TestDisableHeaterCommand command, CancellationToken cancellationToken = default)
     {
         // Test implementation - just log
-        System.Console.WriteLine($"[TEST ACTION] DisableHeater => HeaterId={parameters.HeaterId}, Reason={parameters.DisabledReason}");
+        System.Console.WriteLine($"[TEST ACTION] DisableHeater => HeaterId={command.HeaterId}, Reason={command.DisabledReason}");
         return Task.CompletedTask;
     }
 }

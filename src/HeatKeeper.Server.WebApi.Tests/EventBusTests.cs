@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
+using CQRS.Command.Abstractions;
 using HeatKeeper.Server.Events.Api;
 using HeatKeeper.Server.WebApi.Tests;
 using Microsoft.AspNetCore.Mvc;
@@ -289,14 +290,14 @@ public class EventsApiTests : TestBase
         var token = await client.AuthenticateAsAdminUser();
 
         // Act
-        var details = await client.GetActionDetails(2, token); // TestTurnHeatersOffAction has ID 2
+        var details = await client.GetActionDetails(-2, token); // TestTurnHeatersOffCommand has ID -2
 
         // Assert
         Assert.NotNull(details);
-        Assert.Equal(2, details.Id);
-        Assert.Equal("TurnHeatersOff", details.Name);
-        Assert.Equal("Turn Heaters Off", details.DisplayName);
-        Assert.Equal("Turns off heaters in a specified zone with an optional reason", details.Description);
+        Assert.Equal(-2, details.Id);
+        Assert.Equal("TestTurnHeatersOff", details.Name);
+        Assert.Equal("[TEST] Turn Heaters Off", details.DisplayName);
+        Assert.Equal("Turns off heaters in a specified zone with an optional reason (test action)", details.Description);
         Assert.NotNull(details.ParameterSchema);
         Assert.Equal(2, details.ParameterSchema.Count);
 
@@ -473,18 +474,14 @@ public class TriggerEngineIntegrationTests
         // Arrange
         var bus = new EventBus();
         var catalog = new ActionCatalog();
-        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(TestTurnHeatersOffAction)));
-        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(TestSendNotificationAction)));
+        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(TestTurnHeatersOffCommand)));
+        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(TestSendNotificationCommand)));
 
-        // Create mock service provider with actions
-        var actions = new Dictionary<string, IAction>
-        {
-            ["TurnHeatersOff"] = new TestTurnHeatersOffAction(),
-            ["SendNotification"] = new TestSendNotificationAction()
-        };
-        var mockServiceProvider = new MockServiceProvider(actions);
+        // Create mock command executor
+        var executedCommands = new List<object>();
+        var mockCommandExecutor = new MockCommandExecutor(executedCommands);
 
-        var engine = new TriggerEngine(bus, catalog, mockServiceProvider);
+        var engine = new TriggerEngine(bus, catalog, mockCommandExecutor);
 
         var tempHighTrigger = new TriggerDefinition(
             Name: "Turn heaters off when too warm",
@@ -531,143 +528,21 @@ public class TriggerEngineIntegrationTests
     }
 
     /// <summary>
-    /// Mock service provider for testing that supports LightInject-style named services
+    /// Mock command executor for testing
     /// </summary>
-    private class MockServiceProvider : IServiceProvider
+    private class MockCommandExecutor : ICommandExecutor
     {
-        internal readonly Dictionary<string, IAction> _actions;
+        private readonly List<object> _executedCommands;
 
-        public MockServiceProvider(Dictionary<string, IAction> actions)
+        public MockCommandExecutor(List<object> executedCommands)
         {
-            _actions = actions;
+            _executedCommands = executedCommands;
         }
 
-        public object GetService(Type serviceType)
+        public Task ExecuteAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default)
         {
-            return null; // Not used in our test
-        }
-
-        public IServiceScope CreateScope()
-        {
-            return new MockServiceScope(this);
-        }
-    }
-
-    private class MockServiceScope : IServiceScope
-    {
-        private readonly MockServiceProvider _provider;
-
-        public MockServiceScope(MockServiceProvider provider)
-        {
-            _provider = provider;
-        }
-
-        public IServiceProvider ServiceProvider => new MockLightInjectServiceFactory(_provider._actions);
-
-        public void Dispose() { }
-    }
-
-    private class MockLightInjectServiceFactory : IServiceProvider, LightInject.IServiceFactory
-    {
-        private readonly Dictionary<string, IAction> _actions;
-
-        public MockLightInjectServiceFactory(Dictionary<string, IAction> actions)
-        {
-            _actions = actions;
-        }
-
-        public object GetService(Type serviceType)
-        {
-            return null;
-        }
-
-        public object GetInstance(Type serviceType, string serviceName)
-        {
-            if (serviceType == typeof(IAction) && _actions.TryGetValue(serviceName, out var action))
-            {
-                return action;
-            }
-            throw new InvalidOperationException($"Service {serviceType.Name} with name '{serviceName}' not found");
-        }
-
-        // IServiceFactory methods
-        public object GetInstance(Type serviceType)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T GetInstance<T>()
-        {
-            throw new NotImplementedException();
-        }
-
-        public T GetInstance<T>(string serviceName)
-        {
-            return (T)GetInstance(typeof(T), serviceName);
-        }
-
-        public object GetInstance(Type serviceType, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T GetInstance<T>(object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        public object GetInstance(Type serviceType, string serviceName, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T GetInstance<T>(string serviceName, object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool CanGetInstance(Type serviceType, string serviceName)
-        {
-            return serviceType == typeof(IAction) && _actions.ContainsKey(serviceName);
-        }
-
-        public bool CanGetInstance(Type serviceType)
-        {
-            return false;
-        }
-
-        public IEnumerable<object> GetAllInstances(Type serviceType)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<T> GetAllInstances<T>()
-        {
-            throw new NotImplementedException();
-        }
-
-        public LightInject.Scope BeginScope()
-        {
-            throw new NotImplementedException();
-        }
-
-        public object TryGetInstance(Type serviceType)
-        {
-            return null;
-        }
-
-        public object TryGetInstance(Type serviceType, string serviceName)
-        {
-            if (serviceType == typeof(IAction) && _actions.TryGetValue(serviceName, out var action))
-            {
-                return action;
-            }
-            return null;
-        }
-
-        public object Create(Type serviceType)
-        {
-            throw new NotImplementedException();
+            _executedCommands.Add(command!);
+            return Task.CompletedTask;
         }
     }
 }

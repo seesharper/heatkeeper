@@ -50,7 +50,7 @@ public class PropertyResolutionSimpleTests
 
         // Arrange
         var catalog = new ActionCatalog();
-        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(TestDisableHeaterAction)));
+        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(TestDisableHeaterCommand)));
 
         // Simulate what happens in TriggerEngine.ResolveParameters
         var eventPayload = new TestEventPayload(HeaterId: 99);

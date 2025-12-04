@@ -1,12 +1,17 @@
+#nullable enable
+
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using HeatKeeper.Server.Authorization;
 
 namespace HeatKeeper.Server.Events;
 
 /// <summary>
-/// Parameters for sending a notification.
+/// Command for sending a notification.
 /// </summary>
-public sealed class SendNotificationParameters
+[Action(1, "Send Notification", "Sends a notification with a message and optional severity level")]
+[RequireAdminRole]
+public sealed class SendNotificationCommand
 {
     [Required]
     [Description("The notification message")]
@@ -16,15 +21,11 @@ public sealed class SendNotificationParameters
     public string? Severity { get; init; }
 }
 
-/// <summary>
-/// Sample action that simulates sending notifications.
-/// </summary>
-[Action(1, "Send Notification", "Sends a notification with a message and optional severity level")]
-public sealed class SendNotificationAction : IAction<SendNotificationParameters>
+public sealed class SendNotificationCommandHandler : ICommandHandler<SendNotificationCommand>
 {
-    public Task ExecuteAsync(SendNotificationParameters parameters, CancellationToken ct)
+    public Task HandleAsync(SendNotificationCommand command, CancellationToken cancellationToken = default)
     {
-        Console.WriteLine($"[ACTION] Notify => {parameters.Severity} :: {parameters.Message}");
+        Console.WriteLine($"[ACTION] Notify => {command.Severity} :: {command.Message}");
         return Task.CompletedTask;
     }
 }

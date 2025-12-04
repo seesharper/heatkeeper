@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
@@ -5,49 +7,32 @@ using System.Reflection;
 namespace HeatKeeper.Server.Events;
 
 /// <summary>
-/// Helper class to build ActionDetails from IAction&lt;TParameters&gt; types using reflection.
+/// Helper class to build ActionDetails from command types with [Action] attribute.
 /// </summary>
 public static class ActionDetailsBuilder
 {
     /// <summary>
-    /// Builds an ActionDetails from an action type that implements IAction&lt;TParameters&gt;.
-    /// Uses the type name as the action name, DisplayName attribute for display name,
-    /// and reflects over TParameters properties to build the parameter schema.
+    /// Builds an ActionDetails from a command type with [Action] attribute.
+    /// Uses the type name as the action name,  and reflects over command properties to build the parameter schema.
     /// </summary>
-    /// <param name="actionType">The action type</param>
+    /// <param name="commandType">The command type with [Action] attribute</param>
     /// <returns>An ActionDetails describing the action</returns>
-    public static ActionDetails BuildFrom(Type actionType)
+    public static ActionDetails BuildFrom(Type commandType)
     {
-        if (!typeof(IAction).IsAssignableFrom(actionType))
-        {
-            throw new ArgumentException($"Type {actionType.Name} does not implement IAction", nameof(actionType));
-        }
-
-        // Find the IAction<TParameters> interface
-        var genericInterface = actionType.GetInterfaces()
-            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAction<>));
-
-        if (genericInterface == null)
-        {
-            throw new ArgumentException($"Type {actionType.Name} does not implement IAction<TParameters>", nameof(actionType));
-        }
-
-        var parameterType = genericInterface.GetGenericArguments()[0];
-
-        // Get the ActionAttribute
-        var actionAttr = actionType.GetCustomAttribute<ActionAttribute>();
+        // Get the ActionAttribute from the command type
+        var actionAttr = commandType.GetCustomAttribute<ActionAttribute>();
         if (actionAttr == null)
         {
-            throw new ArgumentException($"Type {actionType.Name} must have an [Action] attribute", nameof(actionType));
+            throw new ArgumentException($"Type {commandType.Name} must have an [Action] attribute", nameof(commandType));
         }
 
-        // Get the action name from the type name (remove "Action" suffix if present)
-        var name = actionType.Name.EndsWith("Action", StringComparison.OrdinalIgnoreCase)
-            ? actionType.Name[..^6]
-            : actionType.Name;
+        // Get the action name from the type name (remove "Command" suffix if present)
+        var name = commandType.Name.EndsWith("Command", StringComparison.OrdinalIgnoreCase)
+            ? commandType.Name[..^7]
+            : commandType.Name;
 
-        // Build parameter schema from TParameters properties
-        var parameterSchema = BuildParameterSchema(parameterType);
+        // Build parameter schema from command properties
+        var parameterSchema = BuildParameterSchema(commandType);
 
         return new ActionDetails
         {

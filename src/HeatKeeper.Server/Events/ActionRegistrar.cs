@@ -4,17 +4,17 @@ using LightInject;
 namespace HeatKeeper.Server.Events;
 
 /// <summary>
-/// Service for registering actions in the DI container.
+/// Service for registering action commands in the DI container.
 /// </summary>
 public static class ActionRegistrar
 {
     /// <summary>
-    /// Discovers all types implementing IAction, builds ActionDetails for each using reflection,
-    /// registers them in the catalog, and registers them as named services in the DI container.
+    /// Discovers all command types with [Action] attribute, builds ActionDetails for each using reflection,
+    /// registers them in the catalog, and registers their handlers in the DI container.
     /// </summary>
     /// <param name="serviceRegistry">The LightInject service registry</param>
     /// <param name="catalog">The action catalog to populate</param>
-    /// <param name="assemblies">Assemblies to search for action types</param>
+    /// <param name="assemblies">Assemblies to search for action command types</param>
     public static IServiceRegistry RegisterActions(
         this IServiceRegistry serviceRegistry,
         ActionCatalog catalog,
@@ -22,30 +22,25 @@ public static class ActionRegistrar
     {
         var allTypes = assemblies.SelectMany(a => a.GetTypes()).ToList();
 
-        // Find all concrete types implementing IAction
-        var actionTypes = allTypes.Where(t =>
-            t.IsClass &&
-            !t.IsAbstract &&
-            typeof(IAction).IsAssignableFrom(t)).ToList();
+        // Find all types with [Action] attribute (commands)
+        var commandTypes = allTypes.Where(t =>
+            t.GetCustomAttribute<ActionAttribute>() != null).ToList();
 
-        foreach (var actionType in actionTypes)
+        foreach (var commandType in commandTypes)
         {
             try
             {
-                // Build ActionDetails from the type using reflection
-                var actionDetails = ActionDetailsBuilder.BuildFrom(actionType);
+                // Build ActionDetails from the command type using reflection
+                var actionDetails = ActionDetailsBuilder.BuildFrom(commandType);
 
                 // Register in catalog
                 catalog.Register(actionDetails);
 
-                // Register as named scoped service in LightInject
-                serviceRegistry.RegisterScoped(typeof(IAction), actionType, actionDetails.Name);
-
-                Console.WriteLine($"[SETUP] Registered action '{actionDetails.Name}' -> {actionType.Name}");
+                Console.WriteLine($"[SETUP] Registered action '{actionDetails.Name}' (ID: {actionDetails.Id}) -> {commandType.Name}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[WARN] Could not register action type '{actionType.Name}': {ex.Message}");
+                Console.WriteLine($"[WARN] Could not register action command type '{commandType.Name}': {ex.Message}");
             }
         }
 
