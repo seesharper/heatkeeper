@@ -65,11 +65,13 @@ else
 }
 
 app.UseStaticFiles();
+app.MapAuthorizeEndpoint();
 app.UseAuthorization();
 app.UseExceptionHandler(_ => { });
 
 
 app.MapPost<MeasurementCommand[]>("api/measurements");
+
 app.MapCqrsEndpoints(typeof(ServerCompositionRoot).Assembly);
 
 app.MapControllers();
