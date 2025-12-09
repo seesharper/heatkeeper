@@ -51,6 +51,9 @@ public static class ConfigurationExtensions
     public static string GetVapidPrivateKey(this IConfiguration configuration)
         => configuration.GetRequiredValue("VAPIDPrivateKey");
 
+    public static string GetGoogleRedirectUri(this IConfiguration configuration)
+        => configuration.GetRequiredValue("GOOGLE_REDIRECT_URI");
+
     internal static string GetRequiredValue(this IConfiguration configuration, string key)
     {
         if (configuration.GetValue<string>(key) is null)

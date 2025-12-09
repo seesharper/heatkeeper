@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
+using HeatKeeper.Abstractions.Configuration;
 using Microsoft.AspNetCore.WebUtilities;
-
 namespace HeatKeeper.Server.Host;
 
 
@@ -15,7 +15,8 @@ public static class OAuth2
     // Configure your Google client + redirect URI (must match what's in Google console)
     const string GoogleClientId = "heatkeeper_google_home";
     const string GoogleClientSecret = "heatkeeper_client_secret";
-    const string GoogleRedirectUri = "https://oauth-redirect.googleusercontent.com/r/heatkeeperintegration-94284";
+
+    //const string GoogleRedirectUri = "https://oauth-redirect.googleusercontent.com/r/heatkeeperintegration-94284";
 
     // For dev we just have a single test user
     const string TestUserId = "user-123";
@@ -23,8 +24,10 @@ public static class OAuth2
 
     public static void MapAuthorizeEndpoint(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/api/oauth2/authorize", async (HttpContext ctx) =>
+        endpoints.MapGet("/api/oauth2/authorize", async (HttpContext ctx, IConfiguration configuration, ILoggerFactory loggerFactory) =>
         {
+            var logger = loggerFactory.CreateLogger("OAuth2Authorize");
+
             var query = ctx.Request.Query;
 
             var clientId = query["client_id"].ToString();
@@ -33,9 +36,13 @@ public static class OAuth2
             var scope = query["scope"].ToString();
             var state = query["state"].ToString();
 
+            logger.LogInformation("OAuth2 authorize request: ClientId={ClientId}, RedirectUri={RedirectUri}, ResponseType={ResponseType}, Scope={Scope}, State={State}",
+                clientId, redirectUri, responseType, scope, state);
+            var googleRedirectUri = configuration.GetGoogleRedirectUri();
+
             // Basic validation
             if (clientId != GoogleClientId ||
-                redirectUri != GoogleRedirectUri ||
+                redirectUri != googleRedirectUri ||
                 responseType != "code")
             {
                 ctx.Response.StatusCode = 400;
@@ -70,7 +77,7 @@ public static class OAuth2
         // =======================
         //  /oauth2/token
         // =======================
-        endpoints.MapPost("/api/oauth2/token", async (HttpContext ctx) =>
+        endpoints.MapPost("/api/oauth2/token", async (HttpContext ctx, IConfiguration configuration) =>
         {
             if (!ctx.Request.HasFormContentType)
             {
@@ -131,8 +138,10 @@ public static class OAuth2
                 return;
             }
 
+            var googleRedirectUri = configuration.GetGoogleRedirectUri();
+
             // Validate redirect URI
-            if (redirectUri != GoogleRedirectUri)
+            if (redirectUri != googleRedirectUri)
             {
                 ctx.Response.StatusCode = 400;
                 await ctx.Response.WriteAsync($"Invalid redirect_uri: {redirectUri}");
