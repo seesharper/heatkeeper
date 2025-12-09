@@ -164,7 +164,7 @@ public static class OAuth2
             {
                 access_token = accessToken,
                 token_type = "Bearer",
-                expires_in = 3600,
+                expires_in = 31536000, // 1 year
                 scope = form["scope"].ToString(), // optional
                 refresh_token = "" // you can skip refresh for dev
             };
