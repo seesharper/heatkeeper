@@ -49,6 +49,10 @@ public static class TestApplicationExtensions
         var livingRoomHeaterId2 = await client.CreateHeater(TestData.Heaters.LivingRoomHeater1(livingRoomZoneId), token);
         var kitchenHeaterId = await client.CreateHeater(TestData.Heaters.KitchenHeater(kitchenZoneId), token);
 
+        var livingRoomLightId1 = await client.CreateLight(TestData.Lights.LivingRoomLight1(livingRoomZoneId), token);
+        var livingRoomLightId2 = await client.CreateLight(TestData.Lights.LivingRoomLight1(livingRoomZoneId), token);
+        var kitchenLightId = await client.CreateLight(TestData.Lights.KitchenLight(kitchenZoneId), token);
+
         await client.UpdateLocation(new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, livingRoomZoneId, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude), locationId, token);
 
         await client.AssignLocationToUser(new AssignLocationToUserCommand(1, locationId), token);
@@ -78,11 +82,11 @@ public static class TestApplicationExtensions
 
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-        return new TestLocation(client, testApplication.Services, token, locationId, livingRoomZoneId, livingRoomSensor.Id, kitchenZoneId, normalProgramId, scheduleId, setPointId, livingRoomHeaterId1, livingRoomHeaterId2, kitchenHeaterId, vatRateId, priceAreaId);
+        return new TestLocation(client, testApplication.Services, token, locationId, livingRoomZoneId, livingRoomSensor.Id, kitchenZoneId, normalProgramId, scheduleId, setPointId, livingRoomHeaterId1, livingRoomHeaterId2, kitchenHeaterId, livingRoomLightId1, livingRoomLightId2, kitchenLightId, vatRateId, priceAreaId);
     }
 }
 
-public record TestLocation(HttpClient HttpClient, IServiceProvider ServiceProvider, string Token, long LocationId, long LivingRoomZoneId, long LivingRoomSensorId, long KitchenZoneId, long NormalProgramId, long ScheduleId, long LivingRoomSetPointId, long LivingRoomHeaterId1, long LivingRoomHeaterId2, long KitchenHeaterId, long VATRateId, long PriceAreaId)
+public record TestLocation(HttpClient HttpClient, IServiceProvider ServiceProvider, string Token, long LocationId, long LivingRoomZoneId, long LivingRoomSensorId, long KitchenZoneId, long NormalProgramId, long ScheduleId, long LivingRoomSetPointId, long LivingRoomHeaterId1, long LivingRoomHeaterId2, long KitchenHeaterId, long LivingRoomLightId1, long LivingRoomLightId2, long KitchenLightId, long VATRateId, long PriceAreaId)
 {
     public async Task DeleteAllMeasurements()
     {
