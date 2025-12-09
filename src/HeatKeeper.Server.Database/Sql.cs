@@ -346,4 +346,20 @@ public interface ISqlProvider
     string DeleteEventTrigger { get; }
 
     string GetSmartMeterReadings { get; }
+
+    string CreateLightsTable { get; }
+
+    string GetLights { get; }
+
+    string InsertLight { get; }
+
+    string DeleteLight { get; }
+
+    string UpdateLight { get; }
+
+    string GetLightDetails { get; }
+
+    string EnableLight { get; }
+
+    string DisableLight { get; }
 }

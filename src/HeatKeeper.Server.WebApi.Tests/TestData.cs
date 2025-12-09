@@ -2,6 +2,7 @@ using System;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.EnergyPriceAreas.Api;
 using HeatKeeper.Server.Heaters.Api;
+using HeatKeeper.Server.Lights.Api;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
@@ -190,6 +191,53 @@ namespace HeatKeeper.Server.WebApi.Tests
                 new(heaterId, UpdatedLivingRoomHeaterName, UpdatedLivingRoomHeaterDescription, UpdatedLivingRoomHeaterMqttTopic, UpdatedLivingRoomHeaterOnPayload, UpdatedLivingRoomHeaterOffPayload, true);
         }
 
+        public static class Lights
+        {
+            public const string LivingRoomLightName = "LivingRoomLight";
+            public const string LivingRoomLightDescription = "Description of the LivingRoomLight";
+            public const string LivingRoomLightMqttTopic = "LivingRoomLightTopic";
+            public const string LivingRoomLightOnPayload = "ON";
+            public const string LivingRoomLightOffPayload = "OFF";
+
+            public const string UpdatedLivingRoomLightName = "UpdatedLivingRoomLight";
+            public const string UpdatedLivingRoomLightDescription = "UpdatedDescription of the LivingRoomLight";
+            public const string UpdatedLivingRoomLightMqttTopic = "UpdatedLivingRoomLightTopic";
+            public const string UpdatedLivingRoomLightOnPayload = "UPDATEDON";
+            public const string UpdatedLivingRoomLightOffPayload = "UPDATEDOFF";
+
+            public const string LivingRoomLight2Name = "LivingRoomLight2";
+            public const string LivingRoomLight2Description = "Description of the LivingRoomLight2";
+            public const string LivingRoomLight2MqttTopic = "LivingRoomLight2Topic";
+            public const string LivingRoomLight2OnPayload = "ON";
+            public const string LivingRoomLight2OffPayload = "OFF";
+
+            public const string KitchenLightName = "KitchenLight";
+            public const string KitchenLightDescription = "Description of the KitchenLight";
+            public const string KitchenLightMqttTopic = "KitchenLightTopic";
+            public const string KitchenLightOnPayload = "ON";
+            public const string KitchenLightOffPayload = "OFF";
+
+            public const string TestLightName = "TestLight";
+            public const string TestLightDescription = "Description of the TestLight";
+            public const string TestLightMqttTopic = "TestLightTopic";
+            public const string TestLightOnPayload = "ON";
+            public const string TestLightOffPayload = "OFF";
+
+            public static CreateLightCommand LivingRoomLight1(long livingRoomZoneId) =>
+                new(Name: LivingRoomLightName, Description: LivingRoomLightDescription, MqttTopic: LivingRoomLightMqttTopic, OnPayload: LivingRoomLightOnPayload, OffPayload: LivingRoomLightOffPayload, ZoneId: livingRoomZoneId);
+
+            public static CreateLightCommand LivingRoomLight2(long livingRoomZoneId) =>
+                new(Name: LivingRoomLight2Name, Description: LivingRoomLight2Description, MqttTopic: LivingRoomLight2MqttTopic, OnPayload: LivingRoomLight2OnPayload, OffPayload: LivingRoomLight2OffPayload, ZoneId: livingRoomZoneId);
+
+            public static CreateLightCommand KitchenLight(long kitchenZoneId) =>
+                new(Name: KitchenLightName, Description: KitchenLightDescription, MqttTopic: KitchenLightMqttTopic, OnPayload: KitchenLightOnPayload, OffPayload: KitchenLightOffPayload, ZoneId: kitchenZoneId);
+
+            public static CreateLightCommand TestLight(long testZoneId) =>
+                new(Name: TestLightName, Description: TestLightDescription, MqttTopic: TestLightMqttTopic, OnPayload: TestLightOnPayload, OffPayload: TestLightOffPayload, ZoneId: testZoneId);
+
+            public static UpdateLightCommand UpdateLight(long lightId) =>
+                new(lightId, UpdatedLivingRoomLightName, UpdatedLivingRoomLightDescription, UpdatedLivingRoomLightMqttTopic, UpdatedLivingRoomLightOnPayload, UpdatedLivingRoomLightOffPayload, true);
+        }
 
         public static class Users
         {
