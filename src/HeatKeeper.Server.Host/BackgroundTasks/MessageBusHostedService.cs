@@ -21,11 +21,11 @@ public class MessageBusHostedService(IMessageBus messageBus) : BackgroundService
             {
                 if (eventMessage.State == LightState.On)
                 {
-                    await eventBus.PublishAsync(new SunriseEvent(eventMessage.LocationName), CancellationToken.None);
+                    await eventBus.PublishAsync(new SunriseEvent(eventMessage.LocationId), CancellationToken.None);
                 }
                 else if (eventMessage.State == LightState.Off)
                 {
-                    await eventBus.PublishAsync(new SunsetEvent(eventMessage.LocationName), CancellationToken.None);
+                    await eventBus.PublishAsync(new SunsetEvent(eventMessage.LocationId), CancellationToken.None);
                 }
             });
 
