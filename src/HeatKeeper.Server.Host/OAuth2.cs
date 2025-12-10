@@ -229,7 +229,8 @@ public static class OAuth2
                             attributes = new
                             {
                                 queryOnlyTemperatureSetting = true,  // READ-ONLY temperature
-                                queryOnlyHumiditySetting = true      // READ-ONLY humidity
+                                queryOnlyHumiditySetting = true,      // READ-ONLY humidity
+                                thermostatTemperatureUnit = "C"
                             },
                             roomHint = "Living room"
                         }
@@ -260,7 +261,8 @@ public static class OAuth2
                         {
                             online = true,
                             status = "SUCCESS",
-                            thermostatTemperatureAmbient = temp
+                            thermostatTemperatureAmbient = temp,
+                            thermostatTemperatureUnit = "C"
                         };
                     }
                 }
