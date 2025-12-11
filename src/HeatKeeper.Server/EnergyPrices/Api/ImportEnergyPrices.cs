@@ -28,19 +28,33 @@ public class ImportEnergyPricesCommandHandler(EntsoeClient entsoeClient, IQueryE
 
             var resolution = marketDocument.Resolution;
 
-
-            var prices = new decimal?[24 * (60 / resolution)];
+            // Build array with all prices from market document
+            var rawPrices = new decimal?[24 * (60 / resolution)];
             for (var i = 0; i < marketDocument.Prices.Length; i++)
             {
-                prices[marketDocument.Prices[i].Position - 1] = marketDocument.Prices[i].Price;
+                rawPrices[marketDocument.Prices[i].Position - 1] = marketDocument.Prices[i].Price;
             }
 
-            for (var i = 0; i < prices.Length; i++)
+            // Fill missing values
+            for (var i = 0; i < rawPrices.Length; i++)
             {
-                if (prices[i] == null)
+                if (rawPrices[i] == null)
                 {
-                    prices[i] = prices[i - 1];
+                    rawPrices[i] = rawPrices[i - 1];
                 }
+            }
+
+            // Calculate hourly averages (we need 24 hourly prices)
+            var prices = new decimal[24];
+            var pricesPerHour = 60 / resolution;
+            for (var hour = 0; hour < 24; hour++)
+            {
+                var sum = 0m;
+                for (var j = 0; j < pricesPerHour; j++)
+                {
+                    sum += rawPrices[hour * pricesPerHour + j].Value;
+                }
+                prices[hour] = sum / pricesPerHour;
             }
 
             for (var i = 0; i < 24; i++)
@@ -48,8 +62,8 @@ public class ImportEnergyPricesCommandHandler(EntsoeClient entsoeClient, IQueryE
                 var startTime = dateToImport.AddHours(i);
                 var stopTime = startTime.AddHours(1);
 
-                var priceInLocalCurrency = prices[i].Value * exchangeRate / 1000;
-                var priceInEuro = prices[i].Value / 1000;
+                var priceInLocalCurrency = prices[i] * exchangeRate / 1000;
+                var priceInEuro = prices[i] / 1000;
                 var priceInLocalCurrencyAfterSubsidy = priceInLocalCurrency;
                 if (IsNorwegianPriceArea(priceArea.EIC_Code))
                 {
