@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
@@ -19,29 +20,27 @@ namespace HeatKeeper.Server.Events;
 /// <param name="commandExecutor">The command executor for executing action commands</param>
 public sealed class TriggerEngine(IEventBus bus, ActionCatalog catalog, ICommandExecutor commandExecutor)
 {
-    private readonly List<TriggerDefinition> _triggers = new();
+    private ImmutableList<TriggerDefinition> _triggers = ImmutableList<TriggerDefinition>.Empty;
 
     /// <summary>
     /// Adds a trigger definition to the engine.
     /// </summary>
     /// <param name="trigger">The trigger to add</param>
-    public void AddTrigger(TriggerDefinition trigger) => _triggers.Add(trigger);
+    public void AddTrigger(TriggerDefinition trigger) =>
+        ImmutableInterlocked.Update(ref _triggers, list => list.Add(trigger));
 
     /// <summary>
     /// Replaces all triggers with the provided collection.
     /// </summary>
     /// <param name="triggers">The new triggers to set</param>
-    public void SetTriggers(IEnumerable<TriggerDefinition> triggers)
-    {
-        _triggers.Clear();
-        _triggers.AddRange(triggers);
-    }
+    public void SetTriggers(IEnumerable<TriggerDefinition> triggers) =>
+        ImmutableInterlocked.Update(ref _triggers, _ => [.. triggers]);
 
     /// <summary>
     /// Gets a read-only list of all registered triggers.
     /// </summary>
     /// <returns>A read-only list of trigger definitions</returns>
-    public IReadOnlyList<TriggerDefinition> ListTriggers() => _triggers.AsReadOnly();
+    public IReadOnlyList<TriggerDefinition> ListTriggers() => _triggers;
 
     /// <summary>
     /// Starts the trigger engine, listening for events and processing triggers.

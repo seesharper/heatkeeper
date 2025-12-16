@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace HeatKeeper.Server.Events;
@@ -10,7 +11,8 @@ namespace HeatKeeper.Server.Events;
 /// <param name="Conditions">List of conditions that must all be true for the trigger to fire</param>
 /// <param name="Actions">List of actions to execute when the trigger fires</param>
 public sealed record TriggerDefinition(
-    string Name,
+
+    [property: Key] string Name,
     string AppliesToEventType,
     IReadOnlyList<Condition> Conditions,
     IReadOnlyList<ActionBinding> Actions

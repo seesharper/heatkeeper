@@ -1,6 +1,7 @@
 using System.Data.Common;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using CQRS.Execution;
 using CQRS.LightInject;
 using CQRS.Transactions;
@@ -9,6 +10,7 @@ using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Events;
+using HeatKeeper.Server.Events.Api;
 
 using HeatKeeper.Server.Lighting;
 using HeatKeeper.Server.Locations;
@@ -28,6 +30,7 @@ using HeatKeeper.Server.Validation;
 using HeatKeeper.Server.Zones;
 
 using LightInject;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using MQTTnet;
 using MQTTnet.Client;
@@ -37,6 +40,12 @@ namespace HeatKeeper.Server;
 
 public class ServerCompositionRoot : ICompositionRoot
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true
+    };
+
     static ServerCompositionRoot()
     {
         DbReaderOptions.WhenReading<long>().Use((rd, i) => rd.GetInt32(i));
@@ -44,6 +53,10 @@ public class ServerCompositionRoot : ICompositionRoot
         DbReaderOptions.WhenReading<bool>().Use((rd, i) => rd.GetInt32(i) != 0);
         DbReaderOptions.WhenReading<DateTime>().Use((rd, i) => rd.GetDateTime(i));
         DbReaderOptions.WhenReading<decimal>().Use((rd, i) => rd.GetDecimal(i));
+        DbReaderOptions.WhenReading<TriggerDefinition>().Use((rd, i) =>
+        {
+            return JsonSerializer.Deserialize<TriggerDefinition>(rd.GetString(i), JsonOptions);
+        });
     }
 
     public void Compose(IServiceRegistry serviceRegistry)
@@ -57,6 +70,7 @@ public class ServerCompositionRoot : ICompositionRoot
             .Decorate<DbConnection, DbConnectionDecorator>()
             .RegisterSingleton<IBootStrapper>(sf => new JanitorBootStrapper(sf), "JanitorBootStrapper")
             .RegisterSingleton<IBootStrapper, DatabaseBootStrapper>("DatabaseBootStrapper")
+            .RegisterSingleton<IBootStrapper>(sf => new TriggerEngineBootStrapper(sf), "TriggerEngineBootStrapper")
             .RegisterSingleton<IPasswordManager, PasswordManager>()
             .RegisterSingleton<IManagedMqttClient>(sf => CreateManagedMqttClient(sf.GetInstance<IConfiguration>()))
             .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
@@ -96,6 +110,7 @@ public class ServerCompositionRoot : ICompositionRoot
             .Decorate<ICommandHandler<DeleteNotificationCommand>, WhenNotificationIsDeleted>()
             .Decorate<ICommandHandler<PostNotificationCommand>, WhenNotificationIsPosted>()
             .Decorate<ICommandHandler<PatchNotificationCommand>, WhenNotificationIsPatched>()
+            .Decorate<ICommandHandler<PatchTriggerCommand>, WhenTriggerIsPatched>()
             .Decorate<ICommandHandler<SetZoneHeatingStatusCommand>, WhenSettingZoneHeatingStatus>()
             .Decorate<ICommandHandler<ActivateProgramCommand>, WhenActivatingProgram>()
 
