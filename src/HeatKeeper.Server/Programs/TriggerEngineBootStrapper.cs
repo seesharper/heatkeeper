@@ -1,0 +1,18 @@
+using HeatKeeper.Abstractions;
+using HeatKeeper.Server.Events;
+using LightInject;
+
+namespace HeatKeeper.Server.Programs;
+
+[Order(3)]
+public class TriggerEngineBootStrapper(IServiceFactory serviceFactory) : IBootStrapper
+{
+    public async Task Execute()
+    {
+        using (Scope scope = serviceFactory.BeginScope())
+        {
+            var commandExecutor = scope.GetInstance<ICommandExecutor>();
+            await commandExecutor.ExecuteAsync(new AddAllTriggersToTriggerEngineCommand());
+        }
+    }
+}

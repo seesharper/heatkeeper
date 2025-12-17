@@ -1,0 +1,2 @@
+select definition
+  from eventtriggers

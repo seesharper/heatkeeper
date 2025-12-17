@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CQRS.AspNet.Testing;
+using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Events;
 using HeatKeeper.Server.Events.Api;
 using Microsoft.Extensions.DependencyInjection;
@@ -355,5 +356,24 @@ public class TriggerTests : TestBase
         triggerDetails.Conditions.Should().BeEmpty();
         triggerDetails.Actions.Should().NotBeNull();
         triggerDetails.Actions.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task ShouldGetAllTriggerDefinitions()
+    {
+        var testLocation = await Factory.CreateTestLocation();
+        var client = testLocation.HttpClient;
+
+        // Create a trigger
+        await client.Post(CreateTemperatureTrigger);
+
+        // Update the trigger (using ID 1 as we know it's the first one)
+        var updateCommand = new PatchTriggerCommand(1, TestData.Triggers.UpdatedTemperatureTrigger);
+        await client.Patch(updateCommand);
+
+        var queryExecutor = testLocation.ServiceProvider.GetRequiredService<IQueryExecutor>();
+        var definitions = await queryExecutor.ExecuteAsync(
+            new GetAllEventTriggersQuery());
+
     }
 }
