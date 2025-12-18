@@ -27,6 +27,7 @@ public class PropertyResolutionEndToEndTests
         // Create an event envelope (what EventBus produces)
         var eventEnvelope = new EventEnvelope(
             Payload: sensorEvent,
+            EventId: 1,
             EventType: "TemperatureReadingPayload",
             OccurredAt: System.DateTimeOffset.UtcNow
         );
@@ -66,7 +67,7 @@ public class PropertyResolutionEndToEndTests
 
         // Arrange
         var sensorEvent = new TemperatureReadingPayload(ZoneId: 1, Temperature: 20.0);
-        var eventEnvelope = new EventEnvelope(sensorEvent, "TemperatureReadingPayload", System.DateTimeOffset.UtcNow);
+        var eventEnvelope = new EventEnvelope(sensorEvent, 1, "TemperatureReadingPayload", System.DateTimeOffset.UtcNow);
 
         var actionBinding = new ActionBinding(
             ActionId: 1,
@@ -101,7 +102,7 @@ public class PropertyResolutionEndToEndTests
             LastSeen: System.DateTimeOffset.Now.AddHours(-2)
         );
 
-        var eventEnvelope = new EventEnvelope(deadSensorEvent, "DeadSensorEvent", System.DateTimeOffset.UtcNow);
+        var eventEnvelope = new EventEnvelope(deadSensorEvent, 998, "DeadSensorEvent", System.DateTimeOffset.UtcNow);
 
         // Action 1: Disable heaters in the affected zone
         var disableHeatersBinding = new ActionBinding(

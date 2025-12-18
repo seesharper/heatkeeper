@@ -19,7 +19,7 @@ public class PostTrigger(IDbConnection dbConnection) : ICommandHandler<PostTrigg
         // Create an empty TriggerDefinition with the provided name
         var emptyTriggerDefinition = new TriggerDefinition(
             command.Name,
-            string.Empty, // Empty event type
+            0, // Default event ID (0 = no event)
             new List<Condition>(), // Empty conditions
             new List<ActionBinding>() // Empty actions
         );

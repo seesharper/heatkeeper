@@ -41,6 +41,7 @@ public sealed class EventBus : IEventBus
 
         var envelope = new EventEnvelope(
             Payload: payload,
+            EventId: attribute.Id,
             EventType: typeof(T).Name,
             OccurredAt: DateTimeOffset.UtcNow
         );

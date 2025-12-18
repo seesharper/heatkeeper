@@ -6,6 +6,7 @@ namespace HeatKeeper.Server.Events;
 /// </summary>
 public sealed record EventEnvelope(
     object Payload,
+    int EventId,
     string EventType,
     DateTimeOffset OccurredAt
 );
