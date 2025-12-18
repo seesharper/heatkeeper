@@ -16,7 +16,7 @@ public static partial class TestData
     {
         public static TriggerDefinition TemperatureTrigger => new(
             "Temperature Alert",
-            "TemperatureReading",
+            1, // TemperatureReadingPayload event ID
             new List<Condition>
             {
                 new("Temperature", ComparisonOperator.GreaterThan, "25.0")
@@ -32,7 +32,7 @@ public static partial class TestData
 
         public static TriggerDefinition UpdatedTemperatureTrigger => new(
             "Updated Temperature Alert",
-            "TemperatureReading",
+            1, // TemperatureReadingPayload event ID
             new List<Condition>
             {
                 new("Temperature", ComparisonOperator.GreaterThan, "30.0")
@@ -48,14 +48,14 @@ public static partial class TestData
 
         public static TriggerDefinition EmptyNameTrigger => new(
             "",
-            "TemperatureReading",
+            1, // TemperatureReadingPayload event ID
             new List<Condition>(),
             new List<ActionBinding>()
         );
 
         public static TriggerDefinition HumidityTrigger => new(
             "Humidity Alert",
-            "HumidityReading",
+            1, // Using TemperatureReadingPayload event ID (HumidityReading doesn't exist)
             new List<Condition>
             {
                 new("Humidity", ComparisonOperator.LessThan, "40.0")
@@ -182,7 +182,7 @@ public class TriggerTests : TestBase
 
         var complexTrigger = new TriggerDefinition(
             "Complex Multi-Condition Trigger",
-            "SensorReading",
+            1, // TemperatureReadingPayload event ID
             new List<Condition>
             {
                 new("Temperature", ComparisonOperator.GreaterThan, "18.5"),
@@ -223,7 +223,7 @@ public class TriggerTests : TestBase
 
         var originalTrigger = new TriggerDefinition(
             "JSON Fidelity Test",
-            "TestEvent",
+            1, // TemperatureReadingPayload event ID
             new List<Condition>
             {
                 new("TestProperty", ComparisonOperator.Equals, "test value")
@@ -317,7 +317,7 @@ public class TriggerTests : TestBase
 
         triggerDetails.Should().NotBeNull();
         triggerDetails.Name.Should().Be("Temperature Alert");
-        triggerDetails.AppliesToEventType.Should().Be("TemperatureReading");
+        triggerDetails.EventId.Should().Be(1);
         triggerDetails.Conditions.Should().HaveCount(1);
         triggerDetails.Actions.Should().HaveCount(1);
     }
@@ -351,7 +351,7 @@ public class TriggerTests : TestBase
         // Verify the trigger has proper empty structure
         triggerDetails.Should().NotBeNull();
         triggerDetails.Name.Should().Be(triggerName);
-        triggerDetails.AppliesToEventType.Should().Be(string.Empty);
+        triggerDetails.EventId.Should().Be(0); // Empty triggers have EventId 0
         triggerDetails.Conditions.Should().NotBeNull();
         triggerDetails.Conditions.Should().BeEmpty();
         triggerDetails.Actions.Should().NotBeNull();

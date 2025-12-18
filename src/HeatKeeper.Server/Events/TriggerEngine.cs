@@ -53,7 +53,7 @@ public sealed class TriggerEngine(IEventBus bus, ActionCatalog catalog, ICommand
         {
             foreach (var trig in _triggers)
             {
-                if (!evt.EventType.Equals(trig.AppliesToEventType, StringComparison.OrdinalIgnoreCase))
+                if (evt.EventId != trig.EventId)
                     continue;
 
                 if (Matches(evt, trig))

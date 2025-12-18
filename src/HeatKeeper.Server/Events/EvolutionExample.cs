@@ -27,12 +27,12 @@ public static class EvolutionExample
 
         Console.WriteLine("// 3. EventBus automatically wraps in EventEnvelope:");
         Console.WriteLine("// - Reads [DomainEvent] attribute");
-        Console.WriteLine("// - Sets EventType from attribute name");
+        Console.WriteLine("// - Sets EventId and EventType from attribute");
         Console.WriteLine("// - Captures OccurredAt timestamp");
         Console.WriteLine();
         Console.WriteLine("// 4. TriggerEngine receives EventEnvelope and processes:");
         Console.WriteLine("var trigger = new TriggerDefinition(");
-        Console.WriteLine("    AppliesToEventType: \"TemperatureReadingPayload\", // ✅ Match attribute name");
+        Console.WriteLine("    EventId: 1, // ✅ Match event ID from [DomainEvent] attribute");
         Console.WriteLine("    ...);");
         Console.WriteLine();
 

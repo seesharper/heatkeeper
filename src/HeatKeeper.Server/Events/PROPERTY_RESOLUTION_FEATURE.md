@@ -102,7 +102,7 @@ public record DeadSensorPayload(int ZoneId, string SensorName);
 // Create trigger
 var trigger = new TriggerDefinition(
     Name: "Disable heaters on dead sensor",
-    AppliesToEventType: "DeadSensorPayload",
+    EventId: 100, // DeadSensorPayload event ID from [DomainEvent] attribute
     Conditions: new List<Condition>(),
     Actions: new List<ActionBinding>
     {

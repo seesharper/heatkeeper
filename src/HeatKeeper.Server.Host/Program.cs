@@ -36,7 +36,7 @@ builder.Services.AddProblemDetails();
 
 builder.Services.AddHttpClient<NorwegianBankClient>(client => client.BaseAddress = new Uri("https://data.norges-bank.no/api/data/"));
 builder.Services.AddHttpClient<EntsoeClient>(client => client.BaseAddress = new Uri("https://web-api.tp.entsoe.eu/api"));
-
+builder.Services.AddHttpClient("RestfulClient", client => client.BaseAddress = new Uri("https://api.met.no/")).AddAsKeyed();
 
 
 var app = builder.Build();

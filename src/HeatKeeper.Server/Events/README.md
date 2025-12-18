@@ -79,7 +79,7 @@ Triggers work seamlessly with domain events using reflection-based property acce
 ```csharp
 var trigger = new TriggerDefinition(
     Name: "Turn heaters off when too warm",
-    AppliesToEventType: "TemperatureReadingPayload", // Must match [DomainEvent] Name
+    EventId: 1, // Event ID from [DomainEvent] attribute (TemperatureReadingPayload)
     Conditions: new List<Condition>
     {
         new(
