@@ -358,7 +358,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         }
 
         public static class Clock
-        {
+        {            
+            
             public static DateTime Today => new(1972, 1, 21, 14, 15, 36, DateTimeKind.Utc);
 
             public static DateTime LaterToday => new(1972, 1, 21, 14, 15, 37, DateTimeKind.Utc);

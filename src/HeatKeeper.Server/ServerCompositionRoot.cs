@@ -9,6 +9,7 @@ using HeatKeeper.Abstractions;
 using HeatKeeper.Abstractions.Configuration;
 using HeatKeeper.Abstractions.Transactions;
 using HeatKeeper.Server.Authentication;
+using HeatKeeper.Server.Caching;
 using HeatKeeper.Server.Events;
 using HeatKeeper.Server.Events.Api;
 
@@ -27,6 +28,7 @@ using HeatKeeper.Server.SmartMeter;
 using HeatKeeper.Server.Users;
 using HeatKeeper.Server.Users.Api;
 using HeatKeeper.Server.Validation;
+using HeatKeeper.Server.Yr;
 using HeatKeeper.Server.Zones;
 
 using LightInject;
@@ -78,15 +80,13 @@ public class ServerCompositionRoot : ICompositionRoot
             .RegisterSingleton<IEmailValidator, EmailValidator>()
             .RegisterSingleton<ICronExpressionValidator, CronExpressionValidator>()
             .RegisterSingleton<IMessageBus, MessageBus>()
-            .RegisterSingleton<IOutdoorLightsController, OutdoorLightsController>()
-            .RegisterSingleton<HttpClient>()
-            .RegisterSingleton<ISunCalculationService, ExternalSunCalculationService>()
+            // .RegisterSingleton<HttpClient>()
             .RegisterSingleton<IEventBus, EventBus>()
             .RegisterSingleton<IEventCatalog, EventCatalog>()
             .RegisterInstance(catalog)
             .RegisterSingleton<TriggerEngine>()
             .RegisterSingleton<ISmartMeterReadingsCache, SmartMeterReadingsCache>()
-
+            .RegisterSingleton(typeof(ICacheInvalidator<>), typeof(CacheInvalidator<>))
             // Discover and register actions automatically
             .RegisterActions(catalog, typeof(ServerCompositionRoot).Assembly)
 
@@ -113,6 +113,17 @@ public class ServerCompositionRoot : ICompositionRoot
             .Decorate<ICommandHandler<PatchTriggerCommand>, WhenTriggerIsPatched>()
             .Decorate<ICommandHandler<SetZoneHeatingStatusCommand>, WhenSettingZoneHeatingStatus>()
             .Decorate<ICommandHandler<ActivateProgramCommand>, WhenActivatingProgram>()
+            .Decorate(typeof(IQueryHandler<,>), typeof(CachedQueryHandler<,>), sr =>
+            {
+                if (sr.ServiceType.IsGenericType && sr.ServiceType.GetGenericTypeDefinition() == typeof(IQueryHandler<,>))
+                {
+                    var cachedAttribute = sr.ServiceType.GetGenericArguments()[0].GetCustomAttributes(typeof(MemoryCached<>), true).FirstOrDefault();
+                    return cachedAttribute != null;
+                }
+
+                return false;
+
+            })
 
             .Decorate(typeof(ICommandHandler<>), typeof(TransactionalCommandHandler<>), sr =>
             {
