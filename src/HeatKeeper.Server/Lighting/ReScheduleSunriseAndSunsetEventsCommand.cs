@@ -17,7 +17,7 @@ public class ReScheduleSunriseAndSunsetEvents(ICommandExecutor commandExecutor, 
         // Every day at noon 
         var cronExpression = "0 12 * * *";
         var todayUtc = timeProvider.GetUtcNow().Date;
-        var tomorrowUtc = todayUtc.AddDays(1);
+        var tomorrowUtc = DateOnly.FromDateTime(todayUtc.AddDays(1));
         janitor.Schedule(builder =>
         {
             builder

@@ -8,6 +8,11 @@ public static class WebApplicationExtensions
 {
     public static async Task RunBootStrappers(this IHost webApplication)
     {
+        if (AppEnvironment.IsRunningFromTests)
+        {
+            return;
+        }
+
         var bootStrappers = webApplication.Services.GetKeyedServices<IBootStrapper>("*")
         .OrderBy(bootStrapper => bootStrapper.GetType().GetCustomAttribute<OrderAttribute>()!.Order);
         foreach (var bootStrapper in bootStrappers)

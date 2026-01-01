@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace HeatKeeper.Server.Lighting;
 
 [RequireBackgroundRole]
-public record ScheduleSunriseAndSunsetEventsCommand(DateTime DateTimeUtc);
+public record ScheduleSunriseAndSunsetEventsCommand(DateOnly Date);
 
 public class ScheduleSunriseAndSunsetEvents(IQueryExecutor queryExecutor, TimeProvider timeProvider, IJanitor janitor, ILogger<ScheduleSunriseAndSunsetEvents> logger) : ICommandHandler<ScheduleSunriseAndSunsetEventsCommand>
 {
@@ -17,7 +17,7 @@ public class ScheduleSunriseAndSunsetEvents(IQueryExecutor queryExecutor, TimePr
         var locationCoordinates = await queryExecutor.ExecuteAsync(new GetLocationCoordinatesQuery(), cancellationToken);
         foreach (var location in locationCoordinates)
         {
-            var sunEvents = await queryExecutor.ExecuteAsync(new GetSunEventsQuery((double)location.Latitude, (double)location.Longitude, DateOnly.FromDateTime(command.DateTimeUtc)), cancellationToken);
+            var sunEvents = await queryExecutor.ExecuteAsync(new GetSunEventsQuery((double)location.Latitude, (double)location.Longitude, command.Date), cancellationToken);
             if (sunEvents.SunriseUtc > timeProvider.GetUtcNow())
             {
                 logger.LogInformation("Scheduling sunrise event for location {LocationId} at {SunriseTime}", location.Id, sunEvents.SunriseUtc);

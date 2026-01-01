@@ -17,7 +17,7 @@ public class JanitorBootStrapper(IServiceFactory serviceFactory) : IBootStrapper
             var timeProvider = scope.GetInstance<TimeProvider>();
             await commandExecutor.ExecuteAsync(new AddAllSchedulesToJanitorCommand());
             await commandExecutor.ExecuteAsync(new AddAllNotificationsToJanitorCommand());
-            await commandExecutor.ExecuteAsync(new ScheduleSunriseAndSunsetEventsCommand(timeProvider.GetUtcNow().Date));
+            await commandExecutor.ExecuteAsync(new ScheduleSunriseAndSunsetEventsCommand(DateOnly.FromDateTime(timeProvider.GetUtcNow().Date)));
             await commandExecutor.ExecuteAsync(new ReScheduleSunriseAndSunsetEventsCommand());
         }
     }
