@@ -51,46 +51,66 @@ public sealed class TriggerEngine(IEventBus bus, ActionCatalog catalog, ICommand
     {
         await foreach (var evt in bus.Reader.ReadAllAsync(ct))
         {
-            foreach (var trig in _triggers)
+            await ProcessEvent(evt, ct);
+        }
+    }
+
+    /// <summary>
+    /// Consumes all pending events in the event bus and processes triggers for testing scenarios.
+    /// This method will process all events currently in the queue and then return.
+    /// </summary>
+    /// <param name="ct">Cancellation token</param>
+    /// <returns>A task that completes when all pending events have been processed</returns>
+    public async Task ConsumeAllEvents(CancellationToken ct = default)
+    {
+        while (bus.Reader.TryRead(out var evt))
+        {
+            await ProcessEvent(evt, ct);
+        }
+    }
+
+    private async Task ProcessEvent(EventEnvelope evt, CancellationToken ct)
+    {
+        foreach (var trig in _triggers)
+        {
+            if (evt.EventId != trig.EventId)
+                continue;
+
+            if (Matches(evt, trig))
             {
-                if (evt.EventId != trig.EventId)
-                    continue;
-
-                if (Matches(evt, trig))
+                foreach (var binding in trig.Actions)
                 {
-                    foreach (var binding in trig.Actions)
+                    ActionDetails actionDetails;
+                    try
                     {
-                        ActionDetails actionDetails;
-                        try
-                        {
-                            actionDetails = catalog.GetActionDetails(binding.ActionId);
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            Console.WriteLine($"[WARN] Unknown action ID '{binding.ActionId}' in trigger '{trig.Name}'.");
-                            continue;
-                        }
+                        actionDetails = catalog.GetActionDetails(binding.ActionId);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        Console.WriteLine($"[WARN] Unknown action ID '{binding.ActionId}' in trigger '{trig.Name}'.");
+                        continue;
+                    }
 
-                        var resolved = ResolveParameters(binding.ParameterMap, evt);
+                    var resolved = ResolveParameters(binding.ParameterMap, evt);
 
-                        try
-                        {
-                            // Create the command from the resolved parameters
-                            var command = CreateCommandFromParameters(actionDetails, resolved);
+                    try
+                    {
+                        // Create the command from the resolved parameters
+                        var command = CreateCommandFromParameters(actionDetails, resolved);
 
-                            // Execute the command using ICommandExecutor
-                            await commandExecutor.ExecuteAsync((dynamic)command, ct);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"[ERROR] Failed to execute action '{actionDetails.Name}': {ex.Message}");
-                            continue;
-                        }
+                        // Execute the command using ICommandExecutor
+                        await commandExecutor.ExecuteAsync((dynamic)command, ct);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[ERROR] Failed to execute action '{actionDetails.Name}': {ex.Message}");
+                        continue;
                     }
                 }
             }
         }
     }
+
 
     private static bool Matches(EventEnvelope evt, TriggerDefinition trig)
     {

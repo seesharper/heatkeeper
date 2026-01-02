@@ -80,6 +80,8 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static class Locations
         {
+            // 63.47227505348376, 10.978200003679191
+            
             public static CreateLocationCommand Home => new("Home", "Description of the Home location", 59.9139, 10.7522); // Oslo, Norway
 
 
@@ -359,6 +361,10 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static class Clock
         {
+            public static DateTime EarlyMorning => new(1972, 1, 21, 6, 0, 0, DateTimeKind.Utc);
+
+            public static DateTime LateEvening => new(1972, 1, 21, 22, 0, 0, DateTimeKind.Utc);
+
             public static DateTime Today => new(1972, 1, 21, 14, 15, 36, DateTimeKind.Utc);
 
             public static DateTime LaterToday => new(1972, 1, 21, 14, 15, 37, DateTimeKind.Utc);
