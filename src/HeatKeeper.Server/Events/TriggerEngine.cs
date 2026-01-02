@@ -111,6 +111,7 @@ public sealed class TriggerEngine(IEventBus bus, ActionCatalog catalog, ICommand
         }
     }
 
+
     private static bool Matches(EventEnvelope evt, TriggerDefinition trig)
     {
         foreach (var c in trig.Conditions)
