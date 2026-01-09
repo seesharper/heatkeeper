@@ -10,13 +10,14 @@ using HeatKeeper.Server.Measurements;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Scalar.AspNetCore;
 using WebPush;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseLightInject(services => services.RegisterFrom<HostCompositionRoot>());
 builder.Configuration.AddEnvironmentVariables(prefix: "HEATKEEPER_");
 // Add services to the container.
-
+builder.Services.AddOpenApi();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddJanitor();
 builder.Services.AddHostedService<MessageBusHostedService>();
@@ -29,10 +30,8 @@ builder.Services.AddHttpClient<IWebPushClient, WebPushClient>();
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddJwtAuthentication(builder.Configuration);
-builder.Services.AddSpaStaticFiles(config => config.RootPath = "wwwroot");
 builder.Services.AddExceptionHandler<ExceptionHandler>();
 builder.Services.AddProblemDetails();
 
@@ -54,8 +53,8 @@ await app.RunBootStrappers();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.MapScalarApiReference();
     app.UseCors("DevelopmentPolicy");
 
     app.UseCookiePolicy(new CookiePolicyOptions

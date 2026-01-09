@@ -20,4 +20,14 @@ public class YrTests : TestBase
         cacheInvalidator.Invalidate(new GetSunEventsQuery(59.9139, 10.7522, DateOnly.FromDateTime(DateTime.UtcNow)));
         var result3 = await queryExecutor.ExecuteAsync(new GetSunEventsQuery(59.9139, 10.7522, DateOnly.FromDateTime(DateTime.UtcNow)));
     }
+
+
+    [Fact]
+    public async Task ShouldGetWeatherForecast()
+    {
+        var queryExecutor = Factory.Services.GetRequiredService<IQueryExecutor>();
+        var result = await queryExecutor.ExecuteAsync(new GetLocationForecastQuery(59.9139, 10.7522));
+        result.Should().NotBeNull();
+        result.Properties.TimeSeries.Should().NotBeNullOrEmpty();
+    }
 }
