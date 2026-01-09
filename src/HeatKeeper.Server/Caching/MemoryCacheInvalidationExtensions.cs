@@ -12,6 +12,8 @@ public static class MemoryCacheInvalidationExtensions
         TimeSpan? absoluteExpirationRelativeToNow = null)
         where TKey : notnull
     {
+
+
         return cache.GetOrCreateAsync(key, async entry =>
         {
             // Invalidate: (all keys of this type) OR (this specific key)
@@ -45,4 +47,45 @@ public static class MemoryCacheInvalidationExtensions
             invalidator,
             _ => factory(),
             absoluteExpirationRelativeToNow);
+
+    public static Task<TValue> GetOrCreateInvalidatedAsync<TKey, TValue>(
+        this IMemoryCache cache,
+        TKey key,
+        ICacheInvalidator<TKey> invalidator,
+        Func<ICacheEntry, Task<TValue>> factory,
+        DateTimeOffset absoluteExpiration)
+        where TKey : notnull
+    {
+        return cache.GetOrCreateAsync(key, async entry =>
+        {
+            // Invalidate: (all keys of this type) OR (this specific key)
+            entry.AddExpirationToken(invalidator.GetToken(key));
+
+            // Cleanup bookkeeping when entry leaves the cache
+            entry.RegisterPostEvictionCallback(static (_, _, _, state) =>
+            {
+                var (inv, k) = ((ICacheInvalidator<TKey> inv, TKey k))state!;
+                inv.Forget(k);
+            }, (invalidator, key));
+
+            // Set absolute expiration
+            entry.AbsoluteExpiration = absoluteExpiration;
+
+            return await factory(entry);
+        });
+    }
+
+    // Convenience overload with DateTimeOffset if you don't care about ICacheEntry
+    public static Task<TValue> GetOrCreateInvalidatedAsync<TKey, TValue>(
+        this IMemoryCache cache,
+        TKey key,
+        ICacheInvalidator<TKey> invalidator,
+        Func<Task<TValue>> factory,
+        DateTimeOffset absoluteExpiration)
+        where TKey : notnull
+        => cache.GetOrCreateInvalidatedAsync(
+            key,
+            invalidator,
+            _ => factory(),
+            absoluteExpiration);
 }
