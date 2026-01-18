@@ -1,4 +1,3 @@
-
 using HeatKeeper.Server.Events;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Yr;
@@ -25,7 +24,7 @@ public class ScheduleSunriseAndSunsetEvents(IQueryExecutor queryExecutor, TimePr
                 {
                     logger.LogInformation("Scheduling sunrise event for location {LocationId} at {SunriseTime}", location.Id, sunEvents.SunriseUtc);
                     builder
-                        .WithName($"Sunrise_Location_{location.Id}")
+                        .WithName($"Sunrise_Location_{location.Id}_{command.Date:yyyyMMdd}")
                         .WithSchedule(new RunOnceSchedule(sunEvents.SunriseUtc))
                         .WithScheduledTask((IEventBus eventBus) => eventBus.PublishAsync(new SunriseEvent(location.Id)));
                 });
@@ -33,7 +32,7 @@ public class ScheduleSunriseAndSunsetEvents(IQueryExecutor queryExecutor, TimePr
                 {
                     logger.LogInformation("Scheduling sunrise event (second try) for location {LocationId} at {SunriseTime}", location.Id, sunEvents.SunriseUtc.AddMinutes(10));
                     builder
-                    .WithName($"Sunrise_Location_{location.Id}_second_try")
+                    .WithName($"Sunrise_Location_{location.Id}_second_try_{command.Date:yyyyMMdd}")
                     .WithSchedule(new RunOnceSchedule(sunEvents.SunriseUtc.AddMinutes(10)))
                     .WithScheduledTask((IEventBus eventBus) => eventBus.PublishAsync(new SunriseEvent(location.Id)));
                 });
@@ -46,7 +45,7 @@ public class ScheduleSunriseAndSunsetEvents(IQueryExecutor queryExecutor, TimePr
                 {
                     logger.LogInformation("Scheduling sunset event for location {LocationId} at {SunsetTime}", location.Id, sunEvents.SunsetUtc);
                     builder
-                        .WithName($"Sunset_Location_{location.Id}")
+                        .WithName($"Sunset_Location_{location.Id}_{command.Date:yyyyMMdd}")
                         .WithSchedule(new RunOnceSchedule(sunEvents.SunsetUtc))
                         .WithScheduledTask((IEventBus eventBus) => eventBus.PublishAsync(new SunsetEvent(location.Id)));
                 });
@@ -54,7 +53,7 @@ public class ScheduleSunriseAndSunsetEvents(IQueryExecutor queryExecutor, TimePr
                 {
                     logger.LogInformation("Scheduling sunset event (second try) for location {LocationId} at {SunsetTime}", location.Id, sunEvents.SunsetUtc.AddMinutes(10));
                     builder
-                    .WithName($"Sunset_Location_{location.Id}_second_try")
+                    .WithName($"Sunset_Location_{location.Id}_second_try_{command.Date:yyyyMMdd}")
                     .WithSchedule(new RunOnceSchedule(sunEvents.SunsetUtc.AddMinutes(10)))
                     .WithScheduledTask((IEventBus eventBus) => eventBus.PublishAsync(new SunsetEvent(location.Id)));
                 });
