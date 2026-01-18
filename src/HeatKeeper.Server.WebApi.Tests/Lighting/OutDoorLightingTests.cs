@@ -25,7 +25,7 @@ public class OutDoorLightingTests : TestBase
         await commandExecutor.ExecuteAsync(new ScheduleSunriseAndSunsetEventsCommand(DateOnly.FromDateTime(TestData.Clock.Today)), CancellationToken.None);
 
         var janitor = Factory.Services.GetRequiredService<IJanitor>();
-        await janitor.Run("Sunset_Location_" + testLocation.LocationId);
+        await janitor.Run($"Sunrise_Location_{testLocation.LocationId}_{DateOnly.FromDateTime(TestData.Clock.Today):yyyyMMdd}");
 
     }
 }

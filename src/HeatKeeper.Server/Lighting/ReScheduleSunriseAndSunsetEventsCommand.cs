@@ -26,8 +26,7 @@ public class ReScheduleSunriseAndSunsetEvents(ICommandExecutor commandExecutor, 
                 .WithScheduledTask(async (ICommandExecutor commandExecutor) =>
                 {
                     await commandExecutor.ExecuteAsync(new ScheduleSunriseAndSunsetEventsCommand(tomorrowUtc), cancellationToken);
-                })
-                .Build();
+                });
         });
 
         return Task.CompletedTask;
