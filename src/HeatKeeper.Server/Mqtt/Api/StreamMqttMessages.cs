@@ -19,7 +19,7 @@ public class StreamMqttMessages(IManagedMqttClient managedMqttClient) : IQueryHa
     public async Task<ServerSentEventsResult<MqttMessage>> HandleAsync(StreamMqttMessagesQuery query, CancellationToken cancellationToken = default)
     {
         var messages = GetMessagesAsync(query.Topic, cancellationToken);
-        return await Task.FromResult(TypedResults.ServerSentEvents(messages));
+        return TypedResults.ServerSentEvents(messages);
     }
 
     private async IAsyncEnumerable<MqttMessage> GetMessagesAsync(string topic, [EnumeratorCancellation] CancellationToken cancellationToken)
