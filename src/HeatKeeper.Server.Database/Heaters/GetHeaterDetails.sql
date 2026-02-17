@@ -6,7 +6,7 @@ SELECT
     h.MqttTopic,
     h.OnPayload,
     h.OffPayload,
-    h.Enabled
+    h.HeaterState
 FROM
     Heaters h
     INNER JOIN Zones z ON h.ZoneId = z.Id

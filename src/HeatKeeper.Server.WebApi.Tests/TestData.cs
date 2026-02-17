@@ -1,6 +1,7 @@
 using System;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.EnergyPriceAreas.Api;
+using HeatKeeper.Server.Heaters;
 using HeatKeeper.Server.Heaters.Api;
 using HeatKeeper.Server.Lights.Api;
 using HeatKeeper.Server.Locations;
@@ -190,7 +191,7 @@ namespace HeatKeeper.Server.WebApi.Tests
                 new(Name: TestHeaterName, Description: TestHeaterDescription, MqttTopic: TestHeaterMqttTopic, OnPayload: TestHeaterOnPayload, OffPayload: TestHeaterOffPayload, ZoneId: testZoneId);
 
             public static UpdateHeaterCommand UpdateHeater(long heaterId) =>
-                new(heaterId, UpdatedLivingRoomHeaterName, UpdatedLivingRoomHeaterDescription, UpdatedLivingRoomHeaterMqttTopic, UpdatedLivingRoomHeaterOnPayload, UpdatedLivingRoomHeaterOffPayload, true);
+                new(heaterId, UpdatedLivingRoomHeaterName, UpdatedLivingRoomHeaterDescription, UpdatedLivingRoomHeaterMqttTopic, UpdatedLivingRoomHeaterOnPayload, UpdatedLivingRoomHeaterOffPayload, HeaterState.Idle);
         }
 
         public static class Lights
