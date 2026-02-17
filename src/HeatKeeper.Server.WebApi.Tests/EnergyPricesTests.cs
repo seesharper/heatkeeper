@@ -26,7 +26,7 @@ public class EnergyPricesTests : TestBase
         Factory.WithConfiguration("ENTSOE_SECURITY_TOKEN", "25dabe3a-9fe1-4074-8cca-b2b3100b26a8");
         var testLocation = await Factory.CreateTestLocation();
         var client = Factory.CreateClient();
-        var dateToImport = new DateTime(2024, 12, 14);
+        var dateToImport = new DateTime(2026, 01, 3);
         await client.ImportEnergyPrices(new ImportEnergyPricesCommand(dateToImport), testLocation.Token);
         var energyPrices = await client.GetEnergyPrices(dateToImport.ToString("yyyy-MM-dd"), testLocation.PriceAreaId, testLocation.Token);
         energyPrices.Length.Should().BeGreaterThanOrEqualTo(24);

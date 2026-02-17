@@ -67,10 +67,10 @@ public class ImportEnergyPricesCommandHandler(EntsoeClient entsoeClient, IQueryE
                 var priceInLocalCurrencyAfterSubsidy = priceInLocalCurrency;
                 if (IsNorwegianPriceArea(priceArea.EIC_Code))
                 {
-                    var priceAfterSubsidy = (priceInLocalCurrency - (decimal)73.0) * (decimal)0.90;
-                    if (priceAfterSubsidy > 0)
+                    var subsidy = (priceInLocalCurrency - (decimal)0.77) * (decimal)0.90;
+                    if (subsidy > 0)
                     {
-                        priceInLocalCurrencyAfterSubsidy = priceAfterSubsidy;
+                        priceInLocalCurrencyAfterSubsidy = priceInLocalCurrency - subsidy;
                     }
                 }
                 var priceInLocalCurrencyIncludingVAT = priceInLocalCurrency * (1 + priceArea.VATRate / 100);
