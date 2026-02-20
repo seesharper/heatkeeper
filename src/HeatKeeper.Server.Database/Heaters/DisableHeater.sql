@@ -1,7 +1,7 @@
 UPDATE
     Heaters
 SET
-    Enabled = 0,
+    HeaterState = 3,
     DisabledReason = @DisabledReason
 WHERE
     Id = @HeaterId

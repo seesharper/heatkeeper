@@ -4,7 +4,7 @@ namespace HeatKeeper.Server.Heaters.Api;
 [Get("api/heaters/{heaterId}")]
 public record HeaterDetailsQuery(long HeaterId) : IQuery<HeaterDetails>;
 
-public record HeaterDetails(long Id, string Name, string ZoneName, string Description, string MqttTopic, string OnPayload, string OffPayload, bool Enabled);
+public record HeaterDetails(long Id, string Name, string ZoneName, string Description, string MqttTopic, string OnPayload, string OffPayload, HeaterState HeaterState);
 
 public class GetHeaterDetails(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<HeaterDetailsQuery, HeaterDetails>
 {

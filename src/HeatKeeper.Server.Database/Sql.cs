@@ -364,4 +364,6 @@ public interface ISqlProvider
     string EnableLight { get; }
 
     string DisableLight { get; }
+
+    string RenameEnabledToHeaterState { get; }
 }

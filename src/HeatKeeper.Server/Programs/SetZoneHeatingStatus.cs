@@ -23,8 +23,8 @@ public class SetZoneHeatingStatus(IQueryExecutor queryExecutor, ICommandExecutor
         {
             foreach (var heaterMqttInfo in heatersMqttInfo)
             {
-                // Only turn on heaters that are enabled
-                if (heaterMqttInfo.Enabled)
+                // Only turn on heaters that are idle or active
+                if (heaterMqttInfo.HeaterState == HeaterState.Idle || heaterMqttInfo.HeaterState == HeaterState.Active)
                 {
                     await commandExecutor.ExecuteAsync(new PublishMqttMessageCommand(heaterMqttInfo.Topic, heaterMqttInfo.OnPayload), cancellationToken);
                 }

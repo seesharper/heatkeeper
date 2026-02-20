@@ -6,7 +6,7 @@ INSERT INTO
         MqttTopic,
         OnPayload,
         OffPayload,
-        Enabled
+        HeaterState
     )
 VALUES
     (
@@ -16,5 +16,5 @@ VALUES
         @MqttTopic,
         @OnPayload,
         @OffPayload,
-        @Enabled
+        @HeaterState
     );

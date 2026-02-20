@@ -1,8 +1,10 @@
+using HeatKeeper.Server.Heaters;
+
 namespace HeatKeeper.Server.Zones.Api;
 
 [RequireAdminRole]
 [Post("/api/zones/{ZoneId}/heaters")]
-public record CreateHeaterCommand(string Name, string Description, string MqttTopic, string OnPayload, string OffPayload, long ZoneId, bool Enabled = true) : PostCommand;
+public record CreateHeaterCommand(string Name, string Description, string MqttTopic, string OnPayload, string OffPayload, long ZoneId, HeaterState HeaterState = HeaterState.Idle) : PostCommand;
 
 public class CreateHeater(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<CreateHeaterCommand>
 {

@@ -6,6 +6,6 @@ SET
     MqttTopic = @MqttTopic,
     OnPayload = @OnPayload,
     OffPayload = @OffPayload,
-    Enabled = @Enabled
+    HeaterState = @HeaterState
 WHERE
     Id = @HeaterId

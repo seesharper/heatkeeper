@@ -77,19 +77,19 @@ public class HeatersTests : TestBase
         var testLocation = await Factory.CreateTestLocation();
 
         var heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
-        heater.Enabled.Should().BeTrue();
+        heater.HeaterState.Should().Be(HeaterState.Idle);
 
         await Factory.Services.GetRequiredService<ICommandHandler<DisableHeaterCommand>>()
             .HandleAsync(new DisableHeaterCommand(testLocation.LivingRoomHeaterId1, HeaterDisabledReason.User));
         heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
 
-        heater.Enabled.Should().BeFalse();
+        heater.HeaterState.Should().Be(HeaterState.Disabled);
 
         await Factory.Services.GetRequiredService<ICommandHandler<EnableHeaterCommand>>()
             .HandleAsync(new EnableHeaterCommand(testLocation.LivingRoomHeaterId1));
         heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
 
-        heater.Enabled.Should().BeTrue();
+        heater.HeaterState.Should().Be(HeaterState.Idle);
     }
 
     [Fact]
@@ -99,17 +99,17 @@ public class HeatersTests : TestBase
         var testLocation = await Factory.CreateTestLocation();
 
         var heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
-        heater.Enabled.Should().BeTrue();
+        heater.HeaterState.Should().Be(HeaterState.Idle);
 
-        await client.Patch(new UpdateHeaterCommand(testLocation.LivingRoomHeaterId1, heater.Name, heater.Description, heater.MqttTopic, heater.OnPayload, heater.OffPayload, false), testLocation.Token);
+        await client.Patch(new UpdateHeaterCommand(testLocation.LivingRoomHeaterId1, heater.Name, heater.Description, heater.MqttTopic, heater.OnPayload, heater.OffPayload, HeaterState.Disabled), testLocation.Token);
         heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
 
-        heater.Enabled.Should().BeFalse();
+        heater.HeaterState.Should().Be(HeaterState.Disabled);
 
-        await client.Patch(new UpdateHeaterCommand(testLocation.LivingRoomHeaterId1, heater.Name, heater.Description, heater.MqttTopic, heater.OnPayload, heater.OffPayload, true), testLocation.Token);
+        await client.Patch(new UpdateHeaterCommand(testLocation.LivingRoomHeaterId1, heater.Name, heater.Description, heater.MqttTopic, heater.OnPayload, heater.OffPayload, HeaterState.Idle), testLocation.Token);
         heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
 
-        heater.Enabled.Should().BeTrue();
+        heater.HeaterState.Should().Be(HeaterState.Idle);
     }
 
     [Fact]
