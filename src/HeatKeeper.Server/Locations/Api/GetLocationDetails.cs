@@ -4,7 +4,7 @@ namespace HeatKeeper.Server.Locations.Api;
 [Get("api/locations/{locationId}")]
 public record GetLocationDetailsQuery(long LocationId) : IQuery<LocationDetails>;
 
-public record LocationDetails(long Id, string Name, string Description, long? DefaultOutsideZoneId, long? DefaultInsideZoneId, long? ActiveProgramId, double? Longitude, double? Latitude);
+public record LocationDetails(long Id, string Name, string Description, long? DefaultOutsideZoneId, long? DefaultInsideZoneId, long? ActiveProgramId, double? Longitude, double? Latitude, double FixedEnergyPrice, bool UseFixedEnergyPrice);
 
 public class GetLocationDetails(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<GetLocationDetailsQuery, LocationDetails>
 {

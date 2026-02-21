@@ -6,6 +6,8 @@ SELECT
     l.DefaultOutsideZoneId,
     l.ActiveProgramId,
     l.Longitude,
-    l.Latitude
+    l.Latitude,
+    l.FixedEnergyPrice,
+    l.UseFixedEnergyPrice
 FROM Locations l
 WHERE l.id = @id

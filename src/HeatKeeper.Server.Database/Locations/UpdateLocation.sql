@@ -5,6 +5,8 @@ SET
     defaultOutsideZoneId = @defaultOutsideZoneId,
     defaultInsideZoneId = @defaultInsideZoneId,
     longitude = @longitude,
-    latitude = @latitude
+    latitude = @latitude,
+    fixedEnergyPrice = @fixedEnergyPrice,
+    useFixedEnergyPrice = @useFixedEnergyPrice
 WHERE
     id = @Id
