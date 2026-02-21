@@ -8,6 +8,7 @@ SELECT
     l.Longitude,
     l.Latitude,
     l.FixedEnergyPrice,
-    l.UseFixedEnergyPrice
+    l.UseFixedEnergyPrice,
+    l.EnergyPriceAreaId
 FROM Locations l
 WHERE l.id = @id

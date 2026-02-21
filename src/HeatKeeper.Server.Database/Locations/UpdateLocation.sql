@@ -7,6 +7,7 @@ SET
     longitude = @longitude,
     latitude = @latitude,
     fixedEnergyPrice = @fixedEnergyPrice,
-    useFixedEnergyPrice = @useFixedEnergyPrice
+    useFixedEnergyPrice = @useFixedEnergyPrice,
+    energyPriceAreaId = @energyPriceAreaId
 WHERE
     id = @Id

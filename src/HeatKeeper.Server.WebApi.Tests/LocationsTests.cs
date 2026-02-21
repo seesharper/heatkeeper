@@ -32,7 +32,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var locationId = await client.CreateLocation(TestData.Locations.Home, token);
 
-            var updateLocationCommand = new UpdateLocationCommand(locationId, TestData.Locations.Cabin.Name, TestData.Locations.Cabin.Description, null, null, TestData.Locations.Cabin.Longitude, TestData.Locations.Cabin.Latitude, 0, false);
+            var updateLocationCommand = new UpdateLocationCommand(locationId, TestData.Locations.Cabin.Name, TestData.Locations.Cabin.Description, null, null, TestData.Locations.Cabin.Longitude, TestData.Locations.Cabin.Latitude, 0, false, null);
 
 
             await client.UpdateLocation(updateLocationCommand, locationId, token);
@@ -87,7 +87,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             await client.CreateLocation(TestData.Locations.Home, token);
             var cabinLocationId = await client.CreateLocation(TestData.Locations.Cabin, token);
 
-            var updateLocationCommand = new UpdateLocationCommand(cabinLocationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, null, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude, 0, false);
+            var updateLocationCommand = new UpdateLocationCommand(cabinLocationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, null, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude, 0, false, null);
 
 
             await client.UpdateLocation(updateLocationCommand, cabinLocationId, token, problem: details => details.ShouldHaveConflictStatus());
@@ -222,7 +222,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             locationDetails.FixedEnergyPrice.Should().Be(0);
             locationDetails.UseFixedEnergyPrice.Should().BeFalse();
 
-            var updateCommand = new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, null, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude, 1.25, true);
+            var updateCommand = new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, null, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude, 1.25, true, null);
             await client.UpdateLocation(updateCommand, locationId, token);
 
             locationDetails = await client.GetLocationDetails(locationId, token);
