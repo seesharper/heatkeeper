@@ -211,6 +211,26 @@ namespace HeatKeeper.Server.WebApi.Tests
         }
 
         [Fact]
+        public async Task ShouldSetAndGetFixedEnergyPrice()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+
+            var locationId = await client.CreateLocation(TestData.Locations.Home, token);
+
+            var locationDetails = await client.GetLocationDetails(locationId, token);
+            locationDetails.FixedEnergyPrice.Should().Be(0);
+            locationDetails.UseFixedEnergyPrice.Should().BeFalse();
+
+            var updateCommand = new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, null, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude, 1.25, true);
+            await client.UpdateLocation(updateCommand, locationId, token);
+
+            locationDetails = await client.GetLocationDetails(locationId, token);
+            locationDetails.FixedEnergyPrice.Should().Be(1.25);
+            locationDetails.UseFixedEnergyPrice.Should().BeTrue();
+        }
+
+        [Fact]
         public async Task ShouldGetLocationTemperatures()
         {
             var testLocation = await Factory.CreateTestLocation();
