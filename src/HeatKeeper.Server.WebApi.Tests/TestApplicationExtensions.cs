@@ -53,7 +53,7 @@ public static class TestApplicationExtensions
         var livingRoomLightId2 = await client.CreateLight(TestData.Lights.LivingRoomLight1(livingRoomZoneId), token);
         var kitchenLightId = await client.CreateLight(TestData.Lights.KitchenLight(kitchenZoneId), token);
 
-        await client.UpdateLocation(new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, livingRoomZoneId, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude), locationId, token);
+        await client.UpdateLocation(new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, livingRoomZoneId, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude, 0, false), locationId, token);
 
         await client.AssignLocationToUser(new AssignLocationToUserCommand(1, locationId), token);
 
