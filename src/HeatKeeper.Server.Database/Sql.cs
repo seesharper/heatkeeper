@@ -368,4 +368,16 @@ public interface ISqlProvider
     string RenameEnabledToHeaterState { get; }
 
     string AddFixedEnergyPriceToLocationsTable { get; }
+
+    string AddEnergyPriceAreaIdToLocationsTable { get; }
+
+    string CreateEnergyCostsTable { get; }
+
+    string UpsertEnergyCost { get; }
+
+    string GetPreviousCumulativeReading { get; }
+
+    string GetEnergyPriceForHour { get; }
+
+    string GetSensorEnergyContext { get; }
 }
