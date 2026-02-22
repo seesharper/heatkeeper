@@ -47,8 +47,6 @@ public class CalculateEnergyCostsCommandHandler(
                     continue;
 
                 var deltaKwh = (measurement.Value - previousReading.Value) / 1000.0;
-                if (deltaKwh <= 0)
-                    continue;
 
                 var previousHourStart = TruncateToHour(previousReading.Created);
                 var currentHourStart = TruncateToHour(measurement.Created);
