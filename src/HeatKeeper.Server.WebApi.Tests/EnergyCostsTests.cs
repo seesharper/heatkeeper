@@ -215,7 +215,7 @@ public class EnergyCostsTests : TestBase
     }
 
     [Fact]
-    public async Task ShouldNotCreateEnergyCostForZeroOrNegativeDelta()
+    public async Task ShouldCreateEnergyCostRecordForZeroAndNegativeDelta()
     {
         var testLocation = await Factory.CreateTestLocation();
         var client = testLocation.HttpClient;
@@ -224,9 +224,9 @@ public class EnergyCostsTests : TestBase
         var hour = new DateTime(2024, 1, 15, 10, 0, 0, DateTimeKind.Utc);
         await InsertEnergyPrice(client, token, testLocation.PriceAreaId, hour, 1.00m, 0.80m);
 
-        // Send baseline to create the sensor
-        var m0 = new MeasurementCommand(TestData.Sensors.PowerMeter, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 100000, hour.AddMinutes(1));
-        await client.CreateMeasurements([m0], token);
+        // Baseline measurement (creates the PM sensor)
+        var m1 = new MeasurementCommand(TestData.Sensors.PowerMeter, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 100000, hour.AddMinutes(1));
+        await client.CreateMeasurements([m1], token);
 
         // Assign sensor to zone
         var powerMeterZoneId = await client.CreateZone(testLocation.LocationId, TestData.Zones.PowerMeter, token);
@@ -234,16 +234,22 @@ public class EnergyCostsTests : TestBase
         var powerMeterSensor = unassignedSensors.Single(s => s.ExternalId == TestData.Sensors.PowerMeter);
         await client.AssignZoneToSensor(new AssignZoneToSensorCommand(powerMeterSensor.Id, powerMeterZoneId), token);
 
-        // Same value (zero delta) - should be ignored
+        // Same value (zero delta) - record should still be upserted with PowerImport = 0
         var m2 = new MeasurementCommand(TestData.Sensors.PowerMeter, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 100000, hour.AddMinutes(20));
         await client.CreateMeasurements([m2], token);
 
-        // Lower value (negative delta - meter reset) - should be ignored
+        var table = await client.ExecuteDatabaseQuery("SELECT PowerImport, CostInLocalCurrency FROM EnergyCosts", token);
+        table.Rows.Length.Should().Be(1);
+        Convert.ToDouble(table.Rows[0].Cells[0].Value).Should().Be(0.0);
+        Convert.ToDecimal(table.Rows[0].Cells[1].Value).Should().Be(0.00m);
+
+        // Negative delta (e.g. meter reset) - record should still be upserted
         var m3 = new MeasurementCommand(TestData.Sensors.PowerMeter, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 50000, hour.AddMinutes(40));
         await client.CreateMeasurements([m3], token);
 
-        var table = await client.ExecuteDatabaseQuery("SELECT * FROM EnergyCosts", token);
-        table.Rows.Length.Should().Be(0);
+        table = await client.ExecuteDatabaseQuery("SELECT PowerImport FROM EnergyCosts", token);
+        table.Rows.Length.Should().Be(1);
+        Convert.ToDouble(table.Rows[0].Cells[0].Value).Should().BeLessThan(0.0);
     }
 
     [Fact]
