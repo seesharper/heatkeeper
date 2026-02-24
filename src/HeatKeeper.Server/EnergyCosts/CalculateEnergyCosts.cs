@@ -38,8 +38,10 @@ public class CalculateEnergyCostsCommandHandler(
 
             foreach (var measurement in sensorGroup.OrderBy(m => m.Created))
             {
+                var currentHourStart = TruncateToHour(measurement.Created);
+
                 var previousReadings = await queryExecutor.ExecuteAsync(
-                    new GetPreviousCumulativeReadingQuery(externalSensorId, measurement.Created),
+                    new GetPreviousCumulativeReadingQuery(externalSensorId, currentHourStart),
                     cancellationToken);
 
                 var previousReading = previousReadings.FirstOrDefault();
@@ -48,32 +50,7 @@ public class CalculateEnergyCostsCommandHandler(
 
                 var deltaKwh = (measurement.Value - previousReading.Value) / 1000.0;
 
-                var previousHourStart = TruncateToHour(previousReading.Created);
-                var currentHourStart = TruncateToHour(measurement.Created);
-
-                if (previousHourStart == currentHourStart)
-                {
-                    await UpsertCostForHour(context, currentHourStart, deltaKwh, cancellationToken);
-                }
-                else
-                {
-                    var hours = new List<DateTime>();
-                    var hourCursor = previousHourStart;
-                    while (hourCursor < currentHourStart)
-                    {
-                        hours.Add(hourCursor);
-                        hourCursor = hourCursor.AddHours(1);
-                    }
-
-                    if (hours.Count == 0)
-                        hours.Add(currentHourStart);
-
-                    var kwhPerHour = deltaKwh / hours.Count;
-                    foreach (var hour in hours)
-                    {
-                        await UpsertCostForHour(context, hour, kwhPerHour, cancellationToken);
-                    }
-                }
+                await UpsertCostForHour(context, currentHourStart, deltaKwh, cancellationToken);
             }
         }
     }
