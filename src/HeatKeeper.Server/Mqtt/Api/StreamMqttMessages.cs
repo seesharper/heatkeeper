@@ -31,17 +31,12 @@ public class StreamMqttMessages(IManagedMqttClient managedMqttClient) : IQueryHa
         var channel = System.Threading.Channels.Channel.CreateUnbounded<MqttMessage>();
 
         // Set up message handler
-        var handler = new Func<MqttApplicationMessageReceivedEventArgs, Task>(async args =>
+        var handler = new Func<MqttApplicationMessageReceivedEventArgs, Task>(args =>
         {
-
             var payload = Encoding.UTF8.GetString(args.ApplicationMessage.PayloadSegment);
-            var message = new MqttMessage(
-                args.ApplicationMessage.Topic,
-                payload,
-                DateTime.UtcNow
-            );
-            await channel.Writer.WriteAsync(message, cancellationToken);
-
+            var message = new MqttMessage(args.ApplicationMessage.Topic, payload, DateTime.UtcNow);
+            channel.Writer.TryWrite(message);
+            return Task.CompletedTask;
         });
 
         managedMqttClient.ApplicationMessageReceivedAsync += handler;
