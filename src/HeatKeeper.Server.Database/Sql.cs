@@ -384,4 +384,14 @@ public interface ISqlProvider
     string AddSmartMeterSensorIdToLocationsTable { get; }
 
     string AddEnergyCalculationStrategyToLocationsTable { get; }
+
+    string GetLocationEnergyCostSettings { get; }
+
+    string GetEnergyCostsByHourForSensor { get; }
+
+    string GetEnergyCostsByDayForSensor { get; }
+
+    string GetEnergyCostsByHourForLocation { get; }
+
+    string GetEnergyCostsByDayForLocation { get; }
 }

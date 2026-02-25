@@ -18,6 +18,8 @@ using HeatKeeper.Server.EnergyPrices.Api;
 using HeatKeeper.Server.Events.Api;
 using HeatKeeper.Server.Heaters.Api;
 using HeatKeeper.Server.Lights.Api;
+using HeatKeeper.Server.EnergyCosts;
+using HeatKeeper.Server.EnergyCosts.Api;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
@@ -558,6 +560,15 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task ChangePassword(this HttpClient client, ChangePasswordCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null) =>
             await Patch(client, "api/users/password", command, token, success, problem);
 
+
+        public static async Task<EnergyCostEntry[]> GetEnergyCosts(this HttpClient client, long locationId, TimePeriod timePeriod, string token, long? sensorId = null, DateTime? fromDateTime = null, DateTime? toDateTime = null, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        {
+            var uri = $"api/energycosts?locationId={locationId}&timePeriod={(int)timePeriod}";
+            if (sensorId.HasValue) uri += $"&sensorId={sensorId.Value}";
+            if (fromDateTime.HasValue) uri += $"&fromDateTime={fromDateTime.Value:o}";
+            if (toDateTime.HasValue) uri += $"&toDateTime={toDateTime.Value:o}";
+            return await Get<EnergyCostEntry[]>(client, uri, token, success, problem);
+        }
 
         public static async Task CreateLivingRoomTemperatureMeasurements(this HttpClient client, int count, TimeSpan interval, RetentionPolicy retentionPolicy, string token)
         {
