@@ -570,6 +570,9 @@ namespace HeatKeeper.Server.WebApi.Tests
             return await Get<EnergyCostEntry[]>(client, uri, token, success, problem);
         }
 
+        public static async Task<EnergyCostSensorInfo[]> GetEnergyCostsSensors(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<EnergyCostSensorInfo[]>(client, $"api/energycosts/sensors?locationId={locationId}", token, success, problem);
+
         public static async Task CreateLivingRoomTemperatureMeasurements(this HttpClient client, int count, TimeSpan interval, RetentionPolicy retentionPolicy, string token)
         {
             var created = TestData.Clock.Today;
