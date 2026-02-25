@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CQRS.AspNet.Testing;
 using CQRS.Command.Abstractions;
 using DbReader;
+using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Programs;
@@ -53,7 +54,7 @@ public static class TestApplicationExtensions
         var livingRoomLightId2 = await client.CreateLight(TestData.Lights.LivingRoomLight1(livingRoomZoneId), token);
         var kitchenLightId = await client.CreateLight(TestData.Lights.KitchenLight(kitchenZoneId), token);
 
-        await client.UpdateLocation(new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, livingRoomZoneId, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude, 0, false, priceAreaId), locationId, token);
+        await client.UpdateLocation(new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, livingRoomZoneId, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude, 0, false, priceAreaId, null, EnergyCalculationStrategy.Sensors), locationId, token);
 
         await client.AssignLocationToUser(new AssignLocationToUserCommand(1, locationId), token);
 

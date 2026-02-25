@@ -380,4 +380,8 @@ public interface ISqlProvider
     string GetEnergyPriceForHour { get; }
 
     string GetSensorEnergyContext { get; }
+
+    string AddSmartMeterSensorIdToLocationsTable { get; }
+
+    string AddEnergyCalculationStrategyToLocationsTable { get; }
 }

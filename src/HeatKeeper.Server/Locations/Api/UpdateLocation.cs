@@ -2,7 +2,7 @@ namespace HeatKeeper.Server.Locations.Api;
 
 [RequireAdminRole]
 [Patch("api/locations/{id}")]
-public record UpdateLocationCommand(long Id, string Name, string Description, long? DefaultOutsideZoneId, long? DefaultInsideZoneId, double? Longitude, double? Latitude, double FixedEnergyPrice, bool UseFixedEnergyPrice, long? EnergyPriceAreaId) : PatchCommand;
+public record UpdateLocationCommand(long Id, string Name, string Description, long? DefaultOutsideZoneId, long? DefaultInsideZoneId, double? Longitude, double? Latitude, double FixedEnergyPrice, bool UseFixedEnergyPrice, long? EnergyPriceAreaId, long? SmartMeterSensorId, EnergyCalculationStrategy EnergyCalculationStrategy) : PatchCommand;
 
 public class UpdateLocation(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<UpdateLocationCommand>
 {

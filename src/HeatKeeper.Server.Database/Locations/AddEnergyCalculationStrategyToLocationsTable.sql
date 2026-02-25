@@ -1,0 +1,1 @@
+ALTER TABLE Locations ADD COLUMN EnergyCalculationStrategy INTEGER NOT NULL DEFAULT 2;

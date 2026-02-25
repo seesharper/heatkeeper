@@ -1,0 +1,1 @@
+ALTER TABLE Locations ADD COLUMN SmartMeterSensorId INTEGER REFERENCES Sensors(Id);
