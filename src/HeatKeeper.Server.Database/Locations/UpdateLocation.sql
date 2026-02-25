@@ -8,6 +8,8 @@ SET
     latitude = @latitude,
     fixedEnergyPrice = @fixedEnergyPrice,
     useFixedEnergyPrice = @useFixedEnergyPrice,
-    energyPriceAreaId = @energyPriceAreaId
+    energyPriceAreaId = @energyPriceAreaId,
+    smartMeterSensorId = @smartMeterSensorId,
+    energyCalculationStrategy = @energyCalculationStrategy
 WHERE
     id = @Id

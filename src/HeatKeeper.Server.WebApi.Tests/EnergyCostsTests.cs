@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Sensors.Api;
@@ -264,7 +265,9 @@ public class EnergyCostsTests : TestBase
             TestData.Locations.Home.Latitude,
             0.75,  // fixed price per kWh
             true,  // useFixedEnergyPrice = true
-            testLocation.PriceAreaId);
+            testLocation.PriceAreaId,
+            null,
+            EnergyCalculationStrategy.Sensors);
         await client.UpdateLocation(updateCommand, testLocation.LocationId, token);
 
         var hour = new DateTime(2024, 1, 15, 10, 0, 0, DateTimeKind.Utc);

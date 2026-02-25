@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using Xunit;
 
@@ -32,7 +33,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             var locationId = await client.CreateLocation(TestData.Locations.Home, token);
 
-            var updateLocationCommand = new UpdateLocationCommand(locationId, TestData.Locations.Cabin.Name, TestData.Locations.Cabin.Description, null, null, TestData.Locations.Cabin.Longitude, TestData.Locations.Cabin.Latitude, 0, false, null);
+            var updateLocationCommand = new UpdateLocationCommand(locationId, TestData.Locations.Cabin.Name, TestData.Locations.Cabin.Description, null, null, TestData.Locations.Cabin.Longitude, TestData.Locations.Cabin.Latitude, 0, false, null, null, EnergyCalculationStrategy.Sensors);
 
 
             await client.UpdateLocation(updateLocationCommand, locationId, token);
@@ -87,7 +88,7 @@ namespace HeatKeeper.Server.WebApi.Tests
             await client.CreateLocation(TestData.Locations.Home, token);
             var cabinLocationId = await client.CreateLocation(TestData.Locations.Cabin, token);
 
-            var updateLocationCommand = new UpdateLocationCommand(cabinLocationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, null, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude, 0, false, null);
+            var updateLocationCommand = new UpdateLocationCommand(cabinLocationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, null, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude, 0, false, null, null, EnergyCalculationStrategy.Sensors);
 
 
             await client.UpdateLocation(updateLocationCommand, cabinLocationId, token, problem: details => details.ShouldHaveConflictStatus());
@@ -222,12 +223,36 @@ namespace HeatKeeper.Server.WebApi.Tests
             locationDetails.FixedEnergyPrice.Should().Be(0);
             locationDetails.UseFixedEnergyPrice.Should().BeFalse();
 
-            var updateCommand = new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, null, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude, 1.25, true, null);
+            var updateCommand = new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, null, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude, 1.25, true, null, null, EnergyCalculationStrategy.Sensors);
             await client.UpdateLocation(updateCommand, locationId, token);
 
             locationDetails = await client.GetLocationDetails(locationId, token);
             locationDetails.FixedEnergyPrice.Should().Be(1.25);
             locationDetails.UseFixedEnergyPrice.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task ShouldSetAndGetEnergyCalculationStrategy()
+        {
+            var client = Factory.CreateClient();
+            var token = await client.AuthenticateAsAdminUser();
+
+            var locationId = await client.CreateLocation(TestData.Locations.Home, token);
+
+            var locationDetails = await client.GetLocationDetails(locationId, token);
+            locationDetails.EnergyCalculationStrategy.Should().Be(EnergyCalculationStrategy.Sensors);
+            locationDetails.SmartMeterSensorId.Should().BeNull();
+
+            await client.CreateMeasurements(new[] { TestData.Measurements.CumulativePowerImportMeasurement1 }, token);
+            var unassignedSensors = await client.GetUnassignedSensors(token);
+            var smartMeterSensor = unassignedSensors.Single(s => s.ExternalId == TestData.Sensors.PowerMeter);
+
+            var updateCommand = new UpdateLocationCommand(locationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description, null, null, TestData.Locations.Home.Longitude, TestData.Locations.Home.Latitude, 0, false, null, smartMeterSensor.Id, EnergyCalculationStrategy.SmartMeter);
+            await client.UpdateLocation(updateCommand, locationId, token);
+
+            locationDetails = await client.GetLocationDetails(locationId, token);
+            locationDetails.EnergyCalculationStrategy.Should().Be(EnergyCalculationStrategy.SmartMeter);
+            locationDetails.SmartMeterSensorId.Should().Be(smartMeterSensor.Id);
         }
 
         [Fact]

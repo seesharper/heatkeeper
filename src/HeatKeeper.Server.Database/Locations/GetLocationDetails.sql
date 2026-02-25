@@ -9,6 +9,8 @@ SELECT
     l.Latitude,
     l.FixedEnergyPrice,
     l.UseFixedEnergyPrice,
-    l.EnergyPriceAreaId
+    l.EnergyPriceAreaId,
+    l.SmartMeterSensorId,
+    l.EnergyCalculationStrategy
 FROM Locations l
 WHERE l.id = @id
