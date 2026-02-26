@@ -134,7 +134,7 @@ public class GetEnergyCostsTests : TestBase
     }
 
     [Fact]
-    public async Task ShouldReturnDailyResolutionForThisYear()
+    public async Task ShouldReturnMonthlyResolutionForThisYear()
     {
         var now = DateTime.UtcNow;
         var withinThisYear = new DateTime(now.Year, 1, 15, 10, 0, 0, DateTimeKind.Utc);
@@ -144,11 +144,12 @@ public class GetEnergyCostsTests : TestBase
 
         entries.Should().HaveCountGreaterOrEqualTo(1);
         entries.All(e => e.Timestamp.Year == now.Year).Should().BeTrue();
+        entries.All(e => e.Timestamp.Day == 1).Should().BeTrue(); // monthly aggregation → timestamps on 1st of each month
         entries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
     }
 
     [Fact]
-    public async Task ShouldReturnDailyResolutionForLastYear()
+    public async Task ShouldReturnMonthlyResolutionForLastYear()
     {
         var now = DateTime.UtcNow;
         var withinLastYear = new DateTime(now.Year - 1, 6, 15, 10, 0, 0, DateTimeKind.Utc);
@@ -158,6 +159,7 @@ public class GetEnergyCostsTests : TestBase
 
         entries.Should().HaveCountGreaterOrEqualTo(1);
         entries.All(e => e.Timestamp.Year == now.Year - 1).Should().BeTrue();
+        entries.All(e => e.Timestamp.Day == 1).Should().BeTrue(); // monthly aggregation → timestamps on 1st of each month
         entries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
     }
 

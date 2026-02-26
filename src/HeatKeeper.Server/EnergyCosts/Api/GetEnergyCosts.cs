@@ -16,10 +16,10 @@ public class GetEnergyCostsQueryHandler(IDbConnection dbConnection, ISqlProvider
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var (fromDateTime, toDateTime) = GetTimeRange(query, now);
-        var isHourly = IsHourlyResolution(query.TimePeriod, fromDateTime, toDateTime);
+        var resolution = GetResolution(query.TimePeriod, fromDateTime, toDateTime);
 
         if (query.SensorId.HasValue)
-            return await QueryBySensor(query.SensorId.Value, fromDateTime, toDateTime, isHourly);
+            return await QueryBySensor(query.SensorId.Value, fromDateTime, toDateTime, resolution);
 
         var settings = (await dbConnection.ReadAsync<LocationEnergyCostSettings>(
             sqlProvider.GetLocationEnergyCostSettings,
@@ -29,21 +29,33 @@ public class GetEnergyCostsQueryHandler(IDbConnection dbConnection, ISqlProvider
         {
             if (settings.SmartMeterSensorId == null)
                 return [];
-            return await QueryBySensor(settings.SmartMeterSensorId.Value, fromDateTime, toDateTime, isHourly);
+            return await QueryBySensor(settings.SmartMeterSensorId.Value, fromDateTime, toDateTime, resolution);
         }
 
-        return await QueryByLocation(query.LocationId, fromDateTime, toDateTime, isHourly);
+        return await QueryByLocation(query.LocationId, fromDateTime, toDateTime, resolution);
     }
 
-    private async Task<EnergyCostEntry[]> QueryBySensor(long sensorId, DateTime from, DateTime to, bool isHourly)
+    private async Task<EnergyCostEntry[]> QueryBySensor(long sensorId, DateTime from, DateTime to, Resolution resolution)
     {
-        var sql = isHourly ? sqlProvider.GetEnergyCostsByHourForSensor : sqlProvider.GetEnergyCostsByDayForSensor;
+        var sql = resolution switch
+        {
+            Resolution.Hourly => sqlProvider.GetEnergyCostsByHourForSensor,
+            Resolution.Daily => sqlProvider.GetEnergyCostsByDayForSensor,
+            Resolution.Monthly => sqlProvider.GetEnergyCostsByMonthForSensor,
+            _ => throw new ArgumentOutOfRangeException(nameof(resolution))
+        };
         return (await dbConnection.ReadAsync<EnergyCostEntry>(sql, new { SensorId = sensorId, FromDateTime = from, ToDateTime = to })).ToArray();
     }
 
-    private async Task<EnergyCostEntry[]> QueryByLocation(long locationId, DateTime from, DateTime to, bool isHourly)
+    private async Task<EnergyCostEntry[]> QueryByLocation(long locationId, DateTime from, DateTime to, Resolution resolution)
     {
-        var sql = isHourly ? sqlProvider.GetEnergyCostsByHourForLocation : sqlProvider.GetEnergyCostsByDayForLocation;
+        var sql = resolution switch
+        {
+            Resolution.Hourly => sqlProvider.GetEnergyCostsByHourForLocation,
+            Resolution.Daily => sqlProvider.GetEnergyCostsByDayForLocation,
+            Resolution.Monthly => sqlProvider.GetEnergyCostsByMonthForLocation,
+            _ => throw new ArgumentOutOfRangeException(nameof(resolution))
+        };
         return (await dbConnection.ReadAsync<EnergyCostEntry>(sql, new { LocationId = locationId, FromDateTime = from, ToDateTime = to })).ToArray();
     }
 
@@ -62,18 +74,20 @@ public class GetEnergyCostsQueryHandler(IDbConnection dbConnection, ISqlProvider
             _ => throw new ArgumentOutOfRangeException(nameof(query.TimePeriod))
         };
 
-    private static bool IsHourlyResolution(TimePeriod timePeriod, DateTime from, DateTime to)
+    private static Resolution GetResolution(TimePeriod timePeriod, DateTime from, DateTime to)
         => timePeriod switch
         {
-            TimePeriod.Today => true,
-            TimePeriod.Yesterday => true,
-            TimePeriod.LastWeek => false,
-            TimePeriod.ThisWeek => false,
-            TimePeriod.ThisMonth => false,
-            TimePeriod.LastMonth => false,
-            TimePeriod.ThisYear => false,
-            TimePeriod.LastYear => false,
-            TimePeriod.Custom => (to - from).TotalHours <= 24,
+            TimePeriod.Today => Resolution.Hourly,
+            TimePeriod.Yesterday => Resolution.Hourly,
+            TimePeriod.LastWeek => Resolution.Daily,
+            TimePeriod.ThisWeek => Resolution.Daily,
+            TimePeriod.ThisMonth => Resolution.Daily,
+            TimePeriod.LastMonth => Resolution.Daily,
+            TimePeriod.ThisYear => Resolution.Monthly,
+            TimePeriod.LastYear => Resolution.Monthly,
+            TimePeriod.Custom => (to - from).TotalHours <= 24 ? Resolution.Hourly : Resolution.Daily,
             _ => throw new ArgumentOutOfRangeException(nameof(timePeriod))
         };
 }
+
+internal enum Resolution { Hourly, Daily, Monthly }
