@@ -561,11 +561,11 @@ namespace HeatKeeper.Server.WebApi.Tests
             await Patch(client, "api/users/password", command, token, success, problem);
 
 
-        public static async Task<EnergyCostEntry[]> GetEnergyCosts(this HttpClient client, long locationId, TimePeriod timePeriod, string token, long? sensorId = null, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+        public static async Task<EnergyCost> GetEnergyCosts(this HttpClient client, long locationId, TimePeriod timePeriod, string token, long? sensorId = null, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
             var uri = $"api/energy-costs?locationId={locationId}&timePeriod={(int)timePeriod}";
             if (sensorId.HasValue) uri += $"&sensorId={sensorId.Value}";
-            return await Get<EnergyCostEntry[]>(client, uri, token, success, problem);
+            return await Get<EnergyCost>(client, uri, token, success, problem);
         }
 
         public static async Task<EnergyCostSensorInfo[]> GetEnergyCostsSensors(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)

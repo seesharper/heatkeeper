@@ -4,22 +4,24 @@ namespace HeatKeeper.Server.EnergyCosts.Api;
 
 [RequireUserRole]
 [Get("api/energy-costs")]
-public record GetEnergyCostsQuery(long LocationId, long? SensorId, TimePeriod TimePeriod) : IQuery<EnergyCostEntry[]>;
+public record GetEnergyCostsQuery(long LocationId, long? SensorId, TimePeriod TimePeriod) : IQuery<EnergyCost>;
+
+public record EnergyCost(Resolution Resolution, EnergyCostEntry[] TimeSeries);
 
 public record EnergyCostEntry(DateTime Timestamp, double PowerImport, decimal CostInLocalCurrency, decimal CostInLocalCurrencyAfterSubsidy, decimal CostInLocalCurrencyWithFixedPrice);
 
 internal record LocationEnergyCostSettings(long? SmartMeterSensorId, EnergyCalculationStrategy EnergyCalculationStrategy);
 
-public class GetEnergyCostsQueryHandler(IDbConnection dbConnection, ISqlProvider sqlProvider, TimeProvider timeProvider) : IQueryHandler<GetEnergyCostsQuery, EnergyCostEntry[]>
+public class GetEnergyCostsQueryHandler(IDbConnection dbConnection, ISqlProvider sqlProvider, TimeProvider timeProvider) : IQueryHandler<GetEnergyCostsQuery, EnergyCost>
 {
-    public async Task<EnergyCostEntry[]> HandleAsync(GetEnergyCostsQuery query, CancellationToken cancellationToken = default)
+    public async Task<EnergyCost> HandleAsync(GetEnergyCostsQuery query, CancellationToken cancellationToken = default)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var (fromDateTime, toDateTime) = GetTimeRange(query, now);
         var resolution = GetResolution(query.TimePeriod);
 
         if (query.SensorId.HasValue)
-            return await QueryBySensor(query.SensorId.Value, fromDateTime, toDateTime, resolution);
+            return new EnergyCost(resolution, await QueryBySensor(query.SensorId.Value, fromDateTime, toDateTime, resolution));
 
         var settings = (await dbConnection.ReadAsync<LocationEnergyCostSettings>(
             sqlProvider.GetLocationEnergyCostSettings,
@@ -28,11 +30,11 @@ public class GetEnergyCostsQueryHandler(IDbConnection dbConnection, ISqlProvider
         if (settings?.EnergyCalculationStrategy == EnergyCalculationStrategy.SmartMeter)
         {
             if (settings.SmartMeterSensorId == null)
-                return [];
-            return await QueryBySensor(settings.SmartMeterSensorId.Value, fromDateTime, toDateTime, resolution);
+                return new EnergyCost(resolution, []);
+            return new EnergyCost(resolution, await QueryBySensor(settings.SmartMeterSensorId.Value, fromDateTime, toDateTime, resolution));
         }
 
-        return await QueryByLocation(query.LocationId, fromDateTime, toDateTime, resolution);
+        return new EnergyCost(resolution, await QueryByLocation(query.LocationId, fromDateTime, toDateTime, resolution));
     }
 
     private async Task<EnergyCostEntry[]> QueryBySensor(long sensorId, DateTime from, DateTime to, Resolution resolution)
@@ -88,4 +90,4 @@ public class GetEnergyCostsQueryHandler(IDbConnection dbConnection, ISqlProvider
         };
 }
 
-internal enum Resolution { Hourly, Daily, Monthly }
+public enum Resolution { Hourly, Daily, Monthly }
