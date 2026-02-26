@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.EnergyCosts;
+using HeatKeeper.Server.EnergyCosts.Api;
 using HeatKeeper.Server.Locations;
 using HeatKeeper.Server.Locations.Api;
 using HeatKeeper.Server.Measurements;
@@ -13,42 +14,6 @@ namespace HeatKeeper.Server.WebApi.Tests;
 
 public class GetEnergyCostsTests : TestBase
 {
-    // ─── Custom period / hourly resolution ───────────────────────────────────
-
-    [Fact]
-    public async Task ShouldReturnHourlyResolutionForCustomPeriodWithin24Hours()
-    {
-        var ctx = await SetupSensorWithEnergyCosts();
-
-        var from = ctx.Hour;
-        var to = ctx.Hour.AddHours(4);
-
-        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Custom, ctx.Token, fromDateTime: from, toDateTime: to);
-
-        entries.Should().HaveCount(2);
-        entries[0].Timestamp.Should().Be(ctx.Hour);
-        entries[0].PowerImport.Should().BeApproximately(2.0, 0.001);
-        entries[0].CostInLocalCurrency.Should().Be(3.00m);
-        entries[1].Timestamp.Should().Be(ctx.Hour.AddHours(1));
-        entries[1].PowerImport.Should().BeApproximately(1.0, 0.001);
-    }
-
-    [Fact]
-    public async Task ShouldReturnDailyResolutionForCustomPeriodExceeding24Hours()
-    {
-        var ctx = await SetupSensorWithEnergyCosts();
-
-        var from = ctx.Hour.Date;
-        var to = ctx.Hour.Date.AddDays(3);
-
-        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Custom, ctx.Token, fromDateTime: from, toDateTime: to);
-
-        entries.Should().HaveCount(1);
-        entries[0].Timestamp.Should().Be(ctx.Hour.Date);
-        entries[0].PowerImport.Should().BeApproximately(3.0, 0.001);
-        entries[0].CostInLocalCurrency.Should().Be(5.50m);  // 2*1.50 + 1*2.50
-    }
-
     // ─── TimePeriod: Today / Yesterday ───────────────────────────────────────
 
     [Fact]
@@ -57,10 +22,11 @@ public class GetEnergyCostsTests : TestBase
         var now = DateTime.UtcNow;
         var ctx = await SetupSensorWithEnergyCosts(baseHour: new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, DateTimeKind.Utc).AddHours(-2));
 
-        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Today, ctx.Token);
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Today, ctx.Token);
 
-        entries.Should().HaveCount(2);
-        entries.All(e => e.Timestamp.Date == now.Date).Should().BeTrue();
+        result.Resolution.Should().Be(Resolution.Hourly);
+        result.TimeSeries.Should().HaveCount(2);
+        result.TimeSeries.All(e => e.Timestamp.Date == now.Date).Should().BeTrue();
     }
 
     [Fact]
@@ -69,10 +35,11 @@ public class GetEnergyCostsTests : TestBase
         var yesterday = DateTime.UtcNow.Date.AddDays(-1);
         var ctx = await SetupSensorWithEnergyCosts(baseHour: new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 10, 0, 0, DateTimeKind.Utc));
 
-        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Yesterday, ctx.Token);
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Yesterday, ctx.Token);
 
-        entries.Should().HaveCount(2);
-        entries.All(e => e.Timestamp.Date == yesterday).Should().BeTrue();
+        result.Resolution.Should().Be(Resolution.Hourly);
+        result.TimeSeries.Should().HaveCount(2);
+        result.TimeSeries.All(e => e.Timestamp.Date == yesterday).Should().BeTrue();
     }
 
     [Fact]
@@ -81,11 +48,12 @@ public class GetEnergyCostsTests : TestBase
         var fiveDaysAgo = DateTime.UtcNow.Date.AddDays(-5);
         var ctx = await SetupSensorWithEnergyCosts(baseHour: new DateTime(fiveDaysAgo.Year, fiveDaysAgo.Month, fiveDaysAgo.Day, 10, 0, 0, DateTimeKind.Utc));
 
-        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.LastWeek, ctx.Token);
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.LastWeek, ctx.Token);
 
-        entries.Should().HaveCount(1);
-        entries[0].Timestamp.Date.Should().Be(fiveDaysAgo);
-        entries[0].PowerImport.Should().BeApproximately(3.0, 0.001);
+        result.Resolution.Should().Be(Resolution.Daily);
+        result.TimeSeries.Should().HaveCount(1);
+        result.TimeSeries[0].Timestamp.Date.Should().Be(fiveDaysAgo);
+        result.TimeSeries[0].PowerImport.Should().BeApproximately(3.0, 0.001);
     }
 
     [Fact]
@@ -95,11 +63,76 @@ public class GetEnergyCostsTests : TestBase
         var thisMonth = new DateTime(now.Year, now.Month, 5, 10, 0, 0, DateTimeKind.Utc);
         var ctx = await SetupSensorWithEnergyCosts(baseHour: thisMonth);
 
-        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.ThisMonth, ctx.Token);
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.ThisMonth, ctx.Token);
 
-        entries.Should().HaveCountGreaterOrEqualTo(1);
-        entries.All(e => e.Timestamp.Year == now.Year && e.Timestamp.Month == now.Month).Should().BeTrue();
-        entries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
+        result.Resolution.Should().Be(Resolution.Daily);
+        result.TimeSeries.Should().HaveCountGreaterOrEqualTo(1);
+        result.TimeSeries.All(e => e.Timestamp.Year == now.Year && e.Timestamp.Month == now.Month).Should().BeTrue();
+        result.TimeSeries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
+    }
+
+    [Fact]
+    public async Task ShouldReturnDailyResolutionForThisWeek()
+    {
+        var now = DateTime.UtcNow;
+        var mondayThisWeek = now.Date.AddDays(-(((int)now.DayOfWeek + 6) % 7));
+        var withinThisWeek = new DateTime(mondayThisWeek.Year, mondayThisWeek.Month, mondayThisWeek.Day, 10, 0, 0, DateTimeKind.Utc);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: withinThisWeek);
+
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.ThisWeek, ctx.Token);
+
+        result.Resolution.Should().Be(Resolution.Daily);
+        result.TimeSeries.Should().HaveCountGreaterOrEqualTo(1);
+        result.TimeSeries.All(e => e.Timestamp >= mondayThisWeek).Should().BeTrue();
+        result.TimeSeries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
+    }
+
+    [Fact]
+    public async Task ShouldReturnDailyResolutionForLastMonth()
+    {
+        var now = DateTime.UtcNow;
+        var firstOfLastMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc).AddMonths(-1);
+        var withinLastMonth = new DateTime(firstOfLastMonth.Year, firstOfLastMonth.Month, 15, 10, 0, 0, DateTimeKind.Utc);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: withinLastMonth);
+
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.LastMonth, ctx.Token);
+
+        result.Resolution.Should().Be(Resolution.Daily);
+        result.TimeSeries.Should().HaveCountGreaterOrEqualTo(1);
+        result.TimeSeries.All(e => e.Timestamp.Year == firstOfLastMonth.Year && e.Timestamp.Month == firstOfLastMonth.Month).Should().BeTrue();
+        result.TimeSeries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
+    }
+
+    [Fact]
+    public async Task ShouldReturnMonthlyResolutionForThisYear()
+    {
+        var now = DateTime.UtcNow;
+        var withinThisYear = new DateTime(now.Year, 1, 15, 10, 0, 0, DateTimeKind.Utc);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: withinThisYear);
+
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.ThisYear, ctx.Token);
+
+        result.Resolution.Should().Be(Resolution.Monthly);
+        result.TimeSeries.Should().HaveCountGreaterOrEqualTo(1);
+        result.TimeSeries.All(e => e.Timestamp.Year == now.Year).Should().BeTrue();
+        result.TimeSeries.All(e => e.Timestamp.Day == 1).Should().BeTrue();
+        result.TimeSeries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
+    }
+
+    [Fact]
+    public async Task ShouldReturnMonthlyResolutionForLastYear()
+    {
+        var now = DateTime.UtcNow;
+        var withinLastYear = new DateTime(now.Year - 1, 6, 15, 10, 0, 0, DateTimeKind.Utc);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: withinLastYear);
+
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.LastYear, ctx.Token);
+
+        result.Resolution.Should().Be(Resolution.Monthly);
+        result.TimeSeries.Should().HaveCountGreaterOrEqualTo(1);
+        result.TimeSeries.All(e => e.Timestamp.Year == now.Year - 1).Should().BeTrue();
+        result.TimeSeries.All(e => e.Timestamp.Day == 1).Should().BeTrue();
+        result.TimeSeries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
     }
 
     // ─── SensorId filter ─────────────────────────────────────────────────────
@@ -107,31 +140,29 @@ public class GetEnergyCostsTests : TestBase
     [Fact]
     public async Task ShouldFilterBySpecificSensor()
     {
-        var ctx = await SetupSensorWithEnergyCosts();
+        var yesterday = DateTime.UtcNow.Date.AddDays(-1);
+        var baseHour = new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 10, 0, 0, DateTimeKind.Utc);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: baseHour);
 
         // Add a second sensor with different costs
-        var hour2 = ctx.Hour;
         var zone2Id = await ctx.Client.CreateZone(ctx.LocationId, TestData.Zones.TestZone, ctx.Token);
         const string sensor2ExternalId = "SENSOR_2_FILTER_TEST";
         await ctx.Client.CreateMeasurements([
-            new MeasurementCommand(sensor2ExternalId, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 50000, hour2.AddMinutes(-5)),
+            new MeasurementCommand(sensor2ExternalId, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 50000, baseHour.AddMinutes(-5)),
         ], ctx.Token);
         var unassigned = await ctx.Client.GetUnassignedSensors(ctx.Token);
         var sensor2 = unassigned.Single(s => s.ExternalId == sensor2ExternalId);
         await ctx.Client.AssignZoneToSensor(new AssignZoneToSensorCommand(sensor2.Id, zone2Id), ctx.Token);
         await ctx.Client.CreateMeasurements([
-            new MeasurementCommand(sensor2ExternalId, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 60000, hour2.AddMinutes(30)),
+            new MeasurementCommand(sensor2ExternalId, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 60000, baseHour.AddMinutes(30)),
         ], ctx.Token);
 
-        var from = ctx.Hour.AddMinutes(-10);
-        var to = ctx.Hour.AddHours(4);
-
         // Query only for first sensor (ctx.SensorId)
-        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Custom, ctx.Token, sensorId: ctx.SensorId, fromDateTime: from, toDateTime: to);
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Yesterday, ctx.Token, sensorId: ctx.SensorId);
 
-        entries.Should().HaveCount(2);
-        entries.All(e => e.PowerImport < 5).Should().BeTrue(); // only first sensor's modest costs
-        entries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
+        result.TimeSeries.Should().HaveCount(2);
+        result.TimeSeries.All(e => e.PowerImport < 5).Should().BeTrue(); // only first sensor's modest costs
+        result.TimeSeries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
     }
 
     // ─── EnergyCalculationStrategy: Sensors (aggregate) ─────────────────────
@@ -139,29 +170,27 @@ public class GetEnergyCostsTests : TestBase
     [Fact]
     public async Task ShouldAggregateAllSensorsInLocationForSensorsStrategy()
     {
-        var ctx = await SetupSensorWithEnergyCosts();
+        var yesterday = DateTime.UtcNow.Date.AddDays(-1);
+        var baseHour = new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 10, 0, 0, DateTimeKind.Utc);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: baseHour);
 
         // Add a second sensor contributing to the same location
         var zone2Id = await ctx.Client.CreateZone(ctx.LocationId, TestData.Zones.TestZone, ctx.Token);
         const string sensor2ExternalId = "SENSOR_2_AGGREGATE_TEST";
         await ctx.Client.CreateMeasurements([
-            new MeasurementCommand(sensor2ExternalId, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 200000, ctx.Hour.AddMinutes(-5)),
+            new MeasurementCommand(sensor2ExternalId, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 200000, baseHour.AddMinutes(-5)),
         ], ctx.Token);
         var unassigned = await ctx.Client.GetUnassignedSensors(ctx.Token);
         var sensor2 = unassigned.Single(s => s.ExternalId == sensor2ExternalId);
         await ctx.Client.AssignZoneToSensor(new AssignZoneToSensorCommand(sensor2.Id, zone2Id), ctx.Token);
         await ctx.Client.CreateMeasurements([
-            new MeasurementCommand(sensor2ExternalId, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 205000, ctx.Hour.AddMinutes(30)),
+            new MeasurementCommand(sensor2ExternalId, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 205000, baseHour.AddMinutes(30)),
         ], ctx.Token);
 
-        var from = ctx.Hour.AddMinutes(-10);
-        var to = ctx.Hour.AddHours(1);
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Yesterday, ctx.Token);
 
-        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Custom, ctx.Token, fromDateTime: from, toDateTime: to);
-
-        // Should aggregate: sensor1=2kWh + sensor2=5kWh = 7kWh for first hour
-        entries.Should().HaveCount(1);
-        entries[0].PowerImport.Should().BeApproximately(7.0, 0.001);
+        // Should aggregate: sensor1=2kWh + sensor2=5kWh = 7kWh for the first hour
+        result.TimeSeries[0].PowerImport.Should().BeApproximately(7.0, 0.001);
     }
 
     // ─── EnergyCalculationStrategy: SmartMeter ───────────────────────────────
@@ -169,19 +198,21 @@ public class GetEnergyCostsTests : TestBase
     [Fact]
     public async Task ShouldUseSmartMeterSensorForSmartMeterStrategy()
     {
-        var ctx = await SetupSensorWithEnergyCosts();
+        var yesterday = DateTime.UtcNow.Date.AddDays(-1);
+        var baseHour = new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 10, 0, 0, DateTimeKind.Utc);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: baseHour);
 
         // Add a second sensor (acts as a non-smart-meter sensor)
         var zone2Id = await ctx.Client.CreateZone(ctx.LocationId, TestData.Zones.TestZone, ctx.Token);
         const string sensor2ExternalId = "SENSOR_2_SM_TEST";
         await ctx.Client.CreateMeasurements([
-            new MeasurementCommand(sensor2ExternalId, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 200000, ctx.Hour.AddMinutes(-5)),
+            new MeasurementCommand(sensor2ExternalId, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 200000, baseHour.AddMinutes(-5)),
         ], ctx.Token);
         var unassigned = await ctx.Client.GetUnassignedSensors(ctx.Token);
         var sensor2 = unassigned.Single(s => s.ExternalId == sensor2ExternalId);
         await ctx.Client.AssignZoneToSensor(new AssignZoneToSensorCommand(sensor2.Id, zone2Id), ctx.Token);
         await ctx.Client.CreateMeasurements([
-            new MeasurementCommand(sensor2ExternalId, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 205000, ctx.Hour.AddMinutes(30)),
+            new MeasurementCommand(sensor2ExternalId, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 205000, baseHour.AddMinutes(30)),
         ], ctx.Token);
 
         // Set SmartMeter strategy, designating only the first sensor as the smart meter
@@ -190,20 +221,18 @@ public class GetEnergyCostsTests : TestBase
             ctx.SensorId, EnergyCalculationStrategy.SmartMeter);
         await ctx.Client.UpdateLocation(updateCommand, ctx.LocationId, ctx.Token);
 
-        var from = ctx.Hour.AddMinutes(-10);
-        var to = ctx.Hour.AddHours(1);
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Yesterday, ctx.Token);
 
-        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Custom, ctx.Token, fromDateTime: from, toDateTime: to);
-
-        // Should only include the smart meter sensor (2 kWh), not the second sensor (5 kWh)
-        entries.Should().HaveCount(1);
-        entries[0].PowerImport.Should().BeApproximately(2.0, 0.001);
+        // Should only include the smart meter sensor (3 kWh total), never sensor2's 5 kWh per hour
+        result.TimeSeries.All(e => e.PowerImport < 5.0).Should().BeTrue();
+        result.TimeSeries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
     }
 
     [Fact]
     public async Task ShouldReturnEmptyWhenSmartMeterSensorIdNotSet()
     {
-        var ctx = await SetupSensorWithEnergyCosts();
+        var yesterday = DateTime.UtcNow.Date.AddDays(-1);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 10, 0, 0, DateTimeKind.Utc));
 
         // Set SmartMeter strategy without setting a SmartMeterSensorId
         var updateCommand = new UpdateLocationCommand(ctx.LocationId, TestData.Locations.Home.Name, TestData.Locations.Home.Description,
@@ -211,12 +240,9 @@ public class GetEnergyCostsTests : TestBase
             null, EnergyCalculationStrategy.SmartMeter);
         await ctx.Client.UpdateLocation(updateCommand, ctx.LocationId, ctx.Token);
 
-        var from = ctx.Hour.AddMinutes(-10);
-        var to = ctx.Hour.AddHours(4);
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Yesterday, ctx.Token);
 
-        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Custom, ctx.Token, fromDateTime: from, toDateTime: to);
-
-        entries.Should().BeEmpty();
+        result.TimeSeries.Should().BeEmpty();
     }
 
     // ─── Edge cases ──────────────────────────────────────────────────────────
@@ -224,30 +250,26 @@ public class GetEnergyCostsTests : TestBase
     [Fact]
     public async Task ShouldReturnEmptyWhenNoEnergyCostsInTimeRange()
     {
+        // Default baseHour is June 2024 — outside the LastYear (2025) range
         var ctx = await SetupSensorWithEnergyCosts();
 
-        var from = ctx.Hour.AddDays(10);
-        var to = ctx.Hour.AddDays(11);
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.LastYear, ctx.Token);
 
-        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Custom, ctx.Token, fromDateTime: from, toDateTime: to);
-
-        entries.Should().BeEmpty();
+        result.TimeSeries.Should().BeEmpty();
     }
 
     [Fact]
     public async Task ShouldIncludeCostColumnsForHourlyQuery()
     {
-        var ctx = await SetupSensorWithEnergyCosts();
+        var yesterday = DateTime.UtcNow.Date.AddDays(-1);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: new DateTime(yesterday.Year, yesterday.Month, yesterday.Day, 10, 0, 0, DateTimeKind.Utc));
 
-        var from = ctx.Hour;
-        var to = ctx.Hour.AddHours(1);
+        var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Yesterday, ctx.Token);
 
-        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.Custom, ctx.Token, fromDateTime: from, toDateTime: to);
-
-        entries.Should().HaveCount(1);
-        var entry = entries[0];
+        // First entry is hour 0: 2 kWh at 1.50/kWh (market), 1.20/kWh (subsidy)
+        var entry = result.TimeSeries[0];
         entry.PowerImport.Should().BeApproximately(2.0, 0.001);
-        entry.CostInLocalCurrency.Should().Be(3.00m);           // 2 kWh * 1.50
+        entry.CostInLocalCurrency.Should().Be(3.00m);             // 2 kWh * 1.50
         entry.CostInLocalCurrencyAfterSubsidy.Should().Be(2.40m); // 2 kWh * 1.20
         entry.CostInLocalCurrencyWithFixedPrice.Should().Be(3.00m); // fixed price disabled → same as market
     }

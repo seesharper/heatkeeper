@@ -394,4 +394,10 @@ public interface ISqlProvider
     string GetEnergyCostsByHourForLocation { get; }
 
     string GetEnergyCostsByDayForLocation { get; }
+
+    string GetEnergyCostsSensors { get; }
+
+    string GetEnergyCostsByMonthForLocation { get; }
+
+    string GetEnergyCostsByMonthForSensor { get; }
 }
