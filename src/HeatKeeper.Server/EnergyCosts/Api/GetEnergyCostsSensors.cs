@@ -1,7 +1,7 @@
 namespace HeatKeeper.Server.EnergyCosts.Api;
 
 [RequireUserRole]
-[Get("api/energycosts/sensors")]
+[Get("api/energy-costs/sensors")]
 public record GetEnergyCostsSensorsQuery(long LocationId) : IQuery<EnergyCostSensorInfo[]>;
 
 public record EnergyCostSensorInfo(long Id, string Name);

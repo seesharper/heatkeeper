@@ -563,7 +563,7 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task<EnergyCostEntry[]> GetEnergyCosts(this HttpClient client, long locationId, TimePeriod timePeriod, string token, long? sensorId = null, DateTime? fromDateTime = null, DateTime? toDateTime = null, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {
-            var uri = $"api/energycosts?locationId={locationId}&timePeriod={(int)timePeriod}";
+            var uri = $"api/energy-costs?locationId={locationId}&timePeriod={(int)timePeriod}";
             if (sensorId.HasValue) uri += $"&sensorId={sensorId.Value}";
             if (fromDateTime.HasValue) uri += $"&fromDateTime={fromDateTime.Value:o}";
             if (toDateTime.HasValue) uri += $"&toDateTime={toDateTime.Value:o}";
@@ -571,7 +571,7 @@ namespace HeatKeeper.Server.WebApi.Tests
         }
 
         public static async Task<EnergyCostSensorInfo[]> GetEnergyCostsSensors(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<EnergyCostSensorInfo[]>(client, $"api/energycosts/sensors?locationId={locationId}", token, success, problem);
+            => await Get<EnergyCostSensorInfo[]>(client, $"api/energy-costs/sensors?locationId={locationId}", token, success, problem);
 
         public static async Task CreateLivingRoomTemperatureMeasurements(this HttpClient client, int count, TimeSpan interval, RetentionPolicy retentionPolicy, string token)
         {

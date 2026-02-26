@@ -3,7 +3,7 @@ using HeatKeeper.Server.Locations;
 namespace HeatKeeper.Server.EnergyCosts.Api;
 
 [RequireUserRole]
-[Get("api/energycosts")]
+[Get("api/energy-costs")]
 public record GetEnergyCostsQuery(long LocationId, long? SensorId, TimePeriod TimePeriod, DateTime? FromDateTime, DateTime? ToDateTime) : IQuery<EnergyCostEntry[]>;
 
 public record EnergyCostEntry(DateTime Timestamp, double PowerImport, decimal CostInLocalCurrency, decimal CostInLocalCurrencyAfterSubsidy, decimal CostInLocalCurrencyWithFixedPrice);
