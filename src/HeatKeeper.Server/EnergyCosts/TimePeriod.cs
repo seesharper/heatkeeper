@@ -6,7 +6,6 @@ public enum TimePeriod
     Yesterday = 2,
     LastWeek = 3,
     ThisMonth = 4,
-    Custom = 5,
     ThisWeek = 6,
     LastMonth = 7,
     ThisYear = 8,

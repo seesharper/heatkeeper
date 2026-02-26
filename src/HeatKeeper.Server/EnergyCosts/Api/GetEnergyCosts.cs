@@ -4,7 +4,7 @@ namespace HeatKeeper.Server.EnergyCosts.Api;
 
 [RequireUserRole]
 [Get("api/energy-costs")]
-public record GetEnergyCostsQuery(long LocationId, long? SensorId, TimePeriod TimePeriod, DateTime? FromDateTime, DateTime? ToDateTime) : IQuery<EnergyCostEntry[]>;
+public record GetEnergyCostsQuery(long LocationId, long? SensorId, TimePeriod TimePeriod) : IQuery<EnergyCostEntry[]>;
 
 public record EnergyCostEntry(DateTime Timestamp, double PowerImport, decimal CostInLocalCurrency, decimal CostInLocalCurrencyAfterSubsidy, decimal CostInLocalCurrencyWithFixedPrice);
 
@@ -16,7 +16,7 @@ public class GetEnergyCostsQueryHandler(IDbConnection dbConnection, ISqlProvider
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var (fromDateTime, toDateTime) = GetTimeRange(query, now);
-        var resolution = GetResolution(query.TimePeriod, fromDateTime, toDateTime);
+        var resolution = GetResolution(query.TimePeriod);
 
         if (query.SensorId.HasValue)
             return await QueryBySensor(query.SensorId.Value, fromDateTime, toDateTime, resolution);
@@ -70,11 +70,10 @@ public class GetEnergyCostsQueryHandler(IDbConnection dbConnection, ISqlProvider
             TimePeriod.LastMonth => (new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc).AddMonths(-1), new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc)),
             TimePeriod.ThisYear => (new DateTime(now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc), now),
             TimePeriod.LastYear => (new DateTime(now.Year - 1, 1, 1, 0, 0, 0, DateTimeKind.Utc), new DateTime(now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc)),
-            TimePeriod.Custom => (query.FromDateTime!.Value, query.ToDateTime!.Value),
             _ => throw new ArgumentOutOfRangeException(nameof(query.TimePeriod))
         };
 
-    private static Resolution GetResolution(TimePeriod timePeriod, DateTime from, DateTime to)
+    private static Resolution GetResolution(TimePeriod timePeriod)
         => timePeriod switch
         {
             TimePeriod.Today => Resolution.Hourly,
@@ -85,7 +84,6 @@ public class GetEnergyCostsQueryHandler(IDbConnection dbConnection, ISqlProvider
             TimePeriod.LastMonth => Resolution.Daily,
             TimePeriod.ThisYear => Resolution.Monthly,
             TimePeriod.LastYear => Resolution.Monthly,
-            TimePeriod.Custom => (to - from).TotalHours <= 24 ? Resolution.Hourly : Resolution.Daily,
             _ => throw new ArgumentOutOfRangeException(nameof(timePeriod))
         };
 }
