@@ -102,6 +102,65 @@ public class GetEnergyCostsTests : TestBase
         entries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
     }
 
+    [Fact]
+    public async Task ShouldReturnDailyResolutionForThisWeek()
+    {
+        var now = DateTime.UtcNow;
+        var mondayThisWeek = now.Date.AddDays(-(((int)now.DayOfWeek + 6) % 7));
+        // Use a day that is guaranteed to be within this week
+        var withinThisWeek = new DateTime(mondayThisWeek.Year, mondayThisWeek.Month, mondayThisWeek.Day, 10, 0, 0, DateTimeKind.Utc);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: withinThisWeek);
+
+        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.ThisWeek, ctx.Token);
+
+        entries.Should().HaveCountGreaterOrEqualTo(1);
+        entries.All(e => e.Timestamp >= mondayThisWeek).Should().BeTrue();
+        entries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
+    }
+
+    [Fact]
+    public async Task ShouldReturnDailyResolutionForLastMonth()
+    {
+        var now = DateTime.UtcNow;
+        var firstOfLastMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc).AddMonths(-1);
+        var withinLastMonth = new DateTime(firstOfLastMonth.Year, firstOfLastMonth.Month, 15, 10, 0, 0, DateTimeKind.Utc);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: withinLastMonth);
+
+        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.LastMonth, ctx.Token);
+
+        entries.Should().HaveCountGreaterOrEqualTo(1);
+        entries.All(e => e.Timestamp.Year == firstOfLastMonth.Year && e.Timestamp.Month == firstOfLastMonth.Month).Should().BeTrue();
+        entries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
+    }
+
+    [Fact]
+    public async Task ShouldReturnDailyResolutionForThisYear()
+    {
+        var now = DateTime.UtcNow;
+        var withinThisYear = new DateTime(now.Year, 1, 15, 10, 0, 0, DateTimeKind.Utc);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: withinThisYear);
+
+        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.ThisYear, ctx.Token);
+
+        entries.Should().HaveCountGreaterOrEqualTo(1);
+        entries.All(e => e.Timestamp.Year == now.Year).Should().BeTrue();
+        entries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
+    }
+
+    [Fact]
+    public async Task ShouldReturnDailyResolutionForLastYear()
+    {
+        var now = DateTime.UtcNow;
+        var withinLastYear = new DateTime(now.Year - 1, 6, 15, 10, 0, 0, DateTimeKind.Utc);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: withinLastYear);
+
+        var entries = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.LastYear, ctx.Token);
+
+        entries.Should().HaveCountGreaterOrEqualTo(1);
+        entries.All(e => e.Timestamp.Year == now.Year - 1).Should().BeTrue();
+        entries.Sum(e => e.PowerImport).Should().BeApproximately(3.0, 0.001);
+    }
+
     // ─── SensorId filter ─────────────────────────────────────────────────────
 
     [Fact]

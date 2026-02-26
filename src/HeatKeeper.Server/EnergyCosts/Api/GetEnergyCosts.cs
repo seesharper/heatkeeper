@@ -53,7 +53,11 @@ public class GetEnergyCostsQueryHandler(IDbConnection dbConnection, ISqlProvider
             TimePeriod.Today => (now.Date, now),
             TimePeriod.Yesterday => (now.Date.AddDays(-1), now.Date),
             TimePeriod.LastWeek => (now.Date.AddDays(-7), now.Date),
+            TimePeriod.ThisWeek => (now.Date.AddDays(-(((int)now.DayOfWeek + 6) % 7)), now),
             TimePeriod.ThisMonth => (new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc), now),
+            TimePeriod.LastMonth => (new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc).AddMonths(-1), new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc)),
+            TimePeriod.ThisYear => (new DateTime(now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc), now),
+            TimePeriod.LastYear => (new DateTime(now.Year - 1, 1, 1, 0, 0, 0, DateTimeKind.Utc), new DateTime(now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc)),
             TimePeriod.Custom => (query.FromDateTime!.Value, query.ToDateTime!.Value),
             _ => throw new ArgumentOutOfRangeException(nameof(query.TimePeriod))
         };
@@ -64,7 +68,11 @@ public class GetEnergyCostsQueryHandler(IDbConnection dbConnection, ISqlProvider
             TimePeriod.Today => true,
             TimePeriod.Yesterday => true,
             TimePeriod.LastWeek => false,
+            TimePeriod.ThisWeek => false,
             TimePeriod.ThisMonth => false,
+            TimePeriod.LastMonth => false,
+            TimePeriod.ThisYear => false,
+            TimePeriod.LastYear => false,
             TimePeriod.Custom => (to - from).TotalHours <= 24,
             _ => throw new ArgumentOutOfRangeException(nameof(timePeriod))
         };
