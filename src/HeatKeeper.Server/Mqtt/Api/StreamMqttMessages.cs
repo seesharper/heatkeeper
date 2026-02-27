@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using CQRS.Execution;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.DependencyInjection;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
@@ -14,7 +15,7 @@ public record StreamMqttMessagesQuery(string Topic) : IQuery<ServerSentEventsRes
 
 public record MqttMessage(string Topic, string Payload, DateTime Timestamp);
 
-public class StreamMqttMessages(IManagedMqttClient managedMqttClient) : IQueryHandler<StreamMqttMessagesQuery, ServerSentEventsResult<MqttMessage>>
+public class StreamMqttMessages([FromKeyedServices("StreamingMqttClient")] IManagedMqttClient managedMqttClient) : IQueryHandler<StreamMqttMessagesQuery, ServerSentEventsResult<MqttMessage>>
 {
     public async Task<ServerSentEventsResult<MqttMessage>> HandleAsync(StreamMqttMessagesQuery query, CancellationToken cancellationToken = default)
     {
