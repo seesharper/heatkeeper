@@ -7,7 +7,9 @@ namespace HeatKeeper.Server.Schedules;
 
 public class CronSchedule(string cronScheduleExpression) : ISchedule
 {
-    private readonly CronExpression _cronExpression = CronExpression.Parse(cronScheduleExpression);
+    private readonly CronExpression _cronExpression = CronExpression.Parse(
+        cronScheduleExpression,
+        cronScheduleExpression.Split(' ').Length == 6 ? CronFormat.IncludeSeconds : CronFormat.Standard);
 
     public string CronScheduleExpression { get; } = cronScheduleExpression;
 
