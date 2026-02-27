@@ -148,7 +148,7 @@ public class EventCatalogTests
         // Assert - Should have the same number of events each time (no duplicates)
         Assert.Equal(firstScanCount, secondScanCount);
         Assert.Equal(firstScanCount, thirdScanCount);
-        Assert.Equal(5, firstScanCount); // We know there are 5 events with DomainEventAttribute
+        Assert.Equal(6, firstScanCount); // We know there are 6 events with DomainEventAttribute
     }
 
     [Fact]
@@ -256,7 +256,7 @@ public class EventsApiTests : TestBase
         Assert.Contains(events, e => e.Id == 3);
 
         // Verify the count is reasonable (should have exactly the events with DomainEventAttribute)
-        Assert.Equal(5, events.Length);
+        Assert.Equal(6, events.Length);
     }
 
     [Fact]
