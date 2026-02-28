@@ -1,19 +1,24 @@
 using System.Net.Http;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace HeatKeeper.Server.WebApi.Tests
 {
     public class JsonContent : StringContent
     {
+        private static readonly JsonSerializerOptions Options = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true
+        };
+
         public JsonContent(object value)
-            : base (JsonConvert.SerializeObject(value), Encoding.UTF8,
-			"application/json")
+            : base(JsonSerializer.Serialize(value, value.GetType(), Options), Encoding.UTF8, "application/json")
         {
         }
 
         public JsonContent(object value, string mediaType)
-            : base(JsonConvert.SerializeObject(value), Encoding.UTF8, mediaType)
+            : base(JsonSerializer.Serialize(value, value.GetType(), Options), Encoding.UTF8, mediaType)
         {
         }
     }

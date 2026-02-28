@@ -78,12 +78,17 @@ namespace HeatKeeper.Server.WebApi.Tests
 
     public static partial class HttpClientExtensions
     {
+        private static readonly System.Text.Json.JsonSerializerOptions JsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
         public static async Task<T> ContentAs<T>(this HttpResponseMessage response)
         {
             var data = await response.Content.ReadAsStringAsync();
             return string.IsNullOrEmpty(data) ?
                             default :
-                            JsonConvert.DeserializeObject<T>(data);
+                            System.Text.Json.JsonSerializer.Deserialize<T>(data, JsonOptions);
         }
 
         public static async Task<string> AuthenticateAsAdminUser(this HttpClient client)

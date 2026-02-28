@@ -17,10 +17,7 @@ public static partial class TestData
         public static TriggerDefinition TemperatureTrigger => new(
             "Temperature Alert",
             1, // TemperatureReadingPayload event ID
-            new List<Condition>
-            {
-                new("Temperature", ComparisonOperator.GreaterThan, "25.0")
-            },
+            new Condition("Temperature", ComparisonOperator.GreaterThan, "25.0"),
             new List<ActionBinding>
             {
                 new(1, new Dictionary<string, string>
@@ -33,10 +30,7 @@ public static partial class TestData
         public static TriggerDefinition UpdatedTemperatureTrigger => new(
             "Updated Temperature Alert",
             1, // TemperatureReadingPayload event ID
-            new List<Condition>
-            {
-                new("Temperature", ComparisonOperator.GreaterThan, "30.0")
-            },
+            new Condition("Temperature", ComparisonOperator.GreaterThan, "30.0"),
             new List<ActionBinding>
             {
                 new(1, new Dictionary<string, string>
@@ -49,17 +43,14 @@ public static partial class TestData
         public static TriggerDefinition EmptyNameTrigger => new(
             "",
             1, // TemperatureReadingPayload event ID
-            new List<Condition>(),
+            null,
             new List<ActionBinding>()
         );
 
         public static TriggerDefinition HumidityTrigger => new(
             "Humidity Alert",
             1, // Using TemperatureReadingPayload event ID (HumidityReading doesn't exist)
-            new List<Condition>
-            {
-                new("Humidity", ComparisonOperator.LessThan, "40.0")
-            },
+            new Condition("Humidity", ComparisonOperator.LessThan, "40.0"),
             new List<ActionBinding>
             {
                 new(2, new Dictionary<string, string>
@@ -183,12 +174,13 @@ public class TriggerTests : TestBase
         var complexTrigger = new TriggerDefinition(
             "Complex Multi-Condition Trigger",
             1, // TemperatureReadingPayload event ID
-            new List<Condition>
-            {
-                new("Temperature", ComparisonOperator.GreaterThan, "18.5"),
-                new("Temperature", ComparisonOperator.LessThan, "25.0"),
-                new("Humidity", ComparisonOperator.GreaterThan, "40.0")
-            },
+            new LogicalCondition(
+                new LogicalCondition(
+                    new Condition("Temperature", ComparisonOperator.GreaterThan, "18.5"),
+                    LogicalOperator.And,
+                    new Condition("Temperature", ComparisonOperator.LessThan, "25.0")),
+                LogicalOperator.And,
+                new Condition("Humidity", ComparisonOperator.GreaterThan, "40.0")),
             new List<ActionBinding>
             {
                 new(1, new Dictionary<string, string>
@@ -224,10 +216,7 @@ public class TriggerTests : TestBase
         var originalTrigger = new TriggerDefinition(
             "JSON Fidelity Test",
             1, // TemperatureReadingPayload event ID
-            new List<Condition>
-            {
-                new("TestProperty", ComparisonOperator.Equals, "test value")
-            },
+            new Condition("TestProperty", ComparisonOperator.Equals, "test value"),
             new List<ActionBinding>
             {
                 new(999, new Dictionary<string, string>
@@ -318,7 +307,7 @@ public class TriggerTests : TestBase
         triggerDetails.Should().NotBeNull();
         triggerDetails.Name.Should().Be("Temperature Alert");
         triggerDetails.EventId.Should().Be(1);
-        triggerDetails.Conditions.Should().HaveCount(1);
+        triggerDetails.Condition.Should().BeOfType<Condition>();
         triggerDetails.Actions.Should().HaveCount(1);
     }
 
@@ -352,8 +341,7 @@ public class TriggerTests : TestBase
         triggerDetails.Should().NotBeNull();
         triggerDetails.Name.Should().Be(triggerName);
         triggerDetails.EventId.Should().Be(0); // Empty triggers have EventId 0
-        triggerDetails.Conditions.Should().NotBeNull();
-        triggerDetails.Conditions.Should().BeEmpty();
+        triggerDetails.Condition.Should().BeNull();
         triggerDetails.Actions.Should().NotBeNull();
         triggerDetails.Actions.Should().BeEmpty();
     }
@@ -375,5 +363,37 @@ public class TriggerTests : TestBase
         var definitions = await queryExecutor.ExecuteAsync(
             new GetAllEventTriggersQuery());
 
+    }
+
+    [Fact]
+    public async Task ShouldRoundTripLogicalConditionThroughApi()
+    {
+        var testLocation = await Factory.CreateTestLocation();
+        var client = testLocation.HttpClient;
+
+        var triggerId = await client.Post(CreateTemperatureTrigger);
+
+        var logicalCondition = new LogicalCondition(
+            new Condition("ZoneId", ComparisonOperator.Equals, "1"),
+            LogicalOperator.And,
+            new LogicalCondition(
+                new Condition("Name", ComparisonOperator.Equals, "Joe"),
+                LogicalOperator.Or,
+                new Condition("Name", ComparisonOperator.Equals, "Ben")));
+
+        var triggerWithLogical = new TriggerDefinition(
+            "Logical Condition Trigger",
+            1,
+            logicalCondition,
+            new List<ActionBinding>());
+
+        await client.Patch(new PatchTriggerCommand(triggerId, triggerWithLogical));
+
+        var details = await client.Get(new TriggerDetailsQuery(triggerId));
+        details.Condition.Should().BeOfType<LogicalCondition>();
+        var top = (LogicalCondition)details.Condition!;
+        top.Operator.Should().Be(LogicalOperator.And);
+        top.Left.Should().BeOfType<Condition>().Which.PropertyName.Should().Be("ZoneId");
+        top.Right.Should().BeOfType<LogicalCondition>().Which.Operator.Should().Be(LogicalOperator.Or);
     }
 }

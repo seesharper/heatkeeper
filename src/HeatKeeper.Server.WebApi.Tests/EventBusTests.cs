@@ -486,13 +486,10 @@ public class TriggerEngineIntegrationTests
         var tempHighTrigger = new TriggerDefinition(
             Name: "Turn heaters off when too warm",
             EventId: 1, // TemperatureReadingPayload event ID
-            Conditions: new List<Condition>
-            {
-                new(
+            Condition: new Condition(
                     PropertyName: "Temperature",
                     Operator: ComparisonOperator.GreaterThan,
-                    Value: "19.5")
-            },
+                    Value: "19.5"),
             Actions: new List<ActionBinding>
             {
                 new(
