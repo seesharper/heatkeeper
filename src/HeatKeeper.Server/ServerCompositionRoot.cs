@@ -75,6 +75,7 @@ public class ServerCompositionRoot : ICompositionRoot
             .RegisterSingleton<IBootStrapper>(sf => new TriggerEngineBootStrapper(sf), "TriggerEngineBootStrapper")
             .RegisterSingleton<IPasswordManager, PasswordManager>()
             .RegisterSingleton<IManagedMqttClient>(sf => CreateManagedMqttClient(sf.GetInstance<IConfiguration>()))
+            .RegisterSingleton<IManagedMqttClient>(sf => CreateManagedStreamingMqttClient(sf.GetInstance<IConfiguration>()), "StreamingMqttClient")
             .RegisterSingleton<ITokenProvider, JwtTokenProvider>()
             .RegisterSingleton<IApiKeyProvider, ApiKeyProvider>()
             .RegisterSingleton<IEmailValidator, EmailValidator>()
@@ -156,6 +157,26 @@ public class ServerCompositionRoot : ICompositionRoot
             .WithAutoReconnectDelay(TimeSpan.FromSeconds(5))
             .WithClientOptions(new MqttClientOptionsBuilder()
                 .WithClientId("HeatKeeper")
+                .WithCredentials(mqttBrokerUser, mqttBrokerPassword)
+                .WithTcpServer(mqttBrokerAddress, 1883)
+                .Build())
+            .Build();
+
+        var managedClient = new MqttFactory().CreateManagedMqttClient();
+        managedClient.StartAsync(options).Wait();
+        return managedClient;
+    }
+
+    private static IManagedMqttClient CreateManagedStreamingMqttClient(IConfiguration configuration)
+    {
+        var mqttBrokerAddress = configuration.GetMqttBrokerAddress();
+        var mqttBrokerUser = configuration.GetMqttBrokerUser();
+        var mqttBrokerPassword = configuration.GetMqttBrokerPassword();
+
+        var options = new ManagedMqttClientOptionsBuilder()
+            .WithAutoReconnectDelay(TimeSpan.FromSeconds(5))
+            .WithClientOptions(new MqttClientOptionsBuilder()
+                .WithClientId("HeatKeeper-Streaming")
                 .WithCredentials(mqttBrokerUser, mqttBrokerPassword)
                 .WithTcpServer(mqttBrokerAddress, 1883)
                 .Build())

@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using CQRS.Execution;
+using HeatKeeper.Server.Events;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace HeatKeeper.Server.SmartMeter;
@@ -8,6 +9,7 @@ namespace HeatKeeper.Server.SmartMeter;
 [RequireUserRole]
 public record GetSmartMeterReadingsQuery() : IQuery<ServerSentEventsResult<SmartMeterReadings>>;
 
+[DomainEvent(6, "Smart Meter Reading", "Published every 10 seconds with the latest smart meter data")]
 public record SmartMeterReadings(
     double ActivePowerImport,
     double CurrentPhase1,

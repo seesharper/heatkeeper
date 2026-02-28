@@ -2,6 +2,7 @@ using HeatKeeper.Abstractions;
 using HeatKeeper.Server.Lighting;
 using HeatKeeper.Server.Notifications;
 using HeatKeeper.Server.Schedules;
+using HeatKeeper.Server.SmartMeter;
 using LightInject;
 
 namespace HeatKeeper.Server.Programs;
@@ -19,6 +20,7 @@ public class JanitorBootStrapper(IServiceFactory serviceFactory) : IBootStrapper
             await commandExecutor.ExecuteAsync(new AddAllNotificationsToJanitorCommand());
             await commandExecutor.ExecuteAsync(new ScheduleSunriseAndSunsetEventsCommand(DateOnly.FromDateTime(timeProvider.GetUtcNow().Date)));
             await commandExecutor.ExecuteAsync(new ReScheduleSunriseAndSunsetEventsCommand());
+            await commandExecutor.ExecuteAsync(new ScheduleSmartMeterReadingsPublishingCommand());
         }
     }
 }
