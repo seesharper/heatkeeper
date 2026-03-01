@@ -14,6 +14,6 @@ public sealed record TriggerDefinition(
 
     [property: Key] string Name,
     int EventId,
-    IReadOnlyList<Condition> Conditions,
+    ConditionGroup? Condition,
     IReadOnlyList<ActionBinding> Actions
 );

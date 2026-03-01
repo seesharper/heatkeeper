@@ -57,7 +57,10 @@ public class ServerCompositionRoot : ICompositionRoot
         DbReaderOptions.WhenReading<decimal>().Use((rd, i) => rd.GetDecimal(i));
         DbReaderOptions.WhenReading<TriggerDefinition>().Use((rd, i) =>
         {
-            return JsonSerializer.Deserialize<TriggerDefinition>(rd.GetString(i), JsonOptions);
+            var json = rd.GetString(i);
+            if (string.IsNullOrEmpty(json))
+                return new TriggerDefinition(string.Empty, 0, null, []);
+            return JsonSerializer.Deserialize<TriggerDefinition>(json, JsonOptions);
         });
     }
 

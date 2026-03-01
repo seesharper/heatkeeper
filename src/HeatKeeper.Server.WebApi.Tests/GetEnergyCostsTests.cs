@@ -60,8 +60,8 @@ public class GetEnergyCostsTests : TestBase
     public async Task ShouldReturnDailyResolutionForThisMonth()
     {
         var now = DateTime.UtcNow;
-        var thisMonth = new DateTime(now.Year, now.Month, 5, 10, 0, 0, DateTimeKind.Utc);
-        var ctx = await SetupSensorWithEnergyCosts(baseHour: thisMonth);
+        var baseHour = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var ctx = await SetupSensorWithEnergyCosts(baseHour: baseHour);
 
         var result = await ctx.Client.GetEnergyCosts(ctx.LocationId, TimePeriod.ThisMonth, ctx.Token);
 

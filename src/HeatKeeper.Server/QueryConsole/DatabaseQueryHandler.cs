@@ -27,7 +27,7 @@ public class DatabaseQueryHandler(IDbConnection dbConnection) : IQueryHandler<Da
                     continue;
                 }
 
-                cells[i] = new Cell(dataReader.GetValue(i));
+                cells[i] = new Cell(dataReader.GetValue(i)?.ToString());
             }
 
             rows.Add(new Row(cells.ToArray()));
@@ -38,7 +38,7 @@ public class DatabaseQueryHandler(IDbConnection dbConnection) : IQueryHandler<Da
 
 public record Column(string Name);
 
-public record Cell(object Value);
+public record Cell(string? Value);
 
 public record Row(params Cell[] Cells);
 

@@ -3,6 +3,7 @@
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
@@ -113,17 +114,20 @@ public sealed class TriggerEngine(IEventBus bus, ActionCatalog catalog, ICommand
 
 
     private static bool Matches(EventEnvelope evt, TriggerDefinition trig)
-    {
-        foreach (var c in trig.Conditions)
-        {
-            var left = ReadValueFromPayload(evt.Payload, c.PropertyName);
-            var right = c.Value;
+        => Evaluate(trig.Condition, evt);
 
-            if (!Compare(left, right, c.Operator))
-                return false;
-        }
-        return true;
-    }
+    private static bool Evaluate(ConditionGroup? group, EventEnvelope evt) => group switch
+    {
+        null => true,
+        Condition c => Compare(ReadValueFromPayload(evt.Payload, c.PropertyName), c.Value, c.Operator),
+        LogicalCondition lc => lc.Operator switch
+        {
+            LogicalOperator.And => Evaluate(lc.Left, evt) && Evaluate(lc.Right, evt),
+            LogicalOperator.Or  => Evaluate(lc.Left, evt) || Evaluate(lc.Right, evt),
+            _                   => throw new ArgumentOutOfRangeException(nameof(lc.Operator))
+        },
+        _ => throw new ArgumentOutOfRangeException(nameof(group))
+    };
 
     private static object? ReadValueFromPayload(object payload, string key)
     {
@@ -174,9 +178,9 @@ public sealed class TriggerEngine(IEventBus bus, ActionCatalog catalog, ICommand
             case int iv: d = iv; return true;
             case long lv: d = lv; return true;
             case decimal dec: d = (double)dec; return true;
-            case string s when double.TryParse(s, out var parsed): d = parsed; return true;
+            case string s when double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed): d = parsed; return true;
             case JsonElement je when je.ValueKind == JsonValueKind.Number && je.TryGetDouble(out var num): d = num; return true;
-            case JsonElement je when je.ValueKind == JsonValueKind.String && double.TryParse(je.GetString(), out var parsed2): d = parsed2; return true;
+            case JsonElement je when je.ValueKind == JsonValueKind.String && double.TryParse(je.GetString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed2): d = parsed2; return true;
             default: d = default; return false;
         }
     }
