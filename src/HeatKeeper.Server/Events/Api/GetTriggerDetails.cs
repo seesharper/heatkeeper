@@ -22,6 +22,9 @@ public class GetTriggerDetails(IDbConnection dbConnection, ISqlProvider sqlProvi
         if (triggerRow == null)
             throw new InvalidOperationException($"Trigger with ID {query.TriggerId} was not found.");
 
+        if (string.IsNullOrEmpty(triggerRow.Definition))
+            return new TriggerDefinition(triggerRow.Name, 0, null, []);
+
         return JsonSerializer.Deserialize<TriggerDefinition>(triggerRow.Definition, JsonOptions)!;
     }
 }
