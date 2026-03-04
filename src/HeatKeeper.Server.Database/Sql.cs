@@ -400,4 +400,18 @@ public interface ISqlProvider
     string GetEnergyCostsByMonthForLocation { get; }
 
     string GetEnergyCostsByMonthForSensor { get; }
+
+    string GetEnergyCostsByHourForZone { get; }
+
+    string GetEnergyCostsByDayForZone { get; }
+
+    string GetEnergyCostsByMonthForZone { get; }
+
+    string CreateZoneTemperaturesTable { get; }
+
+    string GetAverageZoneTemperatureForHour { get; }
+
+    string UpsertZoneTemperature { get; }
+
+    string GetZoneTemperatures { get; }
 }
