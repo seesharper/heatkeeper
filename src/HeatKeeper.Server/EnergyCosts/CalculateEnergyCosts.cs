@@ -50,6 +50,9 @@ public class CalculateEnergyCostsCommandHandler(
 
                 var deltaKwh = (measurement.Value - previousReading.Value) / 1000.0;
 
+                if (deltaKwh < 0)
+                    continue; // meter reset detected - skip this measurement, use it as new baseline
+
                 await UpsertCostForHour(context, currentHourStart, deltaKwh, cancellationToken);
             }
         }
