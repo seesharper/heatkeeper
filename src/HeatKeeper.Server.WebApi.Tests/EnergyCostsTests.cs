@@ -210,7 +210,7 @@ public class EnergyCostsTests : TestBase
     }
 
     [Fact]
-    public async Task ShouldCreateEnergyCostRecordForZeroAndNegativeDelta()
+    public async Task ShouldCreateEnergyCostRecordForZeroDelta()
     {
         var testLocation = await Factory.CreateTestLocation();
         var client = testLocation.HttpClient;
@@ -237,14 +237,44 @@ public class EnergyCostsTests : TestBase
         table.Rows.Length.Should().Be(1);
         Convert.ToDouble(table.Rows[0].Cells[0].Value).Should().Be(0.0);
         Convert.ToDecimal(table.Rows[0].Cells[1].Value).Should().Be(0.00m);
+    }
 
-        // Negative delta (e.g. meter reset) - record should still be upserted
-        var m3 = new MeasurementCommand(TestData.Sensors.PowerMeter, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 50000, hour.AddMinutes(40));
+    [Fact]
+    public async Task ShouldSkipMeasurementOnMeterReset()
+    {
+        var testLocation = await Factory.CreateTestLocation();
+        var client = testLocation.HttpClient;
+        var token = testLocation.Token;
+
+        var hour = new DateTime(2024, 1, 15, 10, 0, 0, DateTimeKind.Utc);
+        await InsertEnergyPrice(client, token, testLocation.PriceAreaId, hour, 1.00m, 0.80m);
+
+        // Baseline measurement before the hour starts (creates the PM sensor)
+        var m1 = new MeasurementCommand(TestData.Sensors.PowerMeter, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 100000, hour.AddMinutes(-5));
+        await client.CreateMeasurements([m1], token);
+
+        // Assign sensor to zone
+        var powerMeterZoneId = await client.CreateZone(testLocation.LocationId, TestData.Zones.PowerMeter, token);
+        var unassignedSensors = await client.GetUnassignedSensors(token);
+        var powerMeterSensor = unassignedSensors.Single(s => s.ExternalId == TestData.Sensors.PowerMeter);
+        await client.AssignZoneToSensor(new AssignZoneToSensorCommand(powerMeterSensor.Id, powerMeterZoneId), token);
+
+        // Meter reset: value drops below previous reading - should be skipped, no energy cost created
+        var m2 = new MeasurementCommand(TestData.Sensors.PowerMeter, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 50000, hour.AddMinutes(20));
+        await client.CreateMeasurements([m2], token);
+
+        var table = await client.ExecuteDatabaseQuery("SELECT PowerImport FROM EnergyCosts", token);
+        table.Rows.Length.Should().Be(0);
+
+        // Next measurement after reset should use reset reading (50000) as baseline
+        var hour2 = new DateTime(2024, 1, 15, 11, 0, 0, DateTimeKind.Utc);
+        await InsertEnergyPrice(client, token, testLocation.PriceAreaId, hour2, 1.00m, 0.80m);
+        var m3 = new MeasurementCommand(TestData.Sensors.PowerMeter, MeasurementType.CumulativePowerImport, RetentionPolicy.None, 52000, hour2.AddMinutes(30));
         await client.CreateMeasurements([m3], token);
 
-        table = await client.ExecuteDatabaseQuery("SELECT PowerImport FROM EnergyCosts", token);
+        table = await client.ExecuteDatabaseQuery("SELECT PowerImport FROM EnergyCosts ORDER BY Hour", token);
         table.Rows.Length.Should().Be(1);
-        Convert.ToDouble(table.Rows[0].Cells[0].Value).Should().BeLessThan(0.0);
+        Convert.ToDouble(table.Rows[0].Cells[0].Value).Should().Be(2.0); // (52000 - 50000) / 1000
     }
 
     [Fact]
