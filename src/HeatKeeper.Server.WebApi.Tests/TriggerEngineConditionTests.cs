@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text.Json;
 using HeatKeeper.Server.Events;
+using HeatKeeper.Server.Heaters;
 
 namespace HeatKeeper.Server.WebApi.Tests;
 
@@ -342,5 +345,49 @@ public class TriggerEngineConditionTests
 
         restored!.Condition.Should().BeOfType<LogicalCondition>()
             .Which.Operator.Should().Be(LogicalOperator.Or);
+    }
+
+    // -----------------------------------------------------------------------
+    // Enum deserialization from numeric strings
+    // -----------------------------------------------------------------------
+
+    [Theory]
+    [InlineData("0", HeaterState.Idle)]
+    [InlineData("1", HeaterState.Active)]
+    [InlineData("2", HeaterState.Paused)]
+    [InlineData("3", HeaterState.Disabled)]
+    public void CreateCommandFromParameters_DeserializesEnumFromNumericString(string value, HeaterState expected)
+    {
+        var actionDetails = ActionDetailsBuilder.BuildFrom(typeof(SetHeaterStateActionCommand));
+        var parameters = new ReadOnlyDictionary<string, object?>(new Dictionary<string, object?>
+        {
+            ["LocationId"] = "1",
+            ["HeaterId"] = "42",
+            ["HeaterState"] = value
+        });
+
+        var command = (SetHeaterStateActionCommand)TriggerEngine.CreateCommandFromParameters(actionDetails, parameters);
+
+        command.HeaterState.Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData("Idle", HeaterState.Idle)]
+    [InlineData("Active", HeaterState.Active)]
+    [InlineData("Paused", HeaterState.Paused)]
+    [InlineData("Disabled", HeaterState.Disabled)]
+    public void CreateCommandFromParameters_DeserializesEnumFromNamedString(string value, HeaterState expected)
+    {
+        var actionDetails = ActionDetailsBuilder.BuildFrom(typeof(SetHeaterStateActionCommand));
+        var parameters = new ReadOnlyDictionary<string, object?>(new Dictionary<string, object?>
+        {
+            ["LocationId"] = "1",
+            ["HeaterId"] = "42",
+            ["HeaterState"] = value
+        });
+
+        var command = (SetHeaterStateActionCommand)TriggerEngine.CreateCommandFromParameters(actionDetails, parameters);
+
+        command.HeaterState.Should().Be(expected);
     }
 }

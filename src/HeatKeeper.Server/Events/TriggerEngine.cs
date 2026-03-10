@@ -243,7 +243,8 @@ public sealed class TriggerEngine(IEventBus bus, ActionCatalog catalog, ICommand
         var result = JsonSerializer.Deserialize(json, commandType, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
-            NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString
+            NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString,
+            Converters = { new EnumFromStringConverter() }
         });
 
         if (result == null)
