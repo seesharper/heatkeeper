@@ -22,6 +22,18 @@ public class HeatersTests : TestBase
     }
 
     [Fact]
+    public async Task ShouldGetHeatersByLocation()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+
+        var heaters = await client.GetHeatersByLocation(testLocation.LocationId, testLocation.Token);
+
+        heaters.Should().HaveCount(3);
+        heaters.Should().AllSatisfy(h => h.HeaterState.Should().Be(HeaterState.Idle));
+    }
+
+    [Fact]
     public async Task ShouldAddHeater()
     {
         var client = Factory.CreateClient();
@@ -110,6 +122,46 @@ public class HeatersTests : TestBase
         heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
 
         heater.HeaterState.Should().Be(HeaterState.Idle);
+    }
+
+    [Fact]
+    public async Task ShouldSetHeaterState()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+
+        var heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        heater.HeaterState.Should().Be(HeaterState.Idle);
+
+        await Factory.Services.GetRequiredService<ICommandHandler<SetHeaterStateCommand>>()
+            .HandleAsync(new SetHeaterStateCommand(testLocation.LivingRoomHeaterId1, HeaterState.Active));
+        heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        heater.HeaterState.Should().Be(HeaterState.Active);
+
+        await Factory.Services.GetRequiredService<ICommandHandler<SetHeaterStateCommand>>()
+            .HandleAsync(new SetHeaterStateCommand(testLocation.LivingRoomHeaterId1, HeaterState.Paused));
+        heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        heater.HeaterState.Should().Be(HeaterState.Paused);
+
+        await Factory.Services.GetRequiredService<ICommandHandler<SetHeaterStateCommand>>()
+            .HandleAsync(new SetHeaterStateCommand(testLocation.LivingRoomHeaterId1, HeaterState.Idle));
+        heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        heater.HeaterState.Should().Be(HeaterState.Idle);
+    }
+
+    [Fact]
+    public async Task ShouldGetHeaterStates()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+
+        var states = await client.GetHeaterStates(testLocation.Token);
+
+        states.Should().HaveCount(4);
+        states.Should().ContainSingle(s => s.Id == 0 && s.Name == "The heater is idle and not currently active.");
+        states.Should().ContainSingle(s => s.Id == 1 && s.Name == "The heater is currently active and providing heat.");
+        states.Should().ContainSingle(s => s.Id == 2 && s.Name == "The heater is temporarily paused and not providing heat, but can be resumed without re-enabling.");
+        states.Should().ContainSingle(s => s.Id == 3 && s.Name == "The heater is disabled and cannot be activated until re-enabled.");
     }
 
     [Fact]

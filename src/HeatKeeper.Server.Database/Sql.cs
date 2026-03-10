@@ -224,6 +224,8 @@ public interface ISqlProvider
 
     string GetHeaters { get; }
 
+    string GetHeatersByLocation { get; }
+
     string InsertHeater { get; }
 
     string DeleteHeater { get; }
@@ -237,6 +239,8 @@ public interface ISqlProvider
     string EnableHeater { get; }
 
     string DisableHeater { get; }
+
+    string SetHeaterState { get; }
 
     string AddEnabledColumnToHeatersTable { get; }
 

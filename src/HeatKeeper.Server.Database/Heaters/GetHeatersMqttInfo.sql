@@ -1,4 +1,5 @@
 SELECT
+    h.Id AS HeaterId,
     h.MqttTopic AS Topic,
     h.OnPayload,
     h.OffPayload,

@@ -481,11 +481,17 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<HeaterInfo[]> GetHeaters(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<HeaterInfo[]>(client, $"api/zones/{zoneId}/heaters", token, success, problem);
 
+        public static async Task<LocationHeaterInfo[]> GetHeatersByLocation(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<LocationHeaterInfo[]>(client, $"api/locations/{locationId}/heaters", token, success, problem);
+
         public static async Task<LightInfo[]> GetLights(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<LightInfo[]>(client, $"api/zones/{zoneId}/lights", token, success, problem);
 
         public static async Task<HeaterDisabledReasonInfo[]> GetHeaterDisabledReasons(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<HeaterDisabledReasonInfo[]>(client, "api/heaters/disabled-reasons", token, success, problem);
+
+        public static async Task<HeaterStateInfo[]> GetHeaterStates(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<HeaterStateInfo[]>(client, "api/heaters/states", token, success, problem);
 
         public static async Task<ScheduleInfo[]> GetSchedules(this HttpClient client, long programId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ScheduleInfo[]>(client, $"api/programs/{programId}/schedules", token, success, problem);
