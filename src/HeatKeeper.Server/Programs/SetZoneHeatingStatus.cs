@@ -27,10 +27,11 @@ public class SetZoneHeatingStatus(IQueryExecutor queryExecutor, ICommandExecutor
                 if (heaterMqttInfo.HeaterState == HeaterState.Idle || heaterMqttInfo.HeaterState == HeaterState.Active)
                 {
                     await commandExecutor.ExecuteAsync(new PublishMqttMessageCommand(heaterMqttInfo.Topic, heaterMqttInfo.OnPayload), cancellationToken);
+                    await commandExecutor.ExecuteAsync(new SetHeaterStateCommand(heaterMqttInfo.HeaterId, HeaterState.Active), cancellationToken);
                 }
                 else
                 {
-                    // Ensure disabled heaters are turned off
+                    // Ensure disabled/paused heaters are turned off
                     await commandExecutor.ExecuteAsync(new PublishMqttMessageCommand(heaterMqttInfo.Topic, heaterMqttInfo.OffPayload), cancellationToken);
                 }
             }
@@ -40,6 +41,10 @@ public class SetZoneHeatingStatus(IQueryExecutor queryExecutor, ICommandExecutor
             foreach (var heaterMqttInfo in heatersMqttInfo)
             {
                 await commandExecutor.ExecuteAsync(new PublishMqttMessageCommand(heaterMqttInfo.Topic, heaterMqttInfo.OffPayload), cancellationToken);
+                if (heaterMqttInfo.HeaterState == HeaterState.Idle || heaterMqttInfo.HeaterState == HeaterState.Active)
+                {
+                    await commandExecutor.ExecuteAsync(new SetHeaterStateCommand(heaterMqttInfo.HeaterId, HeaterState.Idle), cancellationToken);
+                }
             }
         }
     }
