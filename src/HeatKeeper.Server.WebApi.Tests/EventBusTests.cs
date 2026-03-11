@@ -6,6 +6,8 @@ using System.Net.Http;
 using System.Threading;
 using CQRS.Command.Abstractions;
 using HeatKeeper.Server.Events.Api;
+using HeatKeeper.Server.Heaters;
+using HeatKeeper.Server.SmartMeter;
 using HeatKeeper.Server.WebApi.Tests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -522,6 +524,150 @@ public class TriggerEngineIntegrationTests
         Assert.True(true); // If we get here without exceptions, the trigger processed successfully
 
         cts.Cancel();
+    }
+
+    [Fact]
+    public async Task TriggerEngine_WhenSmartMeterReadingsReceived_SetsHeaterStateToPaused()
+    {
+        // Arrange
+        var bus = new EventBus();
+        var catalog = new ActionCatalog();
+        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(SetHeaterStateActionCommand)));
+
+        var executedCommands = new List<object>();
+        var mockCommandExecutor = new MockCommandExecutor(executedCommands);
+
+        var engine = new TriggerEngine(bus, catalog, mockCommandExecutor);
+
+        var trigger = new TriggerDefinition(
+            Name: "Pause heater when high current on any phase",
+            EventId: 6, // SmartMeterReadings event ID
+            Condition: new LogicalCondition(
+                new LogicalCondition(
+                    new Condition("CurrentPhase1", ComparisonOperator.GreaterOrEqual, "10"),
+                    LogicalOperator.Or,
+                    new Condition("CurrentPhase2", ComparisonOperator.GreaterOrEqual, "10")),
+                LogicalOperator.Or,
+                new Condition("CurrentPhase3", ComparisonOperator.GreaterOrEqual, "10")),
+            Actions: new List<ActionBinding>
+            {
+                new(
+                    ActionId: 6, // SetHeaterStateActionCommand
+                    ParameterMap: new Dictionary<string, string>
+                    {
+                        ["LocationId"] = "1",
+                        ["HeaterId"] = "42",
+                        ["HeaterState"] = "2" // Paused
+                    }
+                )
+            }
+        );
+
+        engine.AddTrigger(trigger);
+
+        // Act
+        var payload = new SmartMeterReadings(
+            ActivePowerImport: 1500.0,
+            CurrentPhase1: 10.0,
+            CurrentPhase2: 10.0,
+            CurrentPhase3: 10.0,
+            VoltageBetweenPhase1AndPhase2: 400.0,
+            VoltageBetweenPhase1AndPhase3: 400.0,
+            VoltageBetweenPhase2AndPhase3: 400.0,
+            CumulativePowerImport: 5000.0,
+            Timestamp: DateTime.UtcNow
+        );
+
+        await bus.PublishAsync(payload);
+        await engine.ConsumeAllEvents();
+
+        // Assert
+        Assert.Single(executedCommands);
+        var command = Assert.IsType<SetHeaterStateActionCommand>(executedCommands[0]);
+        Assert.Equal(HeaterState.Paused, command.HeaterState);
+    }
+
+    [Fact]
+    public async Task TriggerEngine_WhenTriggerIsPatched_SetsHeaterStateToPaused()
+    {
+        // Arrange
+        var bus = new EventBus();
+        var catalog = new ActionCatalog();
+        catalog.Register(ActionDetailsBuilder.BuildFrom(typeof(SetHeaterStateActionCommand)));
+
+        var executedCommands = new List<object>();
+        var mockCommandExecutor = new MockCommandExecutor(executedCommands);
+
+        var engine = new TriggerEngine(bus, catalog, mockCommandExecutor);
+
+        var actions = new List<ActionBinding>
+        {
+            new(
+                ActionId: 6,
+                ParameterMap: new Dictionary<string, string>
+                {
+                    ["LocationId"] = "1",
+                    ["HeaterId"] = "42",
+                    ["HeaterState"] = "2" // Paused
+                }
+            )
+        };
+
+        var triggerWithHighThreshold = new TriggerDefinition(
+            Name: "Pause heater when high current on any phase",
+            EventId: 6,
+            Condition: new LogicalCondition(
+                new LogicalCondition(
+                    new Condition("CurrentPhase1", ComparisonOperator.GreaterOrEqual, "20"),
+                    LogicalOperator.Or,
+                    new Condition("CurrentPhase2", ComparisonOperator.GreaterOrEqual, "20")),
+                LogicalOperator.Or,
+                new Condition("CurrentPhase3", ComparisonOperator.GreaterOrEqual, "20")),
+            Actions: actions
+        );
+
+        engine.AddTrigger(triggerWithHighThreshold);
+
+        var payload = new SmartMeterReadings(
+            ActivePowerImport: 1500.0,
+            CurrentPhase1: 10.0,
+            CurrentPhase2: 10.0,
+            CurrentPhase3: 10.0,
+            VoltageBetweenPhase1AndPhase2: 400.0,
+            VoltageBetweenPhase1AndPhase3: 400.0,
+            VoltageBetweenPhase2AndPhase3: 400.0,
+            CumulativePowerImport: 5000.0,
+            Timestamp: DateTime.UtcNow
+        );
+
+        // Act - publish with threshold at 20, phases at 10 → trigger should not fire
+        await bus.PublishAsync(payload);
+        await engine.ConsumeAllEvents();
+
+        Assert.Empty(executedCommands);
+
+        // Patch the trigger to lower the threshold to 5
+        var triggerWithLowThreshold = triggerWithHighThreshold with
+        {
+            Condition = new LogicalCondition(
+                new LogicalCondition(
+                    new Condition("CurrentPhase1", ComparisonOperator.GreaterOrEqual, "5"),
+                    LogicalOperator.Or,
+                    new Condition("CurrentPhase2", ComparisonOperator.GreaterOrEqual, "5")),
+                LogicalOperator.Or,
+                new Condition("CurrentPhase3", ComparisonOperator.GreaterOrEqual, "5"))
+        };
+
+        engine.SetTriggers([triggerWithLowThreshold]);
+
+        // Publish again with threshold now at 5, phases at 10 → trigger should fire
+        await bus.PublishAsync(payload);
+        await engine.ConsumeAllEvents();
+
+        // Assert
+        Assert.Single(executedCommands);
+        var command = Assert.IsType<SetHeaterStateActionCommand>(executedCommands[0]);
+        Assert.Equal(HeaterState.Paused, command.HeaterState);
     }
 
     /// <summary>
