@@ -6,6 +6,10 @@ using CQRS.AspNet.Testing;
 using CQRS.Query.Abstractions;
 using HeatKeeper.Server.Events;
 using HeatKeeper.Server.Events.Api;
+using HeatKeeper.Server.Heaters;
+using HeatKeeper.Server.Measurements;
+using HeatKeeper.Server.SmartMeter;
+using Janitor;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HeatKeeper.Server.WebApi.Tests;
@@ -363,6 +367,162 @@ public class TriggerTests : TestBase
         var definitions = await queryExecutor.ExecuteAsync(
             new GetAllEventTriggersQuery());
 
+    }
+
+    [Fact]
+    public async Task WhenTriggerIsPatched_SetsHeaterStateToPaused()
+    {
+        var testLocation = await Factory.CreateTestLocation();
+        var client = testLocation.HttpClient;
+
+        var actions = new List<ActionBinding>
+        {
+            new(
+                ActionId: 6, // SetHeaterStateActionCommand
+                ParameterMap: new Dictionary<string, string>
+                {
+                    ["LocationId"] = testLocation.LocationId.ToString(),
+                    ["HeaterId"] = testLocation.LivingRoomHeaterId1.ToString(),
+                    ["HeaterState"] = "2" // Paused
+                }
+            )
+        };
+
+        // Create the trigger and patch it with a high threshold (20) so it does not fire
+        var triggerId = await client.Post(new PostTriggerCommand("Pause heater when high current on any phase"));
+
+        var triggerWithHighThreshold = new TriggerDefinition(
+            Name: "Pause heater when high current on any phase",
+            EventId: 6, // SmartMeterReadings
+            Condition: new LogicalCondition(
+                new LogicalCondition(
+                    new Condition("CurrentPhase1", ComparisonOperator.GreaterOrEqual, "20"),
+                    LogicalOperator.Or,
+                    new Condition("CurrentPhase2", ComparisonOperator.GreaterOrEqual, "20")),
+                LogicalOperator.Or,
+                new Condition("CurrentPhase3", ComparisonOperator.GreaterOrEqual, "20")),
+            Actions: actions
+        );
+
+        await client.Patch(new PatchTriggerCommand(triggerId, triggerWithHighThreshold));
+
+        // Publish SmartMeterReadings with phases at 10 — threshold is 20, trigger should not fire
+        var bus = Factory.Services.GetRequiredService<IEventBus>();
+        var triggerEngine = Factory.Services.GetRequiredService<TriggerEngine>();
+
+        var payload = new SmartMeterReadings(
+            ActivePowerImport: 1500.0,
+            CurrentPhase1: 10.0,
+            CurrentPhase2: 10.0,
+            CurrentPhase3: 10.0,
+            VoltageBetweenPhase1AndPhase2: 400.0,
+            VoltageBetweenPhase1AndPhase3: 400.0,
+            VoltageBetweenPhase2AndPhase3: 400.0,
+            CumulativePowerImport: 5000.0,
+            Timestamp: DateTime.UtcNow
+        );
+
+        await bus.PublishAsync(payload);
+        await triggerEngine.ConsumeAllEvents();
+
+        var heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        heater.HeaterState.Should().Be(HeaterState.Idle);
+
+        // Patch the trigger to lower the threshold to 5 — now it should fire
+        var triggerWithLowThreshold = triggerWithHighThreshold with
+        {
+            Condition = new LogicalCondition(
+                new LogicalCondition(
+                    new Condition("CurrentPhase1", ComparisonOperator.GreaterOrEqual, "5"),
+                    LogicalOperator.Or,
+                    new Condition("CurrentPhase2", ComparisonOperator.GreaterOrEqual, "5")),
+                LogicalOperator.Or,
+                new Condition("CurrentPhase3", ComparisonOperator.GreaterOrEqual, "5"))
+        };
+
+        await client.Patch(new PatchTriggerCommand(triggerId, triggerWithLowThreshold));
+
+        await bus.PublishAsync(payload);
+        await triggerEngine.ConsumeAllEvents();
+
+        heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        heater.HeaterState.Should().Be(HeaterState.Paused);
+    }
+
+    [Fact]
+    public async Task WhenTriggerIsPatched_PublishThroughJanitor_SetsHeaterStateToPaused()
+    {
+        var testLocation = await Factory.CreateTestLocation();
+        var client = testLocation.HttpClient;
+
+        var actions = new List<ActionBinding>
+        {
+            new(
+                ActionId: 6, // SetHeaterStateActionCommand
+                ParameterMap: new Dictionary<string, string>
+                {
+                    ["LocationId"] = testLocation.LocationId.ToString(),
+                    ["HeaterId"] = testLocation.LivingRoomHeaterId1.ToString(),
+                    ["HeaterState"] = "2" // Paused
+                }
+            )
+        };
+
+        // Create and patch the trigger with a high threshold (20) so it does not fire
+        var triggerId = await client.Post(new PostTriggerCommand("Pause heater when high current on any phase"));
+
+        var triggerWithHighThreshold = new TriggerDefinition(
+            Name: "Pause heater when high current on any phase",
+            EventId: 6, // SmartMeterReadings
+            Condition: new LogicalCondition(
+                new LogicalCondition(
+                    new Condition("CurrentPhase1", ComparisonOperator.GreaterOrEqual, "20"),
+                    LogicalOperator.Or,
+                    new Condition("CurrentPhase2", ComparisonOperator.GreaterOrEqual, "20")),
+                LogicalOperator.Or,
+                new Condition("CurrentPhase3", ComparisonOperator.GreaterOrEqual, "20")),
+            Actions: actions
+        );
+
+        await client.Patch(new PatchTriggerCommand(triggerId, triggerWithHighThreshold));
+
+        // Insert smart meter measurements with CurrentPhase1/2/3 = 10
+        // Uses the living room sensor which is already assigned to a zone so the values land in LatestZoneMeasurements
+        await client.CreateMeasurements([
+            new MeasurementCommand(TestData.Sensors.LivingRoomSensor, MeasurementType.CurrentPhase1, RetentionPolicy.None, 10, DateTime.UtcNow),
+            new MeasurementCommand(TestData.Sensors.LivingRoomSensor, MeasurementType.CurrentPhase2, RetentionPolicy.None, 10, DateTime.UtcNow),
+            new MeasurementCommand(TestData.Sensors.LivingRoomSensor, MeasurementType.CurrentPhase3, RetentionPolicy.None, 10, DateTime.UtcNow),
+        ], testLocation.Token);
+
+        var janitor = Factory.Services.GetRequiredService<IJanitor>();
+        var triggerEngine = Factory.Services.GetRequiredService<TriggerEngine>();
+
+        // Publish via janitor — threshold is 20, phases are 10, trigger should not fire
+        await janitor.Run("SmartMeterReadingsPublisher");
+        await triggerEngine.ConsumeAllEvents();
+
+        var heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        heater.HeaterState.Should().Be(HeaterState.Idle);
+
+        // Patch the trigger to lower the threshold to 5 — now it should fire
+        var triggerWithLowThreshold = triggerWithHighThreshold with
+        {
+            Condition = new LogicalCondition(
+                new LogicalCondition(
+                    new Condition("CurrentPhase1", ComparisonOperator.GreaterOrEqual, "5"),
+                    LogicalOperator.Or,
+                    new Condition("CurrentPhase2", ComparisonOperator.GreaterOrEqual, "5")),
+                LogicalOperator.Or,
+                new Condition("CurrentPhase3", ComparisonOperator.GreaterOrEqual, "5"))
+        };
+
+        await client.Patch(new PatchTriggerCommand(triggerId, triggerWithLowThreshold));
+
+        await janitor.Run("SmartMeterReadingsPublisher");
+        await triggerEngine.ConsumeAllEvents();
+
+        heater = await client.GetHeatersDetails(testLocation.LivingRoomHeaterId1, testLocation.Token);
+        heater.HeaterState.Should().Be(HeaterState.Paused);
     }
 
     [Fact]
