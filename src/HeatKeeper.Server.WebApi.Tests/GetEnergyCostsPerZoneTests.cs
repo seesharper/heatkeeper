@@ -18,7 +18,7 @@ public class GetEnergyCostsPerZoneTests : TestBase
     public async Task ShouldReturnHourlyResolutionForToday()
     {
         var now = DateTime.UtcNow;
-        var ctx = await SetupZoneWithEnergyCosts(baseHour: new DateTime(now.Year, now.Month, now.Day, 10, 0, 0, DateTimeKind.Utc));
+        var ctx = await SetupZoneWithEnergyCosts(baseHour: new DateTime(now.Year, now.Month, now.Day, Math.Max(0, now.Hour - 3), 0, 0, DateTimeKind.Utc));
 
         var result = await ExecuteQuery(ctx, TimePeriod.Today);
 
