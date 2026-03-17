@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using CQRS.Command.Abstractions;
+using CQRS.Execution;
 using HeatKeeper.Server.Events.Api;
 using HeatKeeper.Server.Heaters;
 using HeatKeeper.Server.SmartMeter;
@@ -583,8 +584,8 @@ public class TriggerEngineIntegrationTests
 
         // Assert
         Assert.Single(executedCommands);
-        var command = Assert.IsType<SetHeaterStateActionCommand>(executedCommands[0]);
-        Assert.Equal(HeaterState.Paused, command.HeaterState);
+        var scopedCommand = Assert.IsType<ScopedCommand<SetHeaterStateActionCommand>>(executedCommands[0]);
+        Assert.Equal(HeaterState.Paused, scopedCommand.Command.HeaterState);
     }
 
     [Fact]
@@ -666,8 +667,8 @@ public class TriggerEngineIntegrationTests
 
         // Assert
         Assert.Single(executedCommands);
-        var command = Assert.IsType<SetHeaterStateActionCommand>(executedCommands[0]);
-        Assert.Equal(HeaterState.Paused, command.HeaterState);
+        var scopedCommand = Assert.IsType<ScopedCommand<SetHeaterStateActionCommand>>(executedCommands[0]);
+        Assert.Equal(HeaterState.Paused, scopedCommand.Command.HeaterState);
     }
 
     /// <summary>

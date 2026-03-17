@@ -134,11 +134,14 @@ public class ServerCompositionRoot : ICompositionRoot
                 return sr.ServiceType.IsGenericType && sr.ServiceType.GetGenericTypeDefinition() == typeof(ICommandHandler<>) && sr.ImplementingType is not null && sr.ImplementingType.GetConstructors()[0].GetParameters().Any(p => p.ParameterType == typeof(IDbConnection));
             })
             .Decorate(typeof(ICommandHandler<>), typeof(CommandValidator<>))
-            .Decorate(typeof(ICommandHandler<>), typeof(AuthorizedCommandHandler<>))
+
+            // Do not decorate ScopedCommandHandler, as those execute inside their own scope where authorization is re-applied
+            .Decorate(typeof(ICommandHandler<>), typeof(AuthorizedCommandHandler<>), sr =>
+                sr.ImplementingType == null || !sr.ImplementingType.IsGenericType || sr.ImplementingType.GetGenericTypeDefinition() != typeof(ScopedCommandHandler<>))
+            
+            
             .Decorate(typeof(IQueryHandler<,>), typeof(AuthorizedQueryHandler<,>), sr =>
-            {
-                return sr.ImplementingType != null && sr.ImplementingType.IsGenericTypeDefinition && sr.ImplementingType.GetGenericTypeDefinition() != typeof(ScopedQueryHandler<,>);
-            })
+                sr.ImplementingType != null && (!sr.ImplementingType.IsGenericTypeDefinition || sr.ImplementingType.GetGenericTypeDefinition() != typeof(ScopedQueryHandler<,>)))
             .Decorate<IQueryHandler<ReadSmartMeterReadingsQuery, SmartMeterReadings>, CachedSmartMeterReadingsDecorator>();
     }
 
