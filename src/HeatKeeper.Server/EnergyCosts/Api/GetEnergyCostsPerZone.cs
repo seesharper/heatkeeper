@@ -1,5 +1,6 @@
 namespace HeatKeeper.Server.EnergyCosts.Api;
 
+[RequireBackgroundRole]
 public record EnergyCostsPerZoneQuery(long ZoneId, TimePeriod TimePeriod) : IQuery<EnergyCost>;
 
 public class GetEnergyCostsPerZoneQueryHandler(IDbConnection dbConnection, ISqlProvider sqlProvider, TimeProvider timeProvider) : IQueryHandler<EnergyCostsPerZoneQuery, EnergyCost>

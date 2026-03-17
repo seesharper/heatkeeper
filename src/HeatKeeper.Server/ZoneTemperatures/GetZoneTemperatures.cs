@@ -2,7 +2,7 @@ namespace HeatKeeper.Server.ZoneTemperatures;
 
 public record ZoneTemperature(long ZoneId, double Temperature, DateTime Hour, DateTime LastUpdate);
 
-[RequireReporterRole]
+[RequireBackgroundRole]
 public record GetZoneTemperaturesQuery(long ZoneId) : IQuery<ZoneTemperature[]>;
 
 public class GetZoneTemperaturesQueryHandler(IDbConnection dbConnection, ISqlProvider sqlProvider)
