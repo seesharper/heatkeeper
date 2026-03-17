@@ -98,13 +98,12 @@ public sealed class TriggerEngine(IEventBus bus, ActionCatalog catalog, ICommand
                     {
                         // Create the command from the resolved parameters
                         var command = CreateCommandFromParameters(actionDetails, resolved);
-
-                        // Execute the command using ICommandExecutor
-                        await commandExecutor.ExecuteAsync((dynamic)command, ct);
+                        //await commandExecutor.ExecuteAsync((dynamic)command, ct);
+                        await commandExecutor.ExecuteDynamicScopedAsync(command, ct);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"[ERROR] Failed to execute action '{actionDetails.Name}': {ex.Message}");
+                        Console.WriteLine($"[ERROR] Failed to execute action '{actionDetails.Name}': {ex}");
                         continue;
                     }
                 }

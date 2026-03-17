@@ -20,7 +20,12 @@ public class LookupAttributeIntegrationTests : TestBase
         var token = await client.AuthenticateAsAdminUser();
 
         // Act
-        var response = await client.GetAsync($"api/events/2?access_token={token}");
+        var request = new HttpRequestBuilder()
+            .WithMethod(HttpMethod.Get)
+            .AddRequestUri("api/events/2")
+            .AddBearerToken(token)
+            .Build();
+        var response = await client.SendAsync(request);
 
         // Assert
         Assert.True(response.IsSuccessStatusCode);
@@ -45,7 +50,12 @@ public class LookupAttributeIntegrationTests : TestBase
         var token = await client.AuthenticateAsAdminUser();
 
         // Act - TestTurnHeatersOffCommand has action ID -2
-        var response = await client.GetAsync($"api/actions/-2?access_token={token}");
+        var request = new HttpRequestBuilder()
+            .WithMethod(HttpMethod.Get)
+            .AddRequestUri("api/actions/-2")
+            .AddBearerToken(token)
+            .Build();
+        var response = await client.SendAsync(request);
 
         // Assert
         Assert.True(response.IsSuccessStatusCode);
@@ -70,7 +80,12 @@ public class LookupAttributeIntegrationTests : TestBase
         var token = await client.AuthenticateAsAdminUser();
 
         // Act
-        var response = await client.GetAsync($"api/events/1?access_token={token}");
+        var request = new HttpRequestBuilder()
+            .WithMethod(HttpMethod.Get)
+            .AddRequestUri("api/events/1")
+            .AddBearerToken(token)
+            .Build();
+        var response = await client.SendAsync(request);
 
         // Assert
         Assert.True(response.IsSuccessStatusCode);

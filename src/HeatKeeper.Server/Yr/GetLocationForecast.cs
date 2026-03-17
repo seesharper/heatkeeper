@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HeatKeeper.Server.Yr;
 
+[RequireBackgroundRole]
 public record GetLocationForecastQuery([property: JsonPropertyName("lat")] double Latitude, [property: JsonPropertyName("lon")] double Longitude) : IQuery<LocationForecastCompactResponse>;
 
 public class GetLocationForecastQueryHandler([FromKeyedServices("YrHttpClient")] HttpClient httpClient, IMemoryCache memoryCache) : IQueryHandler<GetLocationForecastQuery, LocationForecastCompactResponse>
