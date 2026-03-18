@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using CQRS.Execution;
 using HeatKeeper.Server.Events;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -40,7 +39,7 @@ public class GetSmartMeterReadings(IQueryExecutor queryExecutor) : IQueryHandler
         }
     }
 
-    private async Task<SmartMeterReadings> GetReadingsFromDatabase() 
-        => await queryExecutor.ExecuteScopedAsync(new ReadSmartMeterReadingsQuery(), CancellationToken.None);
+    private async Task<SmartMeterReadings> GetReadingsFromDatabase()
+        => await queryExecutor.ExecuteAsync(new ReadSmartMeterReadingsQuery(), CancellationToken.None);
 }
 
