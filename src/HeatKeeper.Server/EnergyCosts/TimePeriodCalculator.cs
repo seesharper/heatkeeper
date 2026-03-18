@@ -9,7 +9,7 @@ public static class TimePeriodCalculator
         {
             TimePeriod.Today => (now.Date, now),
             TimePeriod.Yesterday => (now.Date.AddDays(-1), now.Date),
-            TimePeriod.LastWeek => (now.Date.AddDays(-7), now.Date),
+            TimePeriod.LastWeek => (now.Date.AddDays(-(((int)now.DayOfWeek + 6) % 7) - 7), now.Date.AddDays(-(((int)now.DayOfWeek + 6) % 7))),
             TimePeriod.ThisWeek => (now.Date.AddDays(-(((int)now.DayOfWeek + 6) % 7)), now),
             TimePeriod.ThisMonth => (new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc), now),
             TimePeriod.LastMonth => (new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc).AddMonths(-1), new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc)),
