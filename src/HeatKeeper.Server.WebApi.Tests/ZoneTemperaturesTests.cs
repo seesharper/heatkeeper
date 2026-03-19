@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CQRS.Query.Abstractions;
 using FluentAssertions;
+using HeatKeeper.Server.EnergyCosts;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Sensors.Api;
 using HeatKeeper.Server.ZoneTemperatures;
@@ -13,8 +14,14 @@ namespace HeatKeeper.Server.WebApi.Tests;
 
 public class ZoneTemperaturesTests : TestBase
 {
-    // Hour used for test measurements, distinct from the 14:00 hour used by CreateTestLocation
-    private static readonly DateTime TestHour = new(1972, 1, 21, 10, 0, 0, DateTimeKind.Utc);
+    private static DateTime TestHour
+    {
+        get
+        {
+            var now = DateTime.UtcNow;
+            return new DateTime(now.Year, now.Month, now.Day, Math.Max(0, now.Hour - 2), 0, 0, DateTimeKind.Utc);
+        }
+    }
 
     [Fact]
     public async Task ShouldCreateEntryWhenTemperatureMeasurementIsInserted()
@@ -27,7 +34,7 @@ public class ZoneTemperaturesTests : TestBase
 
         var entries = await GetZoneTemperatures(testLocation, testLocation.LivingRoomZoneId);
 
-        entries.Should().ContainSingle(e => e.Hour == TestHour)
+        entries.Should().ContainSingle(e => e.Timestamp == TestHour)
             .Which.Temperature.Should().BeApproximately(21.5, 0.001);
     }
 
@@ -43,7 +50,7 @@ public class ZoneTemperaturesTests : TestBase
 
         var entries = await GetZoneTemperatures(testLocation, testLocation.LivingRoomZoneId);
 
-        entries.Should().ContainSingle(e => e.Hour == TestHour)
+        entries.Should().ContainSingle(e => e.Timestamp == TestHour)
             .Which.Temperature.Should().BeApproximately(22.0, 0.001);
     }
 
@@ -60,8 +67,8 @@ public class ZoneTemperaturesTests : TestBase
 
         var entries = await GetZoneTemperatures(testLocation, testLocation.LivingRoomZoneId);
 
-        entries.Should().Contain(e => e.Hour == TestHour).Which.Temperature.Should().BeApproximately(20.0, 0.001);
-        entries.Should().Contain(e => e.Hour == hour2).Which.Temperature.Should().BeApproximately(24.0, 0.001);
+        entries.Should().Contain(e => e.Timestamp == TestHour).Which.Temperature.Should().BeApproximately(20.0, 0.001);
+        entries.Should().Contain(e => e.Timestamp == hour2).Which.Temperature.Should().BeApproximately(24.0, 0.001);
     }
 
     [Fact]
@@ -87,7 +94,7 @@ public class ZoneTemperaturesTests : TestBase
 
         var entries = await GetZoneTemperatures(testLocation, testLocation.LivingRoomZoneId);
 
-        entries.Should().Contain(e => e.Hour == TestHour)
+        entries.Should().Contain(e => e.Timestamp == TestHour)
             .Which.Temperature.Should().BeApproximately(22.0, 0.001);
     }
 
@@ -115,8 +122,8 @@ public class ZoneTemperaturesTests : TestBase
         var livingRoom = await GetZoneTemperatures(testLocation, testLocation.LivingRoomZoneId);
         var kitchen = await GetZoneTemperatures(testLocation, testLocation.KitchenZoneId);
 
-        livingRoom.Should().Contain(e => e.Hour == TestHour).Which.Temperature.Should().BeApproximately(20.0, 0.001);
-        kitchen.Should().Contain(e => e.Hour == TestHour).Which.Temperature.Should().BeApproximately(30.0, 0.001);
+        livingRoom.Should().Contain(e => e.Timestamp == TestHour).Which.Temperature.Should().BeApproximately(20.0, 0.001);
+        kitchen.Should().Contain(e => e.Timestamp == TestHour).Which.Temperature.Should().BeApproximately(30.0, 0.001);
     }
 
     [Fact]
@@ -130,7 +137,7 @@ public class ZoneTemperaturesTests : TestBase
 
         var entries = await GetZoneTemperatures(testLocation, testLocation.LivingRoomZoneId);
 
-        entries.Should().NotContain(e => e.Hour == TestHour);
+        entries.Should().NotContain(e => e.Timestamp == TestHour);
     }
 
     [Fact]
@@ -146,7 +153,7 @@ public class ZoneTemperaturesTests : TestBase
 
         var entries = await GetZoneTemperatures(testLocation, testLocation.LivingRoomZoneId);
 
-        entries.Should().NotContain(e => e.Hour == TestHour);
+        entries.Should().NotContain(e => e.Timestamp == TestHour);
     }
 
     [Fact]
@@ -167,7 +174,7 @@ public class ZoneTemperaturesTests : TestBase
         var entries = await GetZoneTemperatures(testLocation, testLocation.LivingRoomZoneId);
 
         // Only one row for the hour; temperature is the average of both readings
-        entries.Where(e => e.Hour == TestHour).Should().ContainSingle()
+        entries.Where(e => e.Timestamp == TestHour).Should().ContainSingle()
             .Which.Temperature.Should().BeApproximately(22.0, 0.001);
     }
 
@@ -175,26 +182,30 @@ public class ZoneTemperaturesTests : TestBase
     public async Task ShouldSetLastUpdateToLatestMeasurementTimestampInBatch()
     {
         var testLocation = await Factory.CreateTestLocation();
-        var early = TestHour.AddMinutes(15);
-        var late = TestHour.AddMinutes(45);
+        var hour = TestHour;
+        var early = hour.AddMinutes(15);
+        var late = hour.AddMinutes(45);
 
         await testLocation.HttpClient.CreateMeasurements([
             Temp(TestData.Sensors.LivingRoomSensor, 20.0, early),
             Temp(TestData.Sensors.LivingRoomSensor, 24.0, late)
         ], testLocation.Token);
 
-        var entries = await GetZoneTemperatures(testLocation, testLocation.LivingRoomZoneId);
+        var table = await testLocation.HttpClient.ExecuteDatabaseQuery(
+            $"SELECT LastUpdate FROM ZoneTemperatures WHERE ZoneId = {testLocation.LivingRoomZoneId} AND Hour = '{hour:yyyy-MM-dd HH:mm:ss}'",
+            testLocation.Token);
 
-        entries.Should().Contain(e => e.Hour == TestHour)
-            .Which.LastUpdate.Should().Be(late);
+        table.Rows.Should().ContainSingle();
+        DateTime.Parse(table.Rows[0].Cells[0].Value.ToString()!).Should().Be(late);
     }
 
     [Fact]
     public async Task ShouldUpdateLastUpdateWhenLaterBatchArrivesInSameHour()
     {
         var testLocation = await Factory.CreateTestLocation();
-        var firstTime = TestHour.AddMinutes(15);
-        var secondTime = TestHour.AddMinutes(45);
+        var hour = TestHour;
+        var firstTime = hour.AddMinutes(15);
+        var secondTime = hour.AddMinutes(45);
 
         await testLocation.HttpClient.CreateMeasurements([
             Temp(TestData.Sensors.LivingRoomSensor, 20.0, firstTime)
@@ -204,10 +215,12 @@ public class ZoneTemperaturesTests : TestBase
             Temp(TestData.Sensors.LivingRoomSensor, 24.0, secondTime)
         ], testLocation.Token);
 
-        var entries = await GetZoneTemperatures(testLocation, testLocation.LivingRoomZoneId);
+        var table = await testLocation.HttpClient.ExecuteDatabaseQuery(
+            $"SELECT LastUpdate FROM ZoneTemperatures WHERE ZoneId = {testLocation.LivingRoomZoneId} AND Hour = '{hour:yyyy-MM-dd HH:mm:ss}'",
+            testLocation.Token);
 
-        entries.Should().Contain(e => e.Hour == TestHour)
-            .Which.LastUpdate.Should().Be(secondTime);
+        table.Rows.Should().ContainSingle();
+        DateTime.Parse(table.Rows[0].Cells[0].Value.ToString()!).Should().Be(secondTime);
     }
 
     [Fact]
@@ -226,14 +239,15 @@ public class ZoneTemperaturesTests : TestBase
 
         var entries = await GetZoneTemperatures(testLocation, testLocation.LivingRoomZoneId);
 
-        entries.Should().Contain(e => e.Hour == TestHour).Which.Temperature.Should().BeApproximately(20.0, 0.001);
-        entries.Should().Contain(e => e.Hour == hour2).Which.Temperature.Should().BeApproximately(24.0, 0.001);
+        entries.Should().Contain(e => e.Timestamp == TestHour).Which.Temperature.Should().BeApproximately(20.0, 0.001);
+        entries.Should().Contain(e => e.Timestamp == hour2).Which.Temperature.Should().BeApproximately(24.0, 0.001);
     }
 
-    private async Task<ZoneTemperature[]> GetZoneTemperatures(TestLocation testLocation, long zoneId)
+    private async Task<ZoneTemperatureEntry[]> GetZoneTemperatures(TestLocation testLocation, long zoneId)
     {
         var queryExecutor = testLocation.ServiceProvider.GetRequiredService<IQueryExecutor>();
-        return await queryExecutor.ExecuteAsync(new GetZoneTemperaturesQuery(zoneId));
+        var result = await queryExecutor.ExecuteAsync(new ZoneTemperaturesPerZoneQuery(zoneId, TimePeriod.Today));
+        return result.TimeSeries;
     }
 
     private static MeasurementCommand Temp(string sensorId, double value, DateTime created)

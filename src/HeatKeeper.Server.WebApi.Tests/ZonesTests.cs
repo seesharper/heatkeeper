@@ -1,5 +1,7 @@
 using System.Threading.Tasks;
 using FluentAssertions;
+using HeatKeeper.Server.EnergyCosts;
+using HeatKeeper.Server.EnergyCosts.Api;
 using HeatKeeper.Server.Sensors.Api;
 using HeatKeeper.Server.Zones.Api;
 using Xunit;
@@ -135,12 +137,13 @@ public class ZonesTests : TestBase
     [Fact]
     public async Task ShouldGetZoneInsights()
     {
-        var now = Factory.UseFakeTimeProvider(TestData.Clock.Today);
+        Factory.UseFakeTimeProvider(TestData.Clock.Today);
         var client = Factory.CreateClient();
         var testApplication = await Factory.CreateTestLocation();
 
-        var zoneInsights = await client.GetZoneInsights(testApplication.LivingRoomZoneId, TimeRange.Day, testApplication.Token);
-        zoneInsights.TemperatureMeasurements.Length.Should().Be(2);
-        zoneInsights.HumidityMeasurements.Length.Should().Be(2);
+        var zoneInsights = await client.GetZoneInsights(testApplication.LivingRoomZoneId, TimePeriod.Today, testApplication.Token);
+        zoneInsights.Temperatures.Resolution.Should().Be(Resolution.Hourly);
+        zoneInsights.Temperatures.TimeSeries.Should().NotBeEmpty();
+        zoneInsights.EnergyCosts.Resolution.Should().Be(Resolution.Hourly);
     }
 }

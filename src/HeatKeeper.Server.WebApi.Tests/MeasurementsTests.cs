@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HeatKeeper.Server.Measurements;
-using HeatKeeper.Server.Zones.Api;
 using Janitor;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -34,15 +33,15 @@ public class MeasurementsTests : TestBase
         var janitor = Factory.Services.GetRequiredService<IJanitor>();
         await janitor.Run("DeleteExpiredMeasurements");
 
-        var zoneInsights = await client.GetZoneInsights(testLocation.LivingRoomZoneId, TimeRange.Day, testLocation.Token);
-        zoneInsights.TemperatureMeasurements.Length.Should().Be(5);
+        var table = await client.ExecuteDatabaseQuery($"SELECT * FROM Measurements WHERE SensorId = {testLocation.LivingRoomSensorId}", testLocation.Token);
+        table.Rows.Length.Should().Be(5);
 
         now.Advance(TimeSpan.FromHours(1));
 
         await janitor.Run("DeleteExpiredMeasurements");
 
-        zoneInsights = await client.GetZoneInsights(testLocation.LivingRoomZoneId, TimeRange.Day, testLocation.Token);
-        zoneInsights.TemperatureMeasurements.Length.Should().Be(4);
+        table = await client.ExecuteDatabaseQuery($"SELECT * FROM Measurements WHERE SensorId = {testLocation.LivingRoomSensorId}", testLocation.Token);
+        table.Rows.Length.Should().Be(4);
     }
 
     [Fact]
