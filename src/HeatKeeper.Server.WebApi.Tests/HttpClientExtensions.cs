@@ -41,6 +41,7 @@ using HeatKeeper.Server.VATRates;
 using HeatKeeper.Server.Version;
 using HeatKeeper.Server.Zones;
 using HeatKeeper.Server.Zones.Api;
+using HeatKeeper.Server.ZoneTemperatures;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1.Mozilla;
@@ -503,8 +504,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<ZoneDetails> GetZoneDetails(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<ZoneDetails>(client, $"api/zones/{zoneId}", token, success, problem);
 
-        public static async Task<ZoneInsights> GetZoneInsights(this HttpClient client, long zoneId, TimeRange range, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-            => await Get<ZoneInsights>(client, $"api/zones/{zoneId}/insights?Range={range}", token, success, problem);
+        public static async Task<ZoneInsightsResult> GetZoneInsights(this HttpClient client, long zoneId, TimePeriod timePeriod = TimePeriod.Today, string token = null, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<ZoneInsightsResult>(client, $"api/zones/{zoneId}/insights?TimePeriod={timePeriod}", token, success, problem);
 
 
         public static async Task<SensorInfo[]> GetSensors(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
