@@ -417,5 +417,9 @@ public interface ISqlProvider
 
     string UpsertZoneTemperature { get; }
 
-    string GetZoneTemperatures { get; }
+    string GetZoneTemperaturesByHourForZone { get; }
+
+    string GetZoneTemperaturesByDayForZone { get; }
+
+    string GetZoneTemperaturesByMonthForZone { get; }
 }
