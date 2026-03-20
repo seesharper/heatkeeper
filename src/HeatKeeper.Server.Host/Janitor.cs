@@ -6,6 +6,7 @@ using HeatKeeper.Server.Host.BackgroundTasks;
 using HeatKeeper.Server.Measurements;
 using HeatKeeper.Server.Programs;
 using HeatKeeper.Server.Schedules;
+using HeatKeeper.Server.ZoneTemperatures;
 using Janitor;
 
 namespace HeatKeeper.Server.Host;
@@ -32,7 +33,12 @@ public static class JanitorServiceCollectionExtensions
                     .WithName("ImportEnergyPrices")
                     .WithScheduledTask(async (ICommandExecutor commandExecutor, TimeProvider timeProvider, CancellationToken cancellationToken)
                         => await commandExecutor.ExecuteAsync(new ImportEnergyPricesCommand(timeProvider.GetUtcNow().DateTime.AddDays(1)), cancellationToken))
-                    .WithSchedule(new CronSchedule(configuration.GetImportEnergyPricesCronExpression())));
+                    .WithSchedule(new CronSchedule(configuration.GetImportEnergyPricesCronExpression())))
+                .Schedule(builder => builder
+                    .WithName("EnsureZoneTemperatures")
+                    .WithScheduledTask(async (ICommandExecutor commandExecutor, CancellationToken cancellationToken)
+                        => await commandExecutor.ExecuteAsync(new EnsureCurrentHourZoneTemperaturesCommand(), cancellationToken))
+                    .WithSchedule(new CronSchedule("1 * * * *")));
         });
 
         services.AddHostedService<JanitorHostedService>();

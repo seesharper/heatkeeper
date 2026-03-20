@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CQRS.Command.Abstractions;
 using CQRS.Query.Abstractions;
 using FluentAssertions;
 using HeatKeeper.Server.EnergyCosts;
@@ -241,6 +242,60 @@ public class ZoneTemperaturesTests : TestBase
 
         entries.Should().Contain(e => e.Timestamp == TestHour).Which.Temperature.Should().BeApproximately(20.0, 0.001);
         entries.Should().Contain(e => e.Timestamp == hour2).Which.Temperature.Should().BeApproximately(24.0, 0.001);
+    }
+
+    [Fact]
+    public async Task ShouldInsertMissingEntryForCurrentHourFromLatestZoneMeasurement()
+    {
+        var fakeTime = Factory.UseFakeTimeProvider(TestData.Clock.Today);
+        var testLocation = await Factory.CreateTestLocation();
+
+        // Advance to next hour — sensor has not reported since the previous hour
+        fakeTime.Advance(TimeSpan.FromHours(1));
+        var nextHour = new DateTime(1972, 1, 21, 15, 0, 0, DateTimeKind.Utc);
+
+        var commandExecutor = testLocation.ServiceProvider.GetRequiredService<ICommandExecutor>();
+        await commandExecutor.ExecuteAsync(new EnsureCurrentHourZoneTemperaturesCommand());
+
+        var entries = await GetZoneTemperatures(testLocation, testLocation.LivingRoomZoneId);
+
+        entries.Should().Contain(e => e.Timestamp == nextHour)
+            .Which.Temperature.Should().BeApproximately(23.7, 0.001);
+    }
+
+    [Fact]
+    public async Task ShouldNotInsertIfEntryAlreadyExistsForCurrentHour()
+    {
+        var fakeTime = Factory.UseFakeTimeProvider(TestData.Clock.Today);
+        var testLocation = await Factory.CreateTestLocation();
+
+        // CreateTestLocation already inserted a ZoneTemperatures entry for the current hour
+        var currentHour = new DateTime(1972, 1, 21, 14, 0, 0, DateTimeKind.Utc);
+
+        var commandExecutor = testLocation.ServiceProvider.GetRequiredService<ICommandExecutor>();
+        await commandExecutor.ExecuteAsync(new EnsureCurrentHourZoneTemperaturesCommand());
+
+        var entries = await GetZoneTemperatures(testLocation, testLocation.LivingRoomZoneId);
+
+        entries.Where(e => e.Timestamp == currentHour).Should().ContainSingle()
+            .Which.Temperature.Should().BeApproximately(23.7, 0.001);
+    }
+
+    [Fact]
+    public async Task ShouldNotInsertIfNoLatestTemperatureForZone()
+    {
+        var fakeTime = Factory.UseFakeTimeProvider(TestData.Clock.Today);
+        var testLocation = await Factory.CreateTestLocation();
+
+        // Kitchen zone has no sensor assigned, so no LatestZoneMeasurements entry for temperature
+        var currentHour = new DateTime(1972, 1, 21, 14, 0, 0, DateTimeKind.Utc);
+
+        var commandExecutor = testLocation.ServiceProvider.GetRequiredService<ICommandExecutor>();
+        await commandExecutor.ExecuteAsync(new EnsureCurrentHourZoneTemperaturesCommand());
+
+        var entries = await GetZoneTemperatures(testLocation, testLocation.KitchenZoneId);
+
+        entries.Should().NotContain(e => e.Timestamp == currentHour);
     }
 
     private async Task<ZoneTemperatureEntry[]> GetZoneTemperatures(TestLocation testLocation, long zoneId)
