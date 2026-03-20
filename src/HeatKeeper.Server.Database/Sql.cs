@@ -422,4 +422,6 @@ public interface ISqlProvider
     string GetZoneTemperaturesByDayForZone { get; }
 
     string GetZoneTemperaturesByMonthForZone { get; }
+
+    string InsertMissingZoneTemperatureForCurrentHour { get; }
 }
