@@ -146,4 +146,16 @@ public class ZonesTests : TestBase
         zoneInsights.Temperatures.TimeSeries.Should().NotBeEmpty();
         zoneInsights.EnergyCosts.Resolution.Should().Be(Resolution.Hourly);
     }
+
+    [Fact]
+    public async Task ShouldGetSetPointsInZoneInsights()
+    {
+        Factory.UseFakeTimeProvider(TestData.Clock.Today);
+        var testApplication = await Factory.CreateTestLocation();
+
+        var zoneInsights = await testApplication.HttpClient.GetZoneInsights(testApplication.LivingRoomZoneId, TimePeriod.Today, testApplication.Token);
+        zoneInsights.SetPoints.Should().HaveCount(1);
+        zoneInsights.SetPoints[0].Id.Should().Be(testApplication.LivingRoomSetPointId);
+        zoneInsights.SetPoints[0].Value.Should().Be(20);
+    }
 }

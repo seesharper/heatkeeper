@@ -424,4 +424,6 @@ public interface ISqlProvider
     string GetZoneTemperaturesByMonthForZone { get; }
 
     string InsertMissingZoneTemperatureForCurrentHour { get; }
+
+    string GetSetPointsByZoneForActiveProgram { get; }
 }
