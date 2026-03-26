@@ -426,4 +426,12 @@ public interface ISqlProvider
     string InsertMissingZoneTemperatureForCurrentHour { get; }
 
     string GetSetPointsByZoneForActiveProgram { get; }
+
+    string CreateLatestSensorMeasurementsTable { get; }
+
+    string UpsertLatestSensorMeasurement { get; }
+
+    string DeleteLatestSensorMeasurements { get; }
+
+    string GetEnergyConsumers { get; }
 }

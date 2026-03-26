@@ -12,6 +12,7 @@ public class WhenMeasurementsAreInserted(ICommandHandler<MeasurementCommand[]> h
         await commandExecutor.ExecuteAsync(new CreateMissingSensorsCommand(measurements.Select(mc => mc.SensorId)), cancellationToken);
         await handler.HandleAsync(measurements, cancellationToken);
         await commandExecutor.ExecuteAsync(new MaintainLatestZoneMeasurementCommand(measurements), cancellationToken);
+        await commandExecutor.ExecuteAsync(new MaintainLatestSensorMeasurementCommand(measurements), cancellationToken);
         await commandExecutor.ExecuteAsync(new CalculateEnergyCostsCommand(measurements), cancellationToken);
         await commandExecutor.ExecuteAsync(new UpdateZoneTemperaturesCommand(measurements), cancellationToken);
         var measurementsGroupedByExternalSensorId = measurements.Select(mte => new { mte.SensorId, mte.Created }).GroupBy(mte => mte.SensorId);
