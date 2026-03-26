@@ -9,6 +9,7 @@ public class DeleteSensor(IDbConnection dbConnection, ISqlProvider sqlProvider) 
     public async Task HandleAsync(DeleteSensorCommand command, CancellationToken cancellationToken = default)
     {
         await dbConnection.ExecuteAsync(sqlProvider.DeleteSensorMeasurements, command);
+        await dbConnection.ExecuteAsync(sqlProvider.DeleteLatestSensorMeasurements, command);
         await dbConnection.ExecuteAsync(sqlProvider.DeleteSensor, command);
     }
 }
