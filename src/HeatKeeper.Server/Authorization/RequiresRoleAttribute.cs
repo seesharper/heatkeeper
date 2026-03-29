@@ -45,7 +45,7 @@ namespace HeatKeeper.Server.Authorization
 
     public class RequireBackgroundRole : RequireRoleAttribute
     {
-        public RequireBackgroundRole() : base([Roles.AdminRole, Roles.UserRole, Roles.BackgroundUserRole])
+        public RequireBackgroundRole() : base([Roles.AdminRole, Roles.UserRole, Roles.BackgroundUserRole, Roles.ReporterRole])
         {
         }
     }

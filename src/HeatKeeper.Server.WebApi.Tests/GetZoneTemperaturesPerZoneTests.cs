@@ -44,7 +44,8 @@ public class GetZoneTemperaturesPerZoneTests : TestBase
     [Fact]
     public async Task ShouldReturnDailyResolutionForLastWeek()
     {
-        var fiveDaysAgo = DateTime.UtcNow.Date.AddDays(-5);
+        Factory.UseFakeTimeProvider(TestData.Clock.Today);
+        var fiveDaysAgo = TestData.Clock.Today.Date.AddDays(-5);
         var ctx = await SetupZoneWithTemperatures(baseHour: new DateTime(fiveDaysAgo.Year, fiveDaysAgo.Month, fiveDaysAgo.Day, 10, 0, 0, DateTimeKind.Utc));
 
         var result = await ExecuteQuery(ctx, TimePeriod.LastWeek);
