@@ -7,8 +7,9 @@ public class GetEnergyCostsPerZoneQueryHandler(IDbConnection dbConnection, ISqlP
 {
     public async Task<EnergyCost> HandleAsync(EnergyCostsPerZoneQuery query, CancellationToken cancellationToken = default)
     {
+        var timeZoneId = (await dbConnection.ReadAsync<string?>(sqlProvider.GetTimeZoneByZoneId, new { query.ZoneId })).SingleOrDefault();
         var now = timeProvider.GetUtcNow().UtcDateTime;
-        var (fromDateTime, toDateTime) = TimePeriodCalculator.GetDateRange(query.TimePeriod, now);
+        var (fromDateTime, toDateTime) = TimePeriodCalculator.GetDateRange(query.TimePeriod, now, timeZoneId);
         var resolution = TimePeriodCalculator.GetResolution(query.TimePeriod);
 
         var sql = resolution switch

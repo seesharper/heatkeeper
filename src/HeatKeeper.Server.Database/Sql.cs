@@ -434,4 +434,8 @@ public interface ISqlProvider
     string DeleteLatestSensorMeasurements { get; }
 
     string GetEnergyConsumers { get; }
+
+    string AddTimeZoneToLocationsTable { get; }
+
+    string GetTimeZoneByZoneId { get; }
 }

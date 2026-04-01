@@ -10,22 +10,22 @@ public record EnergyCost(Resolution Resolution, EnergyCostEntry[] TimeSeries);
 
 public record EnergyCostEntry(DateTime Timestamp, double PowerImport, decimal CostInLocalCurrency, decimal CostInLocalCurrencyAfterSubsidy, decimal CostInLocalCurrencyWithFixedPrice);
 
-internal record LocationEnergyCostSettings(long? SmartMeterSensorId, EnergyCalculationStrategy EnergyCalculationStrategy);
+internal record LocationEnergyCostSettings(long? SmartMeterSensorId, EnergyCalculationStrategy EnergyCalculationStrategy, string TimeZone = null);
 
 public class GetEnergyCostsQueryHandler(IDbConnection dbConnection, ISqlProvider sqlProvider, TimeProvider timeProvider) : IQueryHandler<GetEnergyCostsQuery, EnergyCost>
 {
     public async Task<EnergyCost> HandleAsync(GetEnergyCostsQuery query, CancellationToken cancellationToken = default)
     {
+        var settings = (await dbConnection.ReadAsync<LocationEnergyCostSettings>(
+            sqlProvider.GetLocationEnergyCostSettings,
+            new { query.LocationId })).SingleOrDefault();
+
         var now = timeProvider.GetUtcNow().UtcDateTime;
-        var (fromDateTime, toDateTime) = TimePeriodCalculator.GetDateRange(query.TimePeriod, now);
+        var (fromDateTime, toDateTime) = TimePeriodCalculator.GetDateRange(query.TimePeriod, now, settings?.TimeZone);
         var resolution = TimePeriodCalculator.GetResolution(query.TimePeriod);
 
         if (query.SensorId.HasValue)
             return new EnergyCost(resolution, await QueryBySensor(query.SensorId.Value, fromDateTime, toDateTime, resolution));
-
-        var settings = (await dbConnection.ReadAsync<LocationEnergyCostSettings>(
-            sqlProvider.GetLocationEnergyCostSettings,
-            new { query.LocationId })).SingleOrDefault();
 
         if (settings?.EnergyCalculationStrategy == EnergyCalculationStrategy.SmartMeter)
         {
