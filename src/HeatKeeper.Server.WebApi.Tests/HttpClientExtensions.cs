@@ -12,6 +12,8 @@ using CQRS.Query.Abstractions;
 using FluentAssertions;
 using HeatKeeper.Server.Authentication;
 using HeatKeeper.Server.Dashboard;
+using HeatKeeper.Server.TimeZones;
+using TimeZoneInfo = HeatKeeper.Server.TimeZones.TimeZoneInfo;
 using HeatKeeper.Server.EnergyPriceAreas;
 using HeatKeeper.Server.EnergyPriceAreas.Api;
 using HeatKeeper.Server.EnergyPrices.Api;
@@ -315,6 +317,9 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task<LocationInfo[]> GetLocations(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<LocationInfo[]>(client, "api/locations", token, success, problem);
+
+        public static async Task<TimeZoneInfo[]> GetTimeZones(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<TimeZoneInfo[]>(client, "api/time-zones", token, success, problem);
 
         private static async Task<TContent> Get<TContent>(HttpClient client, string uri, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
         {

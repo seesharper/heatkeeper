@@ -10,6 +10,7 @@ SET
     useFixedEnergyPrice = @useFixedEnergyPrice,
     energyPriceAreaId = @energyPriceAreaId,
     smartMeterSensorId = @smartMeterSensorId,
-    energyCalculationStrategy = @energyCalculationStrategy
+    energyCalculationStrategy = @energyCalculationStrategy,
+    timeZone = @TimeZone
 WHERE
     id = @Id

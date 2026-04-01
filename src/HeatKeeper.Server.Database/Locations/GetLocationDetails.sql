@@ -11,6 +11,7 @@ SELECT
     l.UseFixedEnergyPrice,
     l.EnergyPriceAreaId,
     l.SmartMeterSensorId,
-    l.EnergyCalculationStrategy
+    l.EnergyCalculationStrategy,
+    l.TimeZone
 FROM Locations l
 WHERE l.id = @id

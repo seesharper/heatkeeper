@@ -14,8 +14,9 @@ public class GetZoneTemperaturesPerZoneQueryHandler(IDbConnection dbConnection, 
 {
     public async Task<ZoneTemperatureResult> HandleAsync(ZoneTemperaturesPerZoneQuery query, CancellationToken cancellationToken = default)
     {
+        var timeZoneId = (await dbConnection.ReadAsync<string?>(sqlProvider.GetTimeZoneByZoneId, new { query.ZoneId })).SingleOrDefault();
         var now = timeProvider.GetUtcNow().UtcDateTime;
-        var (fromDateTime, toDateTime) = TimePeriodCalculator.GetDateRange(query.TimePeriod, now);
+        var (fromDateTime, toDateTime) = TimePeriodCalculator.GetDateRange(query.TimePeriod, now, timeZoneId);
         var resolution = TimePeriodCalculator.GetResolution(query.TimePeriod);
 
         var sql = resolution switch

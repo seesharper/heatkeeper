@@ -18,6 +18,38 @@ public static class TimePeriodCalculator
             _ => throw new ArgumentOutOfRangeException(nameof(timePeriod))
         };
 
+    public static (DateTime from, DateTime to) GetDateRange(TimePeriod timePeriod, DateTime utcNow, string timezoneId)
+    {
+        if (string.IsNullOrEmpty(timezoneId))
+            return GetDateRange(timePeriod, utcNow);
+
+        TimeZoneInfo timezone;
+        try { timezone = TimeZoneInfo.FindSystemTimeZoneById(timezoneId); }
+        catch { return GetDateRange(timePeriod, utcNow); }
+
+        var localNow = TimeZoneInfo.ConvertTimeFromUtc(utcNow, timezone);
+        var (localFrom, localTo) = GetLocalDateRange(timePeriod, localNow);
+
+        return (
+            TimeZoneInfo.ConvertTimeToUtc(localFrom, timezone),
+            TimeZoneInfo.ConvertTimeToUtc(localTo, timezone)
+        );
+    }
+
+    private static (DateTime from, DateTime to) GetLocalDateRange(TimePeriod timePeriod, DateTime localNow)
+        => timePeriod switch
+        {
+            TimePeriod.Today => (localNow.Date, localNow),
+            TimePeriod.Yesterday => (localNow.Date.AddDays(-1), localNow.Date),
+            TimePeriod.LastWeek => (localNow.Date.AddDays(-(((int)localNow.DayOfWeek + 6) % 7) - 7), localNow.Date.AddDays(-(((int)localNow.DayOfWeek + 6) % 7))),
+            TimePeriod.ThisWeek => (localNow.Date.AddDays(-(((int)localNow.DayOfWeek + 6) % 7)), localNow),
+            TimePeriod.ThisMonth => (new DateTime(localNow.Year, localNow.Month, 1), localNow),
+            TimePeriod.LastMonth => (new DateTime(localNow.Year, localNow.Month, 1).AddMonths(-1), new DateTime(localNow.Year, localNow.Month, 1)),
+            TimePeriod.ThisYear => (new DateTime(localNow.Year, 1, 1), localNow),
+            TimePeriod.LastYear => (new DateTime(localNow.Year - 1, 1, 1), new DateTime(localNow.Year, 1, 1)),
+            _ => throw new ArgumentOutOfRangeException(nameof(timePeriod))
+        };
+
     public static Resolution GetResolution(TimePeriod timePeriod)
         => timePeriod switch
         {

@@ -2,7 +2,7 @@ namespace HeatKeeper.Server.Locations;
 
 [RequireAdminRole]
 [Post("api/locations")]
-public record CreateLocationCommand(string Name, string Description, double? Latitude, double? Longitude) : PostCommand;
+public record CreateLocationCommand(string Name, string Description, double? Latitude, double? Longitude, string TimeZone = null) : PostCommand;
 
 public class CreateLocation(IDbConnection dbConnection, ISqlProvider sqlProvider) : ICommandHandler<CreateLocationCommand>
 {
