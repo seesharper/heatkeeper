@@ -34,7 +34,7 @@ public class MaintainLatestZoneMeasurementCommandHandler : ICommandHandler<Maint
 
             if (zoneId == null)
             {
-                return;
+                continue;
             }
 
             var latestZoneMeasurementExists = await _queryExecutor.ExecuteAsync(new LatestZoneMeasurementExistsQuery(zoneId.Value, latestMeasurement.MeasurementType), cancellationToken);

@@ -71,6 +71,23 @@ public class MeasurementsTests : TestBase
     }
 
     [Fact]
+    public async Task ShouldUpdateLatestZoneMeasurementWhenBatchContainsUnassignedSensorBeforeAssignedSensor()
+    {
+        var client = Factory.CreateClient();
+        var testLocation = await Factory.CreateTestLocation();
+
+        const double updatedTemperature = 42.0;
+        await client.CreateMeasurements([
+            new MeasurementCommand("UnassignedSensor", MeasurementType.Temperature, RetentionPolicy.None, 0.0, TestData.Clock.LaterToday),
+            new MeasurementCommand(TestData.Sensors.LivingRoomSensor, MeasurementType.Temperature, RetentionPolicy.None, updatedTemperature, TestData.Clock.LaterToday),
+        ], testLocation.Token);
+
+        var dashboardLocation = (await client.GetDashboardLocations(testLocation.Token)).Single();
+
+        dashboardLocation.InsideTemperature.Should().Be(updatedTemperature);
+    }
+
+    [Fact]
     public async Task ShouldUpdateLastSeenOnSensor()
     {
         var now = Factory.UseFakeTimeProvider(TestData.Clock.Today);
