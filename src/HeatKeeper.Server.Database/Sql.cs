@@ -437,5 +437,7 @@ public interface ISqlProvider
 
     string AddTimeZoneToLocationsTable { get; }
 
+    string SetDefaultTimeZoneForAllLocations { get; }
+
     string GetTimeZoneByZoneId { get; }
 }
