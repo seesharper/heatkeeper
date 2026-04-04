@@ -228,8 +228,8 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<AppVersion> GetAppVersion(this HttpClient client)
             => await Get<AppVersion>(client, "api/version", string.Empty);
 
-        public static async Task<DashboardLocation[]> GetDashboardLocations(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
-           => await Get<DashboardLocation[]>(client, "api/dashboard/locations", token, success, problem);
+        public static async Task<DashboardEntry[]> GetDashboardLocations(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Get<DashboardEntry[]>(client, "api/dashboard/locations", token, success, problem);
 
         public static async Task<LocationDetails> GetLocationDetails(this HttpClient client, long locationId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Get<LocationDetails>(client, $"api/locations/{locationId}", token, success, problem);

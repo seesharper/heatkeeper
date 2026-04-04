@@ -12,13 +12,16 @@ public class YrTests : TestBase
     [Fact]
     public async Task ShouldGetSunEvents()
     {
+        var testLocation = await Factory.CreateTestLocation();
         var queryExecutor = Factory.Services.GetRequiredService<IQueryExecutor>();
-        var result = await queryExecutor.ExecuteAsync(new GetSunEventsQuery(59.9139, 10.7522, DateOnly.FromDateTime(DateTime.UtcNow)));
-        var result2 = await queryExecutor.ExecuteAsync(new GetSunEventsQuery(59.9139, 10.7522, DateOnly.FromDateTime(DateTime.UtcNow)));
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        var result = await queryExecutor.ExecuteAsync(new GetSunEventsQuery(testLocation.LocationId, today));
+        var result2 = await queryExecutor.ExecuteAsync(new GetSunEventsQuery(testLocation.LocationId, today));
 
         var cacheInvalidator = Factory.Services.GetRequiredService<ICacheInvalidator<GetSunEventsQuery>>();
-        cacheInvalidator.Invalidate(new GetSunEventsQuery(59.9139, 10.7522, DateOnly.FromDateTime(DateTime.UtcNow)));
-        var result3 = await queryExecutor.ExecuteAsync(new GetSunEventsQuery(59.9139, 10.7522, DateOnly.FromDateTime(DateTime.UtcNow)));
+        cacheInvalidator.Invalidate(new GetSunEventsQuery(testLocation.LocationId, today));
+        var result3 = await queryExecutor.ExecuteAsync(new GetSunEventsQuery(testLocation.LocationId, today));
     }
 
 

@@ -6,20 +6,21 @@ using System.Text.Json.Serialization;
 using CQRS.AspNet;
 using HeatKeeper.Server.Caching;
 using Microsoft.Extensions.DependencyInjection;
-using Org.BouncyCastle.Asn1.Cms;
 
 namespace HeatKeeper.Server.Yr;
 
 [RequireBackgroundRole]
 [MemoryCached<HoursBeforeExpiration>(3)]
-public record GetSunEventsQuery(double Latitude, double Longitude, DateOnly Date) : IQuery<SunEvents>;
+public record GetSunEventsQuery(long LocationId, DateOnly Date) : IQuery<SunEvents>;
 
-public class GetSunEventsQueryHandler([FromKeyedServices("YrHttpClient")] HttpClient httpClient) : IQueryHandler<GetSunEventsQuery, SunEvents>
+public class GetSunEventsQueryHandler([FromKeyedServices("YrHttpClient")] HttpClient httpClient, IDbConnection dbConnection) : IQueryHandler<GetSunEventsQuery, SunEvents>
 {
     public async Task<SunEvents> HandleAsync(GetSunEventsQuery query, CancellationToken cancellationToken = default)
     {
-        var latString = query.Latitude.ToString("F6", CultureInfo.InvariantCulture);
-        var lngString = query.Longitude.ToString("F6", CultureInfo.InvariantCulture);
+        var location = (await dbConnection.ReadAsync<LocationCoordinates>(
+            "SELECT Latitude, Longitude FROM Locations WHERE Id = @LocationId", new { query.LocationId })).Single();
+        var latString = ((double)location.Latitude).ToString("F6", CultureInfo.InvariantCulture);
+        var lngString = ((double)location.Longitude).ToString("F6", CultureInfo.InvariantCulture);
 
         var url = $"weatherapi/sunrise/3.0/sun?lat={latString}&lon={lngString}&date={query.Date:yyyy-MM-dd}&offset=+00:00";
         var response = await httpClient.SendAndHandleResponse<YrSunResponse>(new HttpRequestMessage(HttpMethod.Get, url), cancellationToken: cancellationToken);
@@ -75,3 +76,5 @@ internal record YrSolarMidnight(
     [property: JsonPropertyName("disc_centre_elevation")] double DiscCentreElevation,
     [property: JsonPropertyName("visible")] bool Visible
 );
+
+internal record LocationCoordinates(double? Latitude, double? Longitude);

@@ -8,7 +8,7 @@ public record LocationTemperaturesQuery(long LocationId) : IQuery<LocationTemper
 public class GetTemperaturesByLocation(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<LocationTemperaturesQuery, LocationTemperature[]>
 {
     public async Task<LocationTemperature[]> HandleAsync(LocationTemperaturesQuery query, CancellationToken cancellationToken = default)
-        => (await dbConnection.ReadAsync<LocationTemperature>(sqlProvider.GetDashboardTemperatures, query)).ToArray();
+        => (await dbConnection.ReadAsync<LocationTemperature>(sqlProvider.GetLocationTemperatures, query)).ToArray();
 }
 
 public record LocationTemperature(

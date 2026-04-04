@@ -34,7 +34,7 @@ public class GetForeCastQueryHandler(IQueryExecutor queryExecutor, ILogger<GetFo
 
         var forecasts = series.GroupBy(t => t.Date).Select(g =>
         {
-            var sunEvents = GetSunEventsForDate(g.Key, (double)locationDetails.Latitude, (double)locationDetails.Longitude);
+            var sunEvents = GetSunEventsForDate(g.Key, query.LocationId);
             return new ForeCast(
                 utcDate: g.Key,
                 utcSunRise: sunEvents.Result.SunriseUtc,
@@ -45,9 +45,8 @@ public class GetForeCastQueryHandler(IQueryExecutor queryExecutor, ILogger<GetFo
         return forecasts.OrderBy(f => f.utcDate).ToArray();
     }
 
-    private async Task<SunEvents> GetSunEventsForDate(DateOnly utcDate, double latitude, double longitude)
+    private async Task<SunEvents> GetSunEventsForDate(DateOnly utcDate, long locationId)
     {
-        var sunEvent = await queryExecutor.ExecuteAsync(new GetSunEventsQuery(latitude, longitude, utcDate));
-        return sunEvent;
+        return await queryExecutor.ExecuteAsync(new GetSunEventsQuery(locationId, utcDate));
     }
 }
