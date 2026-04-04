@@ -16,7 +16,7 @@ public class ScheduleSunriseAndSunsetEvents(IQueryExecutor queryExecutor, TimePr
         var locationCoordinates = await queryExecutor.ExecuteAsync(new GetLocationCoordinatesQuery(), cancellationToken);
         foreach (var location in locationCoordinates)
         {
-            var sunEvents = await queryExecutor.ExecuteAsync(new GetSunEventsQuery((double)location.Latitude, (double)location.Longitude, command.Date), cancellationToken);
+            var sunEvents = await queryExecutor.ExecuteAsync(new GetSunEventsQuery(location.Id, command.Date), cancellationToken);
             if (sunEvents.SunriseUtc > timeProvider.GetUtcNow())
             {
                 logger.LogInformation("Scheduling sunrise event for location {LocationId} at {SunriseTime}", location.Id, sunEvents.SunriseUtc);

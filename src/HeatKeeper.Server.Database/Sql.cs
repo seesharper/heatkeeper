@@ -206,7 +206,7 @@ public interface ISqlProvider
 
     string UpdateRefreshToken { get; }
 
-    string GetDashboardTemperatures { get; }
+    string GetLocationTemperatures { get; }
 
     string GetLocationDetails { get; }
 

@@ -50,9 +50,9 @@ public class MeasurementsTests : TestBase
         var client = Factory.CreateClient();
         var testApplication = await Factory.CreateTestLocation();
 
-        var dashboardLocation = (await client.GetDashboardLocations(testApplication.Token)).Single();
+        var dashboardEntry = (await client.GetDashboardLocations(testApplication.Token)).Single();
 
-        dashboardLocation.InsideTemperature.Should().Be(TestData.Measurements.LivingRoomTemperatureMeasurement.Value);
+        dashboardEntry.Location.InsideTemperature.Should().Be(TestData.Measurements.LivingRoomTemperatureMeasurement.Value);
     }
 
     [Fact]
@@ -82,9 +82,9 @@ public class MeasurementsTests : TestBase
             new MeasurementCommand(TestData.Sensors.LivingRoomSensor, MeasurementType.Temperature, RetentionPolicy.None, updatedTemperature, TestData.Clock.LaterToday),
         ], testLocation.Token);
 
-        var dashboardLocation = (await client.GetDashboardLocations(testLocation.Token)).Single();
+        var dashboardEntry = (await client.GetDashboardLocations(testLocation.Token)).Single();
 
-        dashboardLocation.InsideTemperature.Should().Be(updatedTemperature);
+        dashboardEntry.Location.InsideTemperature.Should().Be(updatedTemperature);
     }
 
     [Fact]
