@@ -1,4 +1,6 @@
 using System;
+using HeatKeeper.Server.Chargers;
+using HeatKeeper.Server.Chargers.Api;
 using HeatKeeper.Server.Database;
 using HeatKeeper.Server.EnergyPriceAreas.Api;
 using HeatKeeper.Server.Heaters;
@@ -192,6 +194,54 @@ namespace HeatKeeper.Server.WebApi.Tests
 
             public static UpdateHeaterCommand UpdateHeater(long heaterId) =>
                 new(heaterId, UpdatedLivingRoomHeaterName, UpdatedLivingRoomHeaterDescription, UpdatedLivingRoomHeaterMqttTopic, UpdatedLivingRoomHeaterOnPayload, UpdatedLivingRoomHeaterOffPayload, HeaterState.Idle);
+        }
+
+        public static class Chargers
+        {
+            public const string LivingRoomChargerName = "LivingRoomCharger";
+            public const string LivingRoomChargerDescription = "Description of the LivingRoomCharger";
+            public const string LivingRoomChargerMqttTopic = "LivingRoomChargerTopic";
+            public const string LivingRoomChargerOnPayload = "ON";
+            public const string LivingRoomChargerOffPayload = "OFF";
+
+            public const string UpdatedLivingRoomChargerName = "UpdatedLivingRoomCharger";
+            public const string UpdatedLivingRoomChargerDescription = "UpdatedDescription of the LivingRoomCharger";
+            public const string UpdatedLivingRoomChargerMqttTopic = "UpdatedLivingRoomChargerTopic";
+            public const string UpdatedLivingRoomChargerOnPayload = "UPDATEDON";
+            public const string UpdatedLivingRoomChargerOffPayload = "UPDATEDOFF";
+
+            public const string LivingRoomCharger2Name = "LivingRoomCharger2";
+            public const string LivingRoomCharger2Description = "Description of the LivingRoomCharger2";
+            public const string LivingRoomCharger2MqttTopic = "LivingRoomCharger2Topic";
+            public const string LivingRoomCharger2OnPayload = "ON";
+            public const string LivingRoomCharger2OffPayload = "OFF";
+
+            public const string KitchenChargerName = "KitchenCharger";
+            public const string KitchenChargerDescription = "Description of the KitchenCharger";
+            public const string KitchenChargerMqttTopic = "KitchenChargerTopic";
+            public const string KitchenChargerOnPayload = "ON";
+            public const string KitchenChargerOffPayload = "OFF";
+
+            public const string TestChargerName = "TestCharger";
+            public const string TestChargerDescription = "Description of the TestCharger";
+            public const string TestChargerMqttTopic = "TestChargerTopic";
+            public const string TestChargerOnPayload = "ON";
+            public const string TestChargerOffPayload = "OFF";
+
+            public static CreateChargerCommand LivingRoomCharger1(long livingRoomZoneId) =>
+                new(Name: LivingRoomChargerName, Description: LivingRoomChargerDescription, MqttTopic: LivingRoomChargerMqttTopic, OnPayload: LivingRoomChargerOnPayload, OffPayload: LivingRoomChargerOffPayload, ZoneId: livingRoomZoneId);
+
+            public static CreateChargerCommand LivingRoomCharger2(long livingRoomZoneId) =>
+                new(Name: LivingRoomCharger2Name, Description: LivingRoomCharger2Description, MqttTopic: LivingRoomCharger2MqttTopic, OnPayload: LivingRoomCharger2OnPayload, OffPayload: LivingRoomCharger2OffPayload, ZoneId: livingRoomZoneId);
+
+            public static CreateChargerCommand KitchenCharger(long kitchenZoneId) =>
+                new(Name: KitchenChargerName, Description: KitchenChargerDescription, MqttTopic: KitchenChargerMqttTopic, OnPayload: KitchenChargerOnPayload, OffPayload: KitchenChargerOffPayload, ZoneId: kitchenZoneId);
+
+            public static CreateChargerCommand TestCharger(long testZoneId) =>
+                new(Name: TestChargerName, Description: TestChargerDescription, MqttTopic: TestChargerMqttTopic, OnPayload: TestChargerOnPayload, OffPayload: TestChargerOffPayload, ZoneId: testZoneId);
+
+            public static UpdateChargerCommand UpdateCharger(long chargerId, long zoneId) =>
+                new(chargerId, zoneId, UpdatedLivingRoomChargerName, UpdatedLivingRoomChargerDescription, UpdatedLivingRoomChargerMqttTopic, UpdatedLivingRoomChargerOnPayload, UpdatedLivingRoomChargerOffPayload);
         }
 
         public static class Lights

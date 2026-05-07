@@ -15,6 +15,7 @@ using HeatKeeper.Server.Dashboard;
 using HeatKeeper.Server.TimeZones;
 using TimeZoneInfo = HeatKeeper.Server.TimeZones.TimeZoneInfo;
 using HeatKeeper.Server.EnergyPriceAreas;
+using HeatKeeper.Server.Chargers.Api;
 using HeatKeeper.Server.EnergyPriceAreas.Api;
 using HeatKeeper.Server.EnergyPrices.Api;
 using HeatKeeper.Server.Events.Api;
@@ -303,6 +304,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task<long> CreateLight(this HttpClient client, CreateLightCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/zones/{content.ZoneId}/lights", content, token, success, problem);
 
+        public static async Task<long> CreateCharger(this HttpClient client, CreateChargerCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Post(client, $"api/zones/{content.ZoneId}/chargers", content, token, success, problem);
+
         public static async Task<long> CreateProgram(this HttpClient client, CreateLocationCommand content, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
             => await Post(client, $"api/programs", content, token, success, problem);
 
@@ -492,6 +496,18 @@ namespace HeatKeeper.Server.WebApi.Tests
 
         public static async Task<LightInfo[]> GetLights(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<LightInfo[]>(client, $"api/zones/{zoneId}/lights", token, success, problem);
+
+        public static async Task<ChargerInfo[]> GetChargers(this HttpClient client, long zoneId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Get<ChargerInfo[]>(client, $"api/zones/{zoneId}/chargers", token, success, problem);
+
+        public static async Task<ChargerDetails> GetChargerDetails(this HttpClient client, long chargerId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+            => await Get<ChargerDetails>(client, $"api/chargers/{chargerId}", token, success, problem);
+
+        public static async Task UpdateCharger(this HttpClient client, UpdateChargerCommand command, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Patch(client, $"api/chargers/{command.ChargerId}", command, token, success, problem);
+
+        public static async Task DeleteCharger(this HttpClient client, long chargerId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Delete(client, $"api/chargers/{chargerId}", token, success, problem);
 
         public static async Task<HeaterDisabledReasonInfo[]> GetHeaterDisabledReasons(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<HeaterDisabledReasonInfo[]>(client, "api/heaters/disabled-reasons", token, success, problem);
