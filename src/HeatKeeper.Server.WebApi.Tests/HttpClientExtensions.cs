@@ -509,6 +509,9 @@ namespace HeatKeeper.Server.WebApi.Tests
         public static async Task DeleteCharger(this HttpClient client, long chargerId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Delete(client, $"api/chargers/{chargerId}", token, success, problem);
 
+        public static async Task<ChargerEnergySensorInfo[]> GetChargerEnergySensors(this HttpClient client, long chargerId, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
+           => await Get<ChargerEnergySensorInfo[]>(client, $"api/chargers/{chargerId}/energy-sensors", token, success, problem);
+
         public static async Task<HeaterDisabledReasonInfo[]> GetHeaterDisabledReasons(this HttpClient client, string token, Action<HttpResponseMessage> success = null, Action<ProblemDetails> problem = null)
            => await Get<HeaterDisabledReasonInfo[]>(client, "api/heaters/disabled-reasons", token, success, problem);
 

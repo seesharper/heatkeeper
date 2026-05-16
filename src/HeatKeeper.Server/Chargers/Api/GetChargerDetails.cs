@@ -6,7 +6,7 @@ namespace HeatKeeper.Server.Chargers.Api;
 [Get("api/chargers/{chargerId}")]
 public record ChargerDetailsQuery(long ChargerId) : IQuery<ChargerDetails>;
 
-public record ChargerDetails(long Id, string Name, string ZoneName, string Description, string MqttTopic, string OnPayload, string OffPayload, ChargerState ChargerState);
+public record ChargerDetails(long Id, string Name, string ZoneName, string Description, string MqttTopic, string OnPayload, string OffPayload, ChargerState ChargerState, long? EnergySensorId, double EnergyThreshold);
 
 public class GetChargerDetails(IDbConnection dbConnection, ISqlProvider sqlProvider) : IQueryHandler<ChargerDetailsQuery, ChargerDetails>
 {

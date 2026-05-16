@@ -452,4 +452,14 @@ public interface ISqlProvider
     string UpdateCharger { get; }
 
     string GetChargerDetails { get; }
+
+    string AddEnergySensorIdToChargersTable { get; }
+
+    string GetChargerEnergySensors { get; }
+
+    string AddEnergyThresholdToChargersTable { get; }
+
+    string SetChargerState { get; }
+
+    string GetChargerByEnergySensorExternalId { get; }
 }

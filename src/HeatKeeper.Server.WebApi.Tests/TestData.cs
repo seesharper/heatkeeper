@@ -240,8 +240,8 @@ namespace HeatKeeper.Server.WebApi.Tests
             public static CreateChargerCommand TestCharger(long testZoneId) =>
                 new(Name: TestChargerName, Description: TestChargerDescription, MqttTopic: TestChargerMqttTopic, OnPayload: TestChargerOnPayload, OffPayload: TestChargerOffPayload, ZoneId: testZoneId);
 
-            public static UpdateChargerCommand UpdateCharger(long chargerId, long zoneId) =>
-                new(chargerId, zoneId, UpdatedLivingRoomChargerName, UpdatedLivingRoomChargerDescription, UpdatedLivingRoomChargerMqttTopic, UpdatedLivingRoomChargerOnPayload, UpdatedLivingRoomChargerOffPayload);
+            public static UpdateChargerCommand UpdateCharger(long chargerId, long zoneId, long? energySensorId = null, double energyThreshold = 0) =>
+                new(chargerId, zoneId, UpdatedLivingRoomChargerName, UpdatedLivingRoomChargerDescription, UpdatedLivingRoomChargerMqttTopic, UpdatedLivingRoomChargerOnPayload, UpdatedLivingRoomChargerOffPayload, energySensorId, energyThreshold);
         }
 
         public static class Lights

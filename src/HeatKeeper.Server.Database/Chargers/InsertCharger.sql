@@ -5,7 +5,9 @@ INSERT INTO
         Description,
         MqttTopic,
         OnPayload,
-        OffPayload
+        OffPayload,
+        EnergySensorId,
+        EnergyThreshold
     )
 VALUES
     (
@@ -14,5 +16,7 @@ VALUES
         @Description,
         @MqttTopic,
         @OnPayload,
-        @OffPayload
+        @OffPayload,
+        @EnergySensorId,
+        @EnergyThreshold
     );

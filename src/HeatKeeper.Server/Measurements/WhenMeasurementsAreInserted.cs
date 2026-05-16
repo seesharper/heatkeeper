@@ -1,3 +1,4 @@
+using HeatKeeper.Server.Chargers;
 using HeatKeeper.Server.EnergyCosts;
 using HeatKeeper.Server.Sensors;
 using HeatKeeper.Server.SmartMeter;
@@ -15,6 +16,7 @@ public class WhenMeasurementsAreInserted(ICommandHandler<MeasurementCommand[]> h
         await commandExecutor.ExecuteAsync(new MaintainLatestSensorMeasurementCommand(measurements), cancellationToken);
         await commandExecutor.ExecuteAsync(new CalculateEnergyCostsCommand(measurements), cancellationToken);
         await commandExecutor.ExecuteAsync(new UpdateZoneTemperaturesCommand(measurements), cancellationToken);
+        await commandExecutor.ExecuteAsync(new UpdateChargerStatesBasedOnEnergyMeasurementsCommand(measurements), cancellationToken);
         var measurementsGroupedByExternalSensorId = measurements.Select(mte => new { mte.SensorId, mte.Created }).GroupBy(mte => mte.SensorId);
         foreach (var group in measurementsGroupedByExternalSensorId)
         {

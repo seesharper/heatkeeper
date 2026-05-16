@@ -1,0 +1,1 @@
+ALTER TABLE Chargers ADD COLUMN EnergySensorId INTEGER REFERENCES Sensors(Id);
