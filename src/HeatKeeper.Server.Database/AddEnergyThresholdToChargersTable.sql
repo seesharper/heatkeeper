@@ -1,0 +1,1 @@
+ALTER TABLE Chargers ADD COLUMN EnergyThreshold REAL NOT NULL DEFAULT 0;

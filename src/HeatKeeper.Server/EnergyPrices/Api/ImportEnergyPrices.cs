@@ -25,6 +25,8 @@ public class ImportEnergyPricesCommandHandler(EntsoeClient entsoeClient, IQueryE
                 continue;
             }
             var marketDocument = await entsoeClient.GetMarketDocument(command.DateToImport, priceArea.EIC_Code);
+            if (marketDocument.Prices.Length == 0)
+                continue;
 
             var resolution = marketDocument.Resolution;
 

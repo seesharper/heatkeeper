@@ -440,4 +440,26 @@ public interface ISqlProvider
     string SetDefaultTimeZoneForAllLocations { get; }
 
     string GetTimeZoneByZoneId { get; }
+
+    string CreateChargersTable { get; }
+
+    string GetChargers { get; }
+
+    string InsertCharger { get; }
+
+    string DeleteCharger { get; }
+
+    string UpdateCharger { get; }
+
+    string GetChargerDetails { get; }
+
+    string AddEnergySensorIdToChargersTable { get; }
+
+    string GetChargerEnergySensors { get; }
+
+    string AddEnergyThresholdToChargersTable { get; }
+
+    string SetChargerState { get; }
+
+    string GetChargerByEnergySensorExternalId { get; }
 }

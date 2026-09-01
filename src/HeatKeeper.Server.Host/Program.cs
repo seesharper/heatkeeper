@@ -17,7 +17,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseLightInject(services => services.RegisterFrom<HostCompositionRoot>());
 builder.Configuration.AddEnvironmentVariables(prefix: "HEATKEEPER_");
 // Add services to the container.
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+});
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddJanitor();
 builder.Services.AddHostedService<MessageBusHostedService>();
@@ -29,14 +32,16 @@ builder.Services.AddHttpClient<IWebPushClient, WebPushClient>();
 
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-// builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddExceptionHandler<ExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 builder.Services.AddHttpClient<NorwegianBankClient>(client => client.BaseAddress = new Uri("https://data.norges-bank.no/api/data/"));
-builder.Services.AddHttpClient<EntsoeClient>(client => client.BaseAddress = new Uri("https://web-api.tp.entsoe.eu/api"));
+builder.Services.AddHttpClient<EntsoeClient>(client =>
+{
+    client.BaseAddress = new Uri("https://web-api.tp.entsoe.eu/api");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
 builder.Services.AddHttpClient("YrHttpClient", client =>
 {
     client.BaseAddress = new Uri("https://api.met.no/");
@@ -50,11 +55,18 @@ await app.RunBootStrappers();
 
 
 
+app.MapOpenApi();
+app.MapScalarApiReference(options =>
+{
+    options
+        .WithTitle("HeatKeeper API")
+        .AddHttpAuthentication("Bearer", scheme => { })
+        .AddPreferredSecuritySchemes("Bearer");
+});
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
     app.UseCors("DevelopmentPolicy");
 
     app.UseCookiePolicy(new CookiePolicyOptions
