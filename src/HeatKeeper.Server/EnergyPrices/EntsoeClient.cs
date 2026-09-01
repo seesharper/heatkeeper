@@ -23,25 +23,33 @@ public class EntsoeClient(HttpClient httpClient, IConfiguration configuration, I
             .AddQueryParameter("periodEnd", DateOnly.FromDateTime(date).ToDateTime(new TimeOnly(0, 0, 0)).ToString("yyyyMMddHHmm"))
             .Build();
 
-        var response = await httpClient.SendAndHandleRequest(httpRequest);
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            logger.LogError("Failed to get market document from ENTSOE. Status code: {StatusCode}", response.StatusCode);
+            var response = await httpClient.SendAsync(httpRequest);
+            if (!response.IsSuccessStatusCode)
+            {
+                logger.LogError("Failed to get market document from ENTSOE. Status code: {StatusCode}", response.StatusCode);
+                return new MarketDocument(Array.Empty<MarketPrice>(), 60);
+            }
+
+            var result = await response.Content.ReadAsStreamAsync();
+            XmlSerializer serializer = new(typeof(Publication_MarketDocument));
+            var marketDocument = (Publication_MarketDocument)serializer.Deserialize(result);
+            var resolutionCode = marketDocument.TimeSeries.First().Period.First().resolution;
+            int resolution = resolutionCode switch
+            {
+                "PT15M" => 15,
+                "PT30M" => 30,
+                "PT60M" => 60,
+                _ => throw new NotSupportedException($"Resolution code {resolutionCode} is not supported.")
+            };
+            return new MarketDocument(marketDocument.TimeSeries.First().Period.First().Point.Select(p => new MarketPrice(p.priceamount, int.Parse(p.position))).ToArray(), resolution);
+        }
+        catch (Exception ex) when (ex is not NotSupportedException)
+        {
+            logger.LogError(ex, "Failed to get market document from ENTSOE for area {Area}", area);
             return new MarketDocument(Array.Empty<MarketPrice>(), 60);
         }
-
-        var result = await response.Content.ReadAsStreamAsync();
-        XmlSerializer serializer = new(typeof(Publication_MarketDocument));
-        var marketDocument = (Publication_MarketDocument)serializer.Deserialize(result);
-        var resolutionCode = marketDocument.TimeSeries.First().Period.First().resolution;
-        int resolution = resolutionCode switch
-        {
-            "PT15M" => 15,
-            "PT30M" => 30,
-            "PT60M" => 60,
-            _ => throw new NotSupportedException($"Resolution code {resolutionCode} is not supported.")
-        };
-        return new MarketDocument(marketDocument.TimeSeries.First().Period.First().Point.Select(p => new MarketPrice(p.priceamount, int.Parse(p.position))).ToArray(), resolution);
     }
 }
 
