@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using CQRS.AspNet;
 using CQRS.AspNet.Testing;
 using CsvHelper;
 using HeatKeeper.Server.Messaging;
